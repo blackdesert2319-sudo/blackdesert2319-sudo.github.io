@@ -480,6 +480,7 @@
             processedText = processedText.replace(/"n"/g, "nờ");
             processedText = processedText.replace(/"s"/g, "sờ");
             processedText = processedText.replace(/"x"/g, "xờ");
+            processedText = processedText.replace(/"qu"/g, "quờ");
             
             let utterance = new SpeechSynthesisUtterance(processedText);
             utterance.lang = 'vi-VN'; 
