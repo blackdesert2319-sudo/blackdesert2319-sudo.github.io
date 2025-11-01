@@ -1,0 +1,16 @@
+{
+    "name": "Bé Ôn Bài - Tiếng Việt Lớp 1",
+    "short_name": "Bé Ôn Bài",
+    "description": "Ứng dụng học Tiếng Việt Lớp 1",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "dienthoai.html",
+    "display": "standalone",
+    "background_color": "#f0f2f5",
+    "theme_color": "#ffffff"
+}
