@@ -318,10 +318,10 @@ let questions = [
     { 
         qType: 'SELECT', 
         type: "Nhận biết", 
-        question: 'Viết vào chỗ ba chấm "g" hay "gh":', 
-        sentence: "...ọn cỏ.",
-        options: ["ng", "ngh"], 
-        correctAnswer: "ng" 
+        question: 'Viết vào chỗ ba chấm "k" hay "c":', 
+        sentence: "...ờ đỏ.",
+        options: ["k", "c"], 
+        correctAnswer: "c" 
     },
     
     // (12 câu ng/ngh)
