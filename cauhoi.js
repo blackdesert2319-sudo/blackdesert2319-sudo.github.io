@@ -20,6 +20,14 @@ let questions = [
         options: ["s", "x"], 
         correctAnswer: "x" 
     },
+ {
+        qType: 'SELECT', 
+        type: "Nhận biết", 
+        question: 'Viết vào chỗ ba chấm "s" hay "x":', 
+        sentence: "Xứ ...ở", 
+        options: ["s", "x"], 
+        correctAnswer: "s" 
+    },
     {
         qType: 'SELECT', 
         type: "Nhận biết", 
