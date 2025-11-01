@@ -69,6 +69,23 @@
             font-size: 1.5em; 
         }
         
+        #install-btn {
+            background-color: #2ecc71; /* Màu xanh lá cây */
+            color: white;
+            padding: 8px 15px; /* Giống nút Kết thúc */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            order: 1; /* Hiển thị nó đầu tiên (trái nhất) */
+            font-size: 0.9em; 
+            display: none; /* Ẩn đi ban đầu */
+        }
+        #install-btn:hover {
+            background-color: #27ae60;
+        }
+        
         #end-game-btn {
             background-color: #e74c3c; /* Màu đỏ (Kết thúc) */
             color: white;
@@ -99,12 +116,14 @@
             order: 3; 
         }
         
-        #total-questions-display {
+        /* --- MỚI: CSS cho bộ đếm "Sai" --- */
+        #wrong-count-display {
             font-size: 1.2em;
             font-weight: bold;
-            color: #3498db; 
-            order: 4; 
+            color: #e74c3c; /* Màu đỏ cho "Sai" */
+            order: 4; /* Nằm cuối cùng */
         }
+        /* --- HẾT PHẦN MỚI --- */
 
 
         #question-area {
@@ -313,16 +332,9 @@
             text-decoration-thickness: 3px;
             color: #e74c3c;
         }
-
-        /* Cột thống kê */
-        /* (Đã xóa CSS cột thống kê) */
         
-        /* ============================================================
-        >>> ĐÂY LÀ DÒNG BẠN CẦN TÌM (MỤC CHỈNH KÍCH THƯỚC LOA) <<<
-        ============================================================
-        */
         .volume-icon {
-            font-size: 2.2em; /* <-- SỬA SỐ NÀY (ví dụ: 2.0em, 1.5em) */
+            font-size: 2.2em;
             margin-right: 5px;
             color: #008000; 
             cursor: pointer; 
@@ -341,9 +353,11 @@
     
 <div id="main-content-column">
         <div id="top-controls">
+            <button id="install-btn">Cài đặt 🚀</button>
             <button id="end-game-btn" onclick="showFinalScreen()">Kết thúc</button>
             <span id="current-score-display">Điểm: 0</span>
-            <span id="total-questions-display">0 / 160 câu</span>
+            
+            <span id="wrong-count-display">Sai: 0</span>
         </div>
 
         <div id="question-area">
@@ -395,6 +409,7 @@
 
         let currentQuestionIndex = 0; 
         let correctCount = 0; 
+        let wrongCount = 0; // MỚI: Biến đếm lỗi sai
         
         let canScorePoints = true; 
 
@@ -413,7 +428,11 @@
         const checkBtn = document.getElementById('check-btn');
         const clickableSentenceArea = document.getElementById('clickable-sentence-area');
         const currentScoreDisplay = document.getElementById('current-score-display'); 
-        const totalQuestionsDisplay = document.getElementById('total-questions-display');
+        const wrongCountDisplay = document.getElementById('wrong-count-display'); // MỚI
+        
+        const installButton = document.getElementById('install-btn');
+        let deferredPrompt; 
+        // --- HẾT PHẦN MỚI ---
 
         // --- HÀM LẤY PHẢN HỒI NGẪU NHIÊN ---
         function getRandomFeedback(messageList) {
@@ -465,7 +484,7 @@
             let utterance = new SpeechSynthesisUtterance(processedText);
             utterance.lang = 'vi-VN'; 
             utterance.rate = 0.9; 
-            utterance.volume = 1.0; // Chỉnh âm lượng giọng đọc
+            utterance.volume = 1.0; 
             
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
@@ -474,7 +493,7 @@
         // --- 4. HÀM CẬP NHẬT THỐNG KÊ ---
         function updateStats() {
             currentScoreDisplay.textContent = `Điểm: ${correctCount}`;
-            totalQuestionsDisplay.textContent = `${currentQuestionIndex} / ${questions.length} câu`;
+            wrongCountDisplay.textContent = `Sai: ${wrongCount}`; // MỚI
         }
 
         // --- 5. (Mục này đã bị xóa) ---
@@ -594,6 +613,10 @@
                 feedbackEl.textContent = "Sai rồi. Con xem lại nhé!";
                 feedbackEl.className = "incorrect";
                 speakText("Sai rồi. Con xem lại nhé!");
+                
+                wrongCount++; // MỚI: Đếm 1 lỗi
+                updateStats(); // MỚI: Cập nhật hiển thị "Sai"
+                
                 canScorePoints = false;
             }
         }
@@ -654,6 +677,11 @@
                 feedbackEl.textContent = "Chưa đúng rồi, cố gắng nhé, bé làm lại.";
                 feedbackEl.className = "incorrect";
                 speakText("Chưa đúng rồi, cố gắng nhé, bé làm lại."); 
+                
+                if (canScorePoints) { // MỚI: Chỉ đếm lỗi ở lần sai đầu tiên
+                    wrongCount++;
+                    updateStats(); 
+                }
                 canScorePoints = false;
             }
         }
@@ -706,6 +734,11 @@
                 feedbackEl.textContent = "Chưa đúng rồi, cố gắng nhé, bé làm lại.";
                 feedbackEl.className = "incorrect";
                 speakText("Chưa đúng rồi, cố gắng nhé, bé làm lại."); 
+                
+                if (canScorePoints) { // MỚI: Chỉ đếm lỗi ở lần sai đầu tiên
+                    wrongCount++;
+                    updateStats();
+                }
                 canScorePoints = false;
             }
         }
@@ -718,7 +751,7 @@
 
         // --- 11. HÀM HIỂN THỊ MÀN HÌNH KẾT THÚC ---
         function showFinalScreen() {
-            totalQuestionsDisplay.textContent = `${questions.length} / ${questions.length} câu`;
+            updateStats(); // Cập nhật lần cuối
 
             document.getElementById('question-area').innerHTML = `
                 <h3 style="text-align: center; font-size: 1.8em; color: #2ecc71;">Chúc mừng!</h3>
@@ -728,6 +761,9 @@
                 </p>
                 <p style="text-align: center; font-size: 1.3em;">
                     (Đúng ${correctCount / 10} / ${questions.length} câu)
+                </p>
+                <p style="text-align: center; font-size: 1.3em; color: #e74c3c;">
+                    (Tổng số lần sai: ${wrongCount})
                 </p>
             `;
             
@@ -739,6 +775,23 @@
         }
 
         // --- 12. BẮT ĐẦU ỨNG DỤNG ---
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installButton) {
+                installButton.style.display = 'block';
+            }
+        });
+
+        if (installButton) {
+            installButton.addEventListener('click', async () => {
+                installButton.style.display = 'none';
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            });
+        }
         
         try {
             questions = shuffleArray(questions);
@@ -757,7 +810,7 @@
             }
         }, { once: true }); 
 
-        document.getElementById('total-questions-display').textContent = `0 / ${questions.length} câu`;
+        // MỚI: Đã XÓA dòng 'total-questions-display'
         
         loadQuestion(); 
         updateStats();  
