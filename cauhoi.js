@@ -658,9 +658,9 @@ let questions = [
     { 
         qType: 'CLICKABLE',
         type: "Gạch chân",
-        question: 'Em hãy gạch chân các tiếng có âm "q":',
+        question: 'Em hãy gạch chân các tiếng có âm "qu":',
         sentence: "Bà cho bé quà quê",
-        targetSound: "q"
+        targetSound: "qu"
     },
 
     // --- Dạng 4: Chính tả (20 câu) ---
