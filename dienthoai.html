@@ -477,6 +477,7 @@
             processedText = processedText.replace(/"ch"/g, "chờ chó");
             processedText = processedText.replace(/"tr"/g, "trờ tre");
             processedText = processedText.replace(/"th"/g, "thờ");
+            processedText = processedText.replace(/"ph"/g, "phờ");
             processedText = processedText.replace(/"nh"/g, "nhờ");
             processedText = processedText.replace(/"ng"/g, "ngờ");
             processedText = processedText.replace(/"gi"/g, "di");
@@ -486,9 +487,12 @@
             processedText = processedText.replace(/"r"/g, "rờ");
             processedText = processedText.replace(/"m"/g, "mờ");
             processedText = processedText.replace(/"n"/g, "nờ");
+            processedText = processedText.replace(/"v"/g, "vờ");
             processedText = processedText.replace(/"s"/g, "sờ");
+            processedText = processedText.replace(/"d"/g, "dờ");
             processedText = processedText.replace(/"x"/g, "xờ");
-            processedText = processedText.replace(/"qu"/g, "quờ");
+            processedText = processedText.replace(/"l"/g, "lờ");
+            processedText = processedText.replace(/"qu"/g, "cùa");
             
             let utterance = new SpeechSynthesisUtterance(processedText);
             utterance.lang = 'vi-VN'; 
