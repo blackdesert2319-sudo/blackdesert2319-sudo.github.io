@@ -590,7 +590,7 @@ let questions = [
         type: "Gạch chân",
         question: 'Em hãy gạch chân các tiếng có âm "nh":',
         sentence: "Bé chia thìa cho cả nhà",
-        targetSound: "nhà" // Không có "s"
+        targetSound: "nh"
     },
     { 
         qType: 'CLICKABLE',
