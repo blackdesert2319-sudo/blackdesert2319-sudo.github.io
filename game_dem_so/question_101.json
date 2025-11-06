@@ -3,7 +3,6 @@
   "level": 1,
   "type": "FILL_IN_BLANK",
   "instruction": "Bạn hãy điền số thích hợp vào chỗ trống.",
-  
   "payload": {
     "scene_objects": [
       { "image_url": "con_cua.png", "count": 10 },
@@ -27,7 +26,6 @@
       }
     ]
   },
-
   "correctAnswer": {
     "prompt_crab": 10,
     "prompt_crocodile": 0
