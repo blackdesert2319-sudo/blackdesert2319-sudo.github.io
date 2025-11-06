@@ -41,8 +41,8 @@ body {
 
 /* --- PHẦN ĐÃ CẬP NHẬT --- */
 #scene-box {
-    width: 200px; /* CẬP NHẬT: Hẹp lại theo yêu cầu của bạn */
-    height: 350px;
+    width: 350px; /* CẬP NHẬT: Hẹp lại theo yêu cầu của bạn */
+    height: 250px;
     border: 2px dashed #ccc;
     border-radius: 10px;
     margin: 20px auto; /* CẬP NHẬT: Tự động căn giữa */
