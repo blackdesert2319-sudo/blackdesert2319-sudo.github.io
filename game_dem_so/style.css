@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000033; /* Giống màu nền game của bạn */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#game-container {
+    width: 900px;
+    max-width: 100%;
+    background-color: #ffffff;
+    border: 10px solid #f0f0f0;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+#game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+#game-header #timer {
+    background-color: #ff8c00;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+#question-area {
+    padding: 20px 0;
+}
+
+#instruction-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Đây là phần CSS quan trọng nhất */
+#scene-box {
+    width: 100%;
+    height: 350px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    margin: 20px 0;
+    position: relative; /* BẮT BUỘC: Để làm cha cho các ảnh */
+    overflow: hidden; /* Tránh ảnh bị văng ra ngoài */
+}
+
+/* CSS cho các con vật được JS thêm vào */
+#scene-box img {
+    position: absolute; /* BẮT BUỘC: Để "Công cụ Sắp xếp" đặt vị trí */
+    width: 60px; /* Kích thước con vật (bạn có thể đổi) */
+    height: auto;
+}
+
+#prompt-area {
+    margin-top: 20px;
+}
+
+.prompt-line {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+.prompt-line input {
+    width: 60px;
+    padding: 5px;
+    font-size: 1.1em;
+    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+
+#game-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+}
+
+#submit-button {
+    background-color: #4CAF50; /* Màu xanh "Trả lời" */
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#submit-button:hover {
+    background-color: #45a049;
+}

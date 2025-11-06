@@ -1,0 +1,35 @@
+{
+  "id": "Q101",
+  "level": 1,
+  "type": "FILL_IN_BLANK",
+  "instruction": "Bạn hãy điền số thích hợp vào chỗ trống.",
+  
+  "payload": {
+    "scene_objects": [
+      { "image_url": "con_cua.png", "count": 10 },
+      { "image_url": "sao_bien.png", "count": 2 },
+      { "image_url": "con_ech.png", "count": 1 }
+    ],
+    "prompts": [
+      {
+        "id": "prompt_crab",
+        "text_before": "Hình trên có số",
+        "object_name": "con cua",
+        "text_after": "là",
+        "unit": "con."
+      },
+      {
+        "id": "prompt_crocodile",
+        "text_before": "Hình trên có số",
+        "object_name": "con cá sấu",
+        "text_after": "là",
+        "unit": "con."
+      }
+    ]
+  },
+
+  "correctAnswer": {
+    "prompt_crab": 10,
+    "prompt_crocodile": 0
+  }
+}
