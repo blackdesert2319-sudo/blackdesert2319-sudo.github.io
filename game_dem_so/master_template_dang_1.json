@@ -1,7 +1,7 @@
 {
   "id": "MASTER_DANG_1",
   "type": "FILL_IN_BLANK_MASTER",
-  "instruction": "Bạn hãy điền số thích hợp vào ô trống.",
+  "instruction": "Bạn hãy điền số thích hợp vào chỗ trống.",
   
   "payload": {
     "scene_rules": {
@@ -13,30 +13,6 @@
     "prompt_rules": {
       "ask_about_all_actors": true, 
       "add_zero_trap": true 
-    },
-
-    "actor_pool": [ 
-      { "id": "crab", "name_vi": "con cua", "image_url": "con_cua.png", "group": "duoi_nuoc" },
-      { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
-      { "id": "starfish", "name_vi": "con sao biển", "image_url": "sao_bien.png", "group": "duoi_nuoc" },
-      { "id": "fish", "name_vi": "con cá", "image_url": "con_ca.png", "group": "duoi_nuoc" },
-      { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
-      { "id": "pen", "name_vi": "bút chì", "image_url": "but_chi.png", "group": "hoc_tap" }
-    ],
-
-    "group_traps": {
-      "duoi_nuoc": [
-        { "id": "shark", "name_vi": "con cá mập" },
-        { "id": "octopus", "name_vi": "con bạch tuộc" }
-      ],
-      "tren_can": [
-        { "id": "lion", "name_vi": "con sư tử" },
-        { "id": "tiger", "name_vi": "con hổ" }
-      ],
-      "hoc_tap": [
-        { "id": "compass", "name_vi": "cái com-pa" },
-        { "id": "backpack", "name_vi": "cái ba lô" }
-      ]
     }
   }
 }
