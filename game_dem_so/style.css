@@ -139,21 +139,42 @@ body {
     margin: 0 10px;
     background-color: white;
 }
-/* --- THÊM VÀO CUỐI FILE STYLE.CSS --- */
 
-/* CSS cho nút "Câu tiếp theo" */
-#next-button {
-    background-color: #007bff; /* Màu xanh dương */
-    color: white;
-    padding: 15px 40px;
-    font-size: 1.3em;
+/* --- 🚀 CSS MỚI CHO TÍNH NĂNG "THÔNG BÁO" 🚀 --- */
+#feedback-area {
+    min-height: 30px; /* Giữ 1 khoảng trống cố định */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+#feedback-message {
+    font-size: 1.2em;
     font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    padding: 8px 15px;
+    border-radius: 5px;
+    /* Ẩn đi lúc đầu */
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-#next-button:hover {
-    background-color: #0069d9;
+#feedback-message.visible {
+    opacity: 1; /* Hiện ra khi có thông báo */
 }
+
+/* Giao diện cho thông báo ĐÚNG */
+#feedback-message.correct {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+/* Giao diện cho thông báo SAI */
+#feedback-message.wrong {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+/* --- (ĐÃ XÓA CSS CHO #next-button) --- */
