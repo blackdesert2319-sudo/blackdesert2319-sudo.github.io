@@ -41,19 +41,19 @@ body {
 
 /* --- PHẦN ĐÃ CẬP NHẬT --- */
 #scene-box {
-    width: 350px; /* CẬP NHẬT: Hẹp lại theo yêu cầu của bạn */
-    height: 250px;
+    width: 350px; 
+    height: 250px; /* Chiều cao từ file gốc của bạn */
     border: 2px dashed #ccc;
     border-radius: 10px;
-    margin: 20px auto; /* CẬP NHẬT: Tự động căn giữa */
+    margin: 20px auto; 
     position: relative; 
     overflow: hidden; 
 }
 #scene-box img {
     position: absolute; 
     width: 60px; 
-    height: 60px; /* CẬP NHẬT: Sửa lỗi tính toán */
-    object-fit: contain; /* Đảm bảo ảnh không bị méo */
+    height: 60px; 
+    object-fit: contain; 
 }
 /* --- KẾT THÚC PHẦN CẬP NHẬT --- */
 
@@ -87,26 +87,23 @@ body {
     cursor: pointer;
 }
 /* --- CSS MỚI CHO DẠNG 1C (SELECT GROUP) --- */
-
 .group-select-container {
     width: 100%;
     display: flex;
-    flex-direction: column; /* Xếp chồng lên nhau: Hộp, Hộp, Câu hỏi */
-    align-items: center; /* Căn giữa */
-    gap: 15px; /* Khoảng cách giữa các phần tử */
+    flex-direction: column;
+    align-items: center; 
+    gap: 15px;
 }
-
 .group-box {
     width: 90%;
     border: 2px solid #007bff;
     border-radius: 10px;
     padding: 10px;
     background-color: #f8f9fa;
-    display: flex; /* Sắp xếp Label và Item-Container */
+    display: flex;
     align-items: center;
     min-height: 80px;
 }
-
 .group-label {
     font-size: 1.5em;
     font-weight: bold;
@@ -114,21 +111,17 @@ body {
     margin-right: 20px;
     padding: 10px;
 }
-
 .item-container {
-    display: flex; /* Xếp các con vật theo hàng ngang */
-    flex-wrap: wrap; /* Tự động xuống hàng nếu hết chỗ */
-    gap: 5px; /* Khoảng cách giữa các con vật */
-    flex: 1; /* Chiếm hết phần còn lại */
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 5px; 
+    flex: 1; 
 }
-
 .item-in-group {
-    width: 40px; /* Kích thước nhỏ hơn cho vừa hộp */
+    width: 40px; 
     height: 40px;
     object-fit: contain;
 }
-
-/* Định dạng menu thả xuống (giống ô nhập) */
 #prompt-area select {
     width: 100px;
     padding: 5px;
@@ -141,40 +134,32 @@ body {
 }
 
 /* --- 🚀 CSS MỚI CHO TÍNH NĂNG "THÔNG BÁO" 🚀 --- */
+/* (Thay thế cho CSS #next-button cũ của bạn) */
 #feedback-area {
-    min-height: 30px; /* Giữ 1 khoảng trống cố định */
+    min-height: 30px; 
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 15px;
 }
-
 #feedback-message {
     font-size: 1.2em;
     font-weight: bold;
     padding: 8px 15px;
     border-radius: 5px;
-    /* Ẩn đi lúc đầu */
     opacity: 0;
     transition: opacity 0.3s;
 }
-
 #feedback-message.visible {
-    opacity: 1; /* Hiện ra khi có thông báo */
+    opacity: 1; 
 }
-
-/* Giao diện cho thông báo ĐÚNG */
 #feedback-message.correct {
     color: #155724;
     background-color: #d4edda;
     border: 1px solid #c3e6cb;
 }
-
-/* Giao diện cho thông báo SAI */
 #feedback-message.wrong {
     color: #721c24;
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
 }
-
-/* --- (ĐÃ XÓA CSS CHO #next-button) --- */

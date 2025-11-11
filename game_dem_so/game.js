@@ -16,10 +16,8 @@ function shuffleArray(array) {
 const tts = window.speechSynthesis;
 let voices = []; // Biến toàn cục để lưu giọng đọc
 function loadVoices() {
-    // Tải danh sách giọng đọc
     voices = tts.getVoices().filter(voice => voice.lang === 'vi-VN');
     if (voices.length === 0) {
-        // Một số trình duyệt (như Chrome) cần sự kiện này để tải giọng đọc
         tts.onvoiceschanged = () => {
             voices = tts.getVoices().filter(voice => voice.lang === 'vi-VN');
             console.log("Đã tải giọng đọc tiếng Việt:", voices);
@@ -29,24 +27,12 @@ function loadVoices() {
     }
 }
 function speakMessage(text) {
-    // Dừng mọi âm thanh đang phát (nếu có)
     tts.cancel();
-    
-    // Tạo một "câu nói" mới
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Thiết lập ngôn ngữ là Tiếng Việt
     utterance.lang = 'vi-VN';
-    
-    // Nếu tìm thấy giọng đọc 'vi-VN' chuẩn, hãy dùng nó
-    if (voices.length > 0) {
-        utterance.voice = voices[0]; // Dùng giọng đầu tiên tìm thấy
-    }
-    
-    utterance.rate = 1.0; // Tốc độ (1.0 là bình thường)
-    utterance.pitch = 1.0; // Cao độ
-    
-    // Bắt đầu nói
+    if (voices.length > 0) { utterance.voice = voices[0]; }
+    utterance.rate = 1.0; 
+    utterance.pitch = 1.0; 
     tts.speak(utterance);
 }
 // --- KẾT THÚC BỘ MÁY ĐỌC ---
@@ -59,30 +45,23 @@ let LAST_QUESTION_TYPE = null;
 let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
-// --- 🚀 NGÂN HÀNG THÔNG BÁO (THEO YÊU CẦU CỦA BẠN) 🚀 ---
+// --- 🚀 NGÂN HÀNG THÔNG BÁO 🚀 ---
 const PRAISE_MESSAGES = [
-    "🎉 Tuyệt vời!",
-    "Con giỏi quá!",
-    "Chính xác!",
-    "Làm tốt lắm!",
-    "Đúng rồi!"
+    "🎉 Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
 ];
 const WARNING_MESSAGES = [
-    "☹️ Chưa đúng rồi, con đếm lại nhé.",
-    "Ôi, sai mất rồi! Con thử lại nào.",
-    "Cố lên, con xem lại kỹ hơn nhé.",
-    "Vẫn chưa chính xác."
+    "☹️ Chưa đúng rồi, con đếm lại nhé.", "Ôi, sai mất rồi! Con thử lại nào.", "Cố lên, con xem lại kỹ hơn nhé.", "Vẫn chưa chính xác."
 ];
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadVoices(); // Tải giọng đọc ngay khi bắt đầu
+    loadVoices(); // Tải giọng đọc
     initializeApp();
 });
 
 async function initializeApp() {
     try {
-        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM (CHỈ 1 LẦN) ---
+        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM ---
         const response = await fetch('kho_du_lieu.json');
         if (!response.ok) throw new Error('Không thể tải kho_du_lieu.json!');
         GAME_DATABASE = await response.json();
@@ -95,7 +74,7 @@ async function initializeApp() {
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
-        // (Đã xóa listener của nút "Next")
+        // (Đã xóa listener của nút "Next" từ file gốc của bạn)
         loadNextQuestion();
 
     } catch (error) {
@@ -104,16 +83,16 @@ async function initializeApp() {
     }
 }
 
-// --- "BỘ NÃO" CHỌN CÂU HỎI (ĐÃ NÂNG CẤP) ---
+// --- "BỘ NÃO" CHỌN CÂU HỎI ---
 function loadNextQuestion() {
     // 1. Reset giao diện
     const submitButton = document.getElementById('submit-button');
-    submitButton.style.display = 'block'; // Hiện nút Trả lời
-    submitButton.disabled = false; // Cho phép bấm
+    submitButton.style.display = 'block'; 
+    submitButton.disabled = false; 
     
     const feedbackMessage = document.getElementById('feedback-message');
-    feedbackMessage.innerText = ''; // Xóa thông báo cũ
-    feedbackMessage.className = ''; // Xóa class 'correct'/'wrong'
+    feedbackMessage.innerText = ''; 
+    feedbackMessage.className = ''; 
     
     // 2. Cập nhật số câu
     document.getElementById('question-count').innerText = QUESTION_NUMBER;
@@ -161,6 +140,7 @@ async function loadQuestionTemplate(questionFile) {
 
 // "Bộ Điều Phối" (Renderer Switch)
 function renderQuestion(question, database) {
+    // (Lấy từ file gốc của bạn)
     document.getElementById('instruction-text').innerText = question.instruction;
     
     document.getElementById('scene-box').innerHTML = '';
@@ -188,8 +168,7 @@ function renderQuestion(question, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
 function generateFillInBlank(payload, database) {
-    // (Toàn bộ code logic của Dạng 1... từ Giai đoạn 1 đến 7)
-    // ... (Giữ nguyên code generateFillInBlank cũ của bạn) ...
+    // (Lấy từ file gốc của bạn)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     const rules = payload.scene_rules; const actorPool = database.actor_pool; 
@@ -262,8 +241,7 @@ function generateFillInBlank(payload, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
-    // (Toàn bộ code logic của Dạng 1c... giữ nguyên y hệt)
-    // ... (Giữ nguyên code generateSelectGroupMaster cũ của bạn) ...
+    // (Lấy từ file gốc của bạn)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
@@ -330,17 +308,17 @@ function generateSelectGroupMaster(payload, database) {
 
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "AUTO-NEXT" & "BIẾT NÓI" 🚀 ---
+// (Đây là phần code được "cấy" vào file gốc)
 function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Phải xóa listener cũ đi để tránh lỗi
+    // Phải xóa listener cũ đi
     const newButton = submitButton.cloneNode(true);
     submitButton.parentNode.replaceChild(newButton, newButton);
 
     newButton.addEventListener('click', () => {
-        // Vô hiệu hóa nút ngay lập tức
-        newButton.disabled = true;
+        newButton.disabled = true; // Vô hiệu hóa nút
         let allCorrect = true; 
 
         // 1. ĐỌC TỪ Ô NHẬP SỐ (CHO DẠNG 1)
@@ -372,33 +350,26 @@ function setupSubmitButton(correctAnswer) {
         // 3. XỬ LÝ KẾT QUẢ (ĐÚNG HOẶC SAI)
         if (allCorrect) {
             // ---- TRẢ LỜI ĐÚNG ----
-            
-            // Lấy 1 lời khen ngẫu nhiên
             const message = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
             feedbackMessage.innerText = message;
-            feedbackMessage.className = 'visible correct'; // Hiện ra và có màu xanh
-            speakMessage(message); // <-- 🚀 GỌI BỘ MÁY ĐỌC
+            feedbackMessage.className = 'visible correct'; // Hiện ra
+            speakMessage(message); // Đọc to
             
-            // Cập nhật điểm
             CURRENT_SCORE += 10;
             document.getElementById('score').innerText = CURRENT_SCORE;
-
-            // Ẩn nút "Trả lời"
-            newButton.style.display = 'none';
+            newButton.style.display = 'none'; // Ẩn nút "Trả lời"
 
             // HẸN GIỜ 2 GIÂY TỰ ĐỘNG CHUYỂN CÂU
             setTimeout(() => {
-                loadNextQuestion(); // Tải câu tiếp theo
-            }, 2000); // 2000ms = 2 giây
+                loadNextQuestion(); 
+            }, 2000); // 2 giây
 
         } else {
             // ---- TRẢ LỜI SAI ----
-            
-            // Lấy 1 cảnh báo ngẫu nhiên
             const message = WARNING_MESSAGES[Math.floor(Math.random() * WARNING_MESSAGES.length)];
             feedbackMessage.innerText = message;
-            feedbackMessage.className = 'visible wrong'; // Hiện ra và có màu đỏ
-            speakMessage(message); // <-- 🚀 GỌI BỘ MÁY ĐỌC
+            feedbackMessage.className = 'visible wrong'; // Hiện ra
+            speakMessage(message); // Đọc to
 
             // Cho phép nút "Trả lời" hoạt động trở lại
             newButton.disabled = false;
