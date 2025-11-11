@@ -21,7 +21,7 @@
       { "id": "starfish", "name_vi": "con sao biển", "image_url": "sao_bien.png", "group": "duoi_nuoc" },
       { "id": "fish", "name_vi": "con cá", "image_url": "con_ca.png", "group": "duoi_nuoc" },
       { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
-      { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" }
+      { "id": "pen", "name_vi": "bút chì", "image_url": "but_chi.png", "group": "hoc_tap" }
     ],
 
     "group_traps": {
