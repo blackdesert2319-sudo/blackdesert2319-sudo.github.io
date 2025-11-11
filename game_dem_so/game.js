@@ -66,10 +66,12 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ CẬP NHẬT) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" ---
         QUESTION_BANK = [
-            'templates/ch_dang_1.json', // Dạng 1
-            'templates/ch_dang_2.json'  // <-- THÊM DẠNG 2 MỚI VÀO ĐÂY
+            'templates/dang_1/1a_dem_that.json',
+            'templates/dang_1/1a_bay_0.json',
+            'templates/dang_1/1b_nhieu_o.json',
+            'templates/dang_1c/1c_chon_hinh.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -147,6 +149,8 @@ function renderQuestion(question, database) {
     let payload = question.payload; 
     let correctAnswers; 
 
+    // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
+    // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -163,52 +167,67 @@ function renderQuestion(question, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ NÂNG CẤP 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ SỬA LỖI LOGIC 🚀 ---
 function generateFillInBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     
-    // (Giai đoạn 1, 2, 3 - TẠO CẢNH - Giữ nguyên)
-    const rules = payload.scene_rules; const actorPool = database.actor_pool; 
-    const allGroups = [...new Set(actorPool.map(actor => actor.group))];
-    const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+    // --- 1. GIAI ĐOẠN CHỌN CHỦ ĐỀ (THEME SELECTION) - ĐÃ NÂNG CẤP ---
+    const rules = payload.scene_rules;
+    const actorPool = database.actor_pool; 
+    const numToPick = rules.num_actors_to_pick; // "Luật" (ví dụ: bốc 2)
+
+    // a. "Quét kho" VÀ "Đếm"
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+
+    // b. Lọc ra các nhóm (group) "Đủ điều kiện"
+    const validGroups = Object.keys(groupCounts).filter(group => 
+        groupCounts[group] >= numToPick
+    );
+
+    if (validGroups.length === 0) {
+        console.error("Không tìm thấy nhóm nào đủ điều kiện!", rules);
+        return; // Dừng lại nếu không có nhóm nào hợp lệ
+    }
+    
+    // c. Bốc thăm ngẫu nhiên 1 nhóm "Hợp lệ"
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
-    const chosenActors = []; const shuffledActors = shuffleArray(filteredActorPool);
-    const numToPick = Math.min(rules.num_actors_to_pick, shuffledActors.length);
-    for (let i = 0; i < numToPick; i++) { chosenActors.push(shuffledActors.pop()); }
+
+    // --- 2. GIAI ĐOẠN CHỌN CON VẬT (ACTOR SELECTION) ---
+    const chosenActors = [];
+    const shuffledActors = shuffleArray(filteredActorPool);
+    // (Bây giờ chúng ta chắc chắn 100% là `shuffledActors.length` >= `numToPick`)
+    for (let i = 0; i < numToPick; i++) { 
+        chosenActors.push(shuffledActors.pop()); 
+    }
+    
+    // (Code Giai đoạn 3, 4, 5, 6, 7... giữ nguyên y hệt)
+    // ...
+    // --- 3. GIAI ĐOẠN TẠO CẢNH (SCENE GENERATION) ---
     chosenActors.forEach(actor => {
         const count = getRandomInt(rules.count_min, rules.count_max);
         generatedAnswers[actor.id] = count; 
         sceneObjectsToDraw.push({ image_url: actor.image_url, count: count });
     });
 
-    // --- 4. GIAI ĐOẠN TẠO CÂU HỎI (PROMPT GENERATION) - ĐÃ NÂNG CẤP ---
+    // --- 4. GIAI ĐOẠN TẠO CÂU HỎI (PROMPT GENERATION) ---
     const promptRules = payload.prompt_rules;
-    
     if (promptRules.ask_about_all_actors) {
-        // Logic cũ (hỏi về TẤT CẢ)
         chosenActors.forEach((actor, index) => {
             promptsToGenerate.push({ id: `prompt_actor_${index}`, name_vi: actor.name_vi, answer_source: actor.id });
         });
-    } 
-    // --- 🚀 LOGIC MỚI CHO DẠNG 2 🚀 ---
-    else if (promptRules.num_actors_to_ask > 0) {
-        // Logic mới (chỉ hỏi 1 số lượng nhất định)
-        const shuffledToAsk = shuffleArray([...chosenActors]); // Xáo trộn diễn viên
+    } else if (promptRules.num_actors_to_ask > 0) {
+        const shuffledToAsk = shuffleArray([...chosenActors]);
         const numToAsk = Math.min(promptRules.num_actors_to_ask, shuffledToAsk.length);
-
         for (let i = 0; i < numToAsk; i++) {
-            const actor = shuffledToAsk.pop(); // Bốc 1 con vật để hỏi
-            promptsToGenerate.push({ 
-                id: `prompt_actor_${i}`, 
-                name_vi: actor.name_vi, 
-                answer_source: actor.id 
-            });
+            const actor = shuffledToAsk.pop(); 
+            promptsToGenerate.push({ id: `prompt_actor_${i}`, name_vi: actor.name_vi, answer_source: actor.id });
         }
     }
-    // --- 🚀 KẾT THÚC LOGIC MỚI 🚀 ---
-
-    // Logic "Bẫy 0" (Giữ nguyên)
     if (promptRules.add_zero_trap && database.group_traps && database.group_traps[chosenGroup]) {
         const trapPool = database.group_traps[chosenGroup]; 
         if (trapPool.length > 0) {
@@ -216,9 +235,9 @@ function generateFillInBlank(payload, database) {
             promptsToGenerate.push({ id: 'prompt_trap_0', name_vi: randomTrap.name_vi, answer_source: randomTrap.id });
         }
     }
-    shuffleArray(promptsToGenerate); // Xáo trộn (câu thật + câu bẫy)
+    shuffleArray(promptsToGenerate);
 
-    // (Giai đoạn 5, 6, 7 - VẼ VÀ CHẤM - Giữ nguyên)
+    // --- 5. GIAI ĐOẠN VẼ CẢNH (SCENE DRAWING) ---
     const placedPositions = []; const imgSize = 60; const retryLimit = 20; const minSafeDistance = imgSize * 0.9; 
     sceneObjectsToDraw.forEach(object => {
         for (let i = 0; i < object.count; i++) {
@@ -242,6 +261,8 @@ function generateFillInBlank(payload, database) {
             sceneBox.appendChild(img);
         }
     });
+
+    // --- 6. GIAI ĐOẠN VẼ CÂU HỎI & TÌM ĐÁP ÁN (PROMPT RENDERING) ---
     promptsToGenerate.forEach(prompt => {
         const line = document.createElement('div');
         line.className = 'prompt-line';
@@ -261,28 +282,48 @@ function generateFillInBlank(payload, database) {
     return finalCorrectAnswers;
 }
 
-// --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 1C (MASTER) - ĐÃ SỬA LỖI LOGIC 🚀 ---
 function generateSelectGroupMaster(payload, database) {
-    // (Toàn bộ code logic của Dạng 1c... không thay đổi)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
     const finalCorrectAnswers = {}; const groupContents = {};
     let targetCount, targetGroup, actorName;
+
+    // --- 1. CHỌN "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN - ĐÃ NÂNG CẤP ---
     const actorPool = database.actor_pool; 
-    const allGroups = [...new Set(actorPool.map(actor => actor.group))];
-    const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+    
+    // a. "Quét kho" VÀ "Đếm" (Dạng 1c chỉ cần 1 actor, nên numToPick = 1)
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+    // b. Lọc ra các nhóm "Đủ điều kiện" (có ít nhất 1 con vật)
+    const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 1);
+    
+    // c. Bốc thăm 1 nhóm "Hợp lệ"
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+    
+    // d. Bốc thăm 1 con vật
     const chosenActor = filteredActorPool[Math.floor(Math.random() * filteredActorPool.length)];
     actorName = chosenActor.name_vi; 
+    
+    // (Code Giai đoạn 2, 3, 4, 5... giữ nguyên y hệt)
+    // ...
+    // --- 2. TẠO SỐ LƯỢNG n, m (n KHÁC m) ---
     const n = getRandomInt(rules.count_min, rules.count_max);
     let m;
     do { m = getRandomInt(rules.count_min, rules.count_max); } while (m === n); 
     groupContents[groups[0].id] = n; 
     groupContents[groups[1].id] = m; 
+
+    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi n hay m?) ---
     if (Math.random() < 0.5) { targetCount = n; targetGroup = groups[0].id; }
     else { targetCount = m; targetGroup = groups[1].id; }
     finalCorrectAnswers['group_select'] = targetGroup;
+
+    // --- 4. VẼ GIAO DIỆN HTML (Bên trong promptArea) ---
     const container = document.createElement('div');
     container.className = 'group-select-container';
     payload.groups.forEach(group => {
@@ -325,6 +366,8 @@ function generateSelectGroupMaster(payload, database) {
     questionLine.appendChild(selectMenu);
     container.appendChild(questionLine);
     promptArea.appendChild(container);
+
+    // --- 5. GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
     return finalCorrectAnswers;
 }
 
