@@ -157,34 +157,3 @@ body {
 #next-button:hover {
     background-color: #0069d9;
 }
-/* --- THÊM VÀO CUỐI FILE STYLE.CSS --- */
-
-/* CSS cho Khu vực Thông báo mới */
-#feedback-area {
-    min-height: 30px; /* Giữ 1 khoảng trống cố định */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 15px;
-}
-
-#feedback-message {
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 8px 15px;
-    border-radius: 5px;
-}
-
-/* Giao diện cho thông báo ĐÚNG */
-#feedback-message.correct {
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-}
-
-/* Giao diện cho thông báo SAI */
-#feedback-message.wrong {
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-}
