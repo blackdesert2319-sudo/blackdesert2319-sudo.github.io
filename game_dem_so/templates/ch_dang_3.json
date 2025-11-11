@@ -1,0 +1,18 @@
+{
+  "id": "DANG_3",
+  "type": "FILL_IN_BLANK_MASTER",
+  "instruction": "Bạn hãy điền số thích hợp vào ô trống.",
+  
+  "payload": {
+    "scene_rules": {
+      "num_actors_to_pick": 4,  
+      "count_min": 1,          
+      "count_max": 3           
+    },
+    "prompt_rules": {
+      "ask_about_all_actors": false, 
+      "num_actors_to_ask": 2, 
+      "add_zero_trap": true 
+    }
+  }
+}
