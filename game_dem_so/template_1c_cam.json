@@ -1,0 +1,24 @@
+{
+  "id": "TPL_1C_CAM",
+  "type": "SELECT_GROUP_BY_COUNT",
+  "instruction": "Bạn hãy chọn đáp án thích hợp để điền vào ô trống.",
+  
+  "payload": {
+    "actor": { 
+      "id": "orange",
+      "name_vi": "quả cam",
+      "image_url": "qua_cam.png"
+    },
+    
+    "groups": [ 
+      { "id": "A", "label": "Hình A" },
+      { "id": "B", "label": "Hình B" }
+    ],
+    
+    "rules": {
+      "target_count": 10,
+      "distractor_count_min": 3, 
+      "distractor_count_max": 8  
+    }
+  }
+}
