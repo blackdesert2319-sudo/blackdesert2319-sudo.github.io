@@ -68,7 +68,8 @@ async function initializeApp() {
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ CẬP NHẬT) ---
         QUESTION_BANK = [
-            'templates/ch_dang_1.json' // <-- NẠP "DẠNG 1" MỚI VÀO ĐÂY
+            'templates/ch_dang_1.json', // Dạng 1
+            'templates/ch_dang_2.json'  // <-- THÊM DẠNG 2 MỚI VÀO ĐÂY
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -146,8 +147,6 @@ function renderQuestion(question, database) {
     let payload = question.payload; 
     let correctAnswers; 
 
-    // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
-    // các "Khuôn Mẫu" Dạng 1
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -164,11 +163,12 @@ function renderQuestion(question, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ NÂNG CẤP 🚀 ---
 function generateFillInBlank(payload, database) {
-    // (Toàn bộ code logic của Dạng 1... không thay đổi)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
+    
+    // (Giai đoạn 1, 2, 3 - TẠO CẢNH - Giữ nguyên)
     const rules = payload.scene_rules; const actorPool = database.actor_pool; 
     const allGroups = [...new Set(actorPool.map(actor => actor.group))];
     const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
@@ -181,12 +181,34 @@ function generateFillInBlank(payload, database) {
         generatedAnswers[actor.id] = count; 
         sceneObjectsToDraw.push({ image_url: actor.image_url, count: count });
     });
+
+    // --- 4. GIAI ĐOẠN TẠO CÂU HỎI (PROMPT GENERATION) - ĐÃ NÂNG CẤP ---
     const promptRules = payload.prompt_rules;
+    
     if (promptRules.ask_about_all_actors) {
+        // Logic cũ (hỏi về TẤT CẢ)
         chosenActors.forEach((actor, index) => {
             promptsToGenerate.push({ id: `prompt_actor_${index}`, name_vi: actor.name_vi, answer_source: actor.id });
         });
+    } 
+    // --- 🚀 LOGIC MỚI CHO DẠNG 2 🚀 ---
+    else if (promptRules.num_actors_to_ask > 0) {
+        // Logic mới (chỉ hỏi 1 số lượng nhất định)
+        const shuffledToAsk = shuffleArray([...chosenActors]); // Xáo trộn diễn viên
+        const numToAsk = Math.min(promptRules.num_actors_to_ask, shuffledToAsk.length);
+
+        for (let i = 0; i < numToAsk; i++) {
+            const actor = shuffledToAsk.pop(); // Bốc 1 con vật để hỏi
+            promptsToGenerate.push({ 
+                id: `prompt_actor_${i}`, 
+                name_vi: actor.name_vi, 
+                answer_source: actor.id 
+            });
+        }
     }
+    // --- 🚀 KẾT THÚC LOGIC MỚI 🚀 ---
+
+    // Logic "Bẫy 0" (Giữ nguyên)
     if (promptRules.add_zero_trap && database.group_traps && database.group_traps[chosenGroup]) {
         const trapPool = database.group_traps[chosenGroup]; 
         if (trapPool.length > 0) {
@@ -194,7 +216,9 @@ function generateFillInBlank(payload, database) {
             promptsToGenerate.push({ id: 'prompt_trap_0', name_vi: randomTrap.name_vi, answer_source: randomTrap.id });
         }
     }
-    shuffleArray(promptsToGenerate);
+    shuffleArray(promptsToGenerate); // Xáo trộn (câu thật + câu bẫy)
+
+    // (Giai đoạn 5, 6, 7 - VẼ VÀ CHẤM - Giữ nguyên)
     const placedPositions = []; const imgSize = 60; const retryLimit = 20; const minSafeDistance = imgSize * 0.9; 
     sceneObjectsToDraw.forEach(object => {
         for (let i = 0; i < object.count; i++) {
@@ -239,6 +263,7 @@ function generateFillInBlank(payload, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
+    // (Toàn bộ code logic của Dạng 1c... không thay đổi)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
@@ -309,9 +334,9 @@ function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Phải xóa listener cũ đi
+    // Phải xóa listener cũ đi (SỬA LỖI)
     const newButton = submitButton.cloneNode(true);
-    submitButton.parentNode.replaceChild(newButton, submitButton);
+    submitButton.parentNode.replaceChild(newButton, submitButton); // Sửa lỗi 'newButton'
 
     newButton.addEventListener('click', () => {
         newButton.disabled = true; // Vô hiệu hóa nút
