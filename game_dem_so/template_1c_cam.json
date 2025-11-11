@@ -1,0 +1,26 @@
+{
+  "id": "MASTER_1C",
+  "type": "SELECT_GROUP_MASTER",
+  "instruction": "Bạn hãy chọn đáp án thích hợp để điền vào ô trống.",
+  
+  "payload": {
+    "groups": [
+      { "id": "A", "label": "Hình A" },
+      { "id": "B", "label": "Hình B" }
+    ],
+
+    "rules": {
+      "count_min": 3, 
+      "count_max": 10 
+    },
+    
+    "actor_pool": [ 
+      { "id": "crab", "name_vi": "con cua", "image_url": "con_cua.png", "group": "duoi_nuoc" },
+      { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
+      { "id": "starfish", "name_vi": "con sao biển", "image_url": "sao_bien.png", "group": "duoi_nuoc" },
+      { "id": "fish", "name_vi": "con cá", "image_url": "con_ca.png", "group": "duoi_nuoc" },
+      { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
+      { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" }
+    ]
+  }
+}
