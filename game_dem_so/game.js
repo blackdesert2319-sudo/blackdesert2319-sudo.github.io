@@ -66,12 +66,15 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ CẬP NHẬT) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ SỬA LỖI) ---
         QUESTION_BANK = [
-            'master_template_dang_1.json',   // Dạng 1b (Nhiều ô)
-            'master_template_1c.json',       // Dạng 1c (Chọn A/B)
-            'master_template_1a.json',       // DẠNG 1A MỚI (1 ô - Thật)
-            'master_template_1a_trap.json'   // DẠNG 1A MỚI (1 ô - Bẫy)
+            // Dạng 1
+            'templates/dang_1/1a_dem_that.json',
+            'templates/dang_1/1a_bay_0.json',
+            'templates/dang_1/1b_nhieu_o.json', // <-- ĐÃ THÊM DẠNG 1B VÀO ĐÂY
+            
+            // Dạng 1c
+            'templates/dang_1c/1c_chon_hinh.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -170,7 +173,6 @@ function renderQuestion(question, database) {
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
 function generateFillInBlank(payload, database) {
     // (Toàn bộ code logic của Dạng 1... không thay đổi)
-    // (Nó đã đủ thông minh để đọc "luật" mới)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     const rules = payload.scene_rules; const actorPool = database.actor_pool; 
