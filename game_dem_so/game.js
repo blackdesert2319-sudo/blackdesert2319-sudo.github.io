@@ -12,7 +12,7 @@ function shuffleArray(array) {
     return array;
 }
 
-// --- 🚀 BỘ MÁY ĐỌC GIỌNG NÓI (TTS) 🚀 ---
+// --- 🚀 BỘ MÁY ĐỌC GIỌNG NÓI (TTS) - ĐÃ SỬA LỖI 🚀 ---
 const tts = window.speechSynthesis;
 let voices = []; // Biến toàn cục để lưu giọng đọc
 function loadVoices() {
@@ -22,6 +22,8 @@ function loadVoices() {
             voices = tts.getVoices().filter(voice => voice.lang === 'vi-VN');
             console.log("Đã tải giọng đọc tiếng Việt:", voices);
         };
+        // THÊM LỆNH KÍCH HOẠT (THEO GỢI Ý CỦA BẠN)
+        tts.getVoices(); 
     } else {
         console.log("Tìm thấy giọng đọc tiếng Việt:", voices);
     }
@@ -45,7 +47,7 @@ let LAST_QUESTION_TYPE = null;
 let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
-// --- 🚀 NGÂN HÀNG THÔNG BÁO 🚀 ---
+// --- NGÂN HÀNG THÔNG BÁO ---
 const PRAISE_MESSAGES = [
     "🎉 Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
 ];
@@ -303,14 +305,14 @@ function generateSelectGroupMaster(payload, database) {
 }
 
 
-// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "AUTO-NEXT" & "BIẾT NÓI" 🚀 ---
+// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
 function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Phải xóa listener cũ đi
+    // Phải xóa listener cũ đi (SỬA LỖI THEO HÌNH ẢNH CỦA BẠN)
     const newButton = submitButton.cloneNode(true);
-    submitButton.parentNode.replaceChild(newButton, newButton);
+    submitButton.parentNode.replaceChild(newButton, submitButton); // Sửa 'newButton' thứ 2 thành 'submitButton'
 
     newButton.addEventListener('click', () => {
         newButton.disabled = true; // Vô hiệu hóa nút
