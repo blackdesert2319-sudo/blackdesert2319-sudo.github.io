@@ -12,9 +12,9 @@ function shuffleArray(array) {
     return array;
 }
 
-// --- 🚀 BỘ MÁY ĐỌC GIỌNG NÓI (TTS) - ĐÃ SỬA LỖI 🚀 ---
+// --- BỘ MÁY ĐỌC GIỌNG NÓI (TTS) ---
 const tts = window.speechSynthesis;
-let voices = []; // Biến toàn cục để lưu giọng đọc
+let voices = []; 
 function loadVoices() {
     voices = tts.getVoices().filter(voice => voice.lang === 'vi-VN');
     if (voices.length === 0) {
@@ -22,7 +22,6 @@ function loadVoices() {
             voices = tts.getVoices().filter(voice => voice.lang === 'vi-VN');
             console.log("Đã tải giọng đọc tiếng Việt:", voices);
         };
-        // THÊM LỆNH KÍCH HOẠT (THEO GỢI Ý CỦA BẠN)
         tts.getVoices(); 
     } else {
         console.log("Tìm thấy giọng đọc tiếng Việt:", voices);
@@ -37,8 +36,6 @@ function speakMessage(text) {
     utterance.pitch = 1.0; 
     tts.speak(utterance);
 }
-// --- KẾT THÚC BỘ MÁY ĐỌC ---
-
 
 // --- "KHO DỮ LIỆU" VÀ "TRẠNG THÁI" TOÀN CỤC ---
 let GAME_DATABASE = null; 
@@ -57,7 +54,7 @@ const WARNING_MESSAGES = [
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadVoices(); // Tải giọng đọc
+    loadVoices(); 
     initializeApp();
 });
 
@@ -69,10 +66,12 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ CẬP NHẬT) ---
         QUESTION_BANK = [
-            'master_template_dang_1.json', // Dạng 1
-            'master_template_1c.json'      // Dạng 1c
+            'master_template_dang_1.json',   // Dạng 1b (Nhiều ô)
+            'master_template_1c.json',       // Dạng 1c (Chọn A/B)
+            'master_template_1a.json',       // DẠNG 1A MỚI (1 ô - Thật)
+            'master_template_1a_trap.json'   // DẠNG 1A MỚI (1 ô - Bẫy)
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -150,6 +149,8 @@ function renderQuestion(question, database) {
     let payload = question.payload; 
     let correctAnswers; 
 
+    // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
+    // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -168,6 +169,8 @@ function renderQuestion(question, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
 function generateFillInBlank(payload, database) {
+    // (Toàn bộ code logic của Dạng 1... không thay đổi)
+    // (Nó đã đủ thông minh để đọc "luật" mới)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     const rules = payload.scene_rules; const actorPool = database.actor_pool; 
@@ -240,6 +243,7 @@ function generateFillInBlank(payload, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
+    // (Toàn bộ code logic của Dạng 1c... không thay đổi)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
@@ -310,9 +314,9 @@ function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Phải xóa listener cũ đi (SỬA LỖI THEO HÌNH ẢNH CỦA BẠN)
+    // Phải xóa listener cũ đi (SỬA LỖI)
     const newButton = submitButton.cloneNode(true);
-    submitButton.parentNode.replaceChild(newButton, submitButton); // Sửa 'newButton' thứ 2 thành 'submitButton'
+    submitButton.parentNode.replaceChild(newButton, submitButton); // Sửa lỗi 'newButton'
 
     newButton.addEventListener('click', () => {
         newButton.disabled = true; // Vô hiệu hóa nút
