@@ -42,7 +42,7 @@ body {
 /* --- PHẦN ĐÃ CẬP NHẬT --- */
 #scene-box {
     width: 350px; 
-    height: 250px; /* Chiều cao từ file gốc của bạn */
+    height: 250px;
     border: 2px dashed #ccc;
     border-radius: 10px;
     margin: 20px auto; 
@@ -134,7 +134,6 @@ body {
 }
 
 /* --- 🚀 CSS MỚI CHO TÍNH NĂNG "THÔNG BÁO" 🚀 --- */
-/* (Thay thế cho CSS #next-button cũ của bạn) */
 #feedback-area {
     min-height: 30px; 
     display: flex;

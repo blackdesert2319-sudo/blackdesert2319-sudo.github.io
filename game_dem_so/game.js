@@ -74,7 +74,6 @@ async function initializeApp() {
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
-        // (Đã xóa listener của nút "Next" từ file gốc của bạn)
         loadNextQuestion();
 
     } catch (error) {
@@ -140,7 +139,6 @@ async function loadQuestionTemplate(questionFile) {
 
 // "Bộ Điều Phối" (Renderer Switch)
 function renderQuestion(question, database) {
-    // (Lấy từ file gốc của bạn)
     document.getElementById('instruction-text').innerText = question.instruction;
     
     document.getElementById('scene-box').innerHTML = '';
@@ -168,7 +166,6 @@ function renderQuestion(question, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
 function generateFillInBlank(payload, database) {
-    // (Lấy từ file gốc của bạn)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     const rules = payload.scene_rules; const actorPool = database.actor_pool; 
@@ -241,7 +238,6 @@ function generateFillInBlank(payload, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
-    // (Lấy từ file gốc của bạn)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
@@ -308,7 +304,6 @@ function generateSelectGroupMaster(payload, database) {
 
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "AUTO-NEXT" & "BIẾT NÓI" 🚀 ---
-// (Đây là phần code được "cấy" vào file gốc)
 function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
