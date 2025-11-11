@@ -66,15 +66,9 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ SỬA LỖI) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ CẬP NHẬT) ---
         QUESTION_BANK = [
-            // Dạng 1
-            'templates/dang_1/1a_dem_that.json',
-            'templates/dang_1/1a_bay_0.json',
-            'templates/dang_1/1b_nhieu_o.json', // <-- ĐÃ THÊM DẠNG 1B VÀO ĐÂY
-            
-            // Dạng 1c
-            'templates/dang_1c/1c_chon_hinh.json'
+            'templates/ch_dang_1.json' // <-- NẠP "DẠNG 1" MỚI VÀO ĐÂY
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -153,7 +147,7 @@ function renderQuestion(question, database) {
     let correctAnswers; 
 
     // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
-    // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
+    // các "Khuôn Mẫu" Dạng 1
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -245,7 +239,6 @@ function generateFillInBlank(payload, database) {
 
 // --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
-    // (Toàn bộ code logic của Dạng 1c... không thay đổi)
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
@@ -316,9 +309,9 @@ function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Phải xóa listener cũ đi (SỬA LỖI)
+    // Phải xóa listener cũ đi
     const newButton = submitButton.cloneNode(true);
-    submitButton.parentNode.replaceChild(newButton, submitButton); // Sửa lỗi 'newButton'
+    submitButton.parentNode.replaceChild(newButton, submitButton);
 
     newButton.addEventListener('click', () => {
         newButton.disabled = true; // Vô hiệu hóa nút
