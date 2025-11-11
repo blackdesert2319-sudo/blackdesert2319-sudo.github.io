@@ -139,3 +139,21 @@ body {
     margin: 0 10px;
     background-color: white;
 }
+/* --- THÊM VÀO CUỐI FILE STYLE.CSS --- */
+
+/* CSS cho nút "Câu tiếp theo" */
+#next-button {
+    background-color: #007bff; /* Màu xanh dương */
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#next-button:hover {
+    background-color: #0069d9;
+}
