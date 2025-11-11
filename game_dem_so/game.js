@@ -5,26 +5,19 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// DÁN KHỐI CODE MỚI NÀY VÀO THAY THẾ
+// HÀM TIỆN ÍCH: Xáo trộn một mảng (Fisher-Yates shuffle)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- 1. TẠO NGÂN HÀNG CÂU HỎI CHO DẠNG 1 ---
-    const questionBank_Dang1 = [
-        'template_fill_in_blank.json',  // Dạng 1b (Cua/Ếch/Cá sấu)
-        'template_1a_dem_ca.json',      // Dạng 1a (Đếm cá)
-        'template_1a_dem_trai_cay.json' // Dạng 1a (Đếm dưa hấu)
-    ];
-
-    // --- 2. CHỌN NGẪU NHIÊN MỘT CÂU HỎI ---
-    // (Tạo một số ngẫu nhiên từ 0 đến số lượng câu hỏi - 1)
-    const randomIndex = Math.floor(Math.random() * questionBank_Dang1.length);
-    
-    // (Lấy tên file câu hỏi đã được chọn)
-    const chosenTemplate = questionBank_Dang1[randomIndex];
-
-    // --- 3. TẢI CÂU HỎI ĐÃ CHỌN ---
-    console.log("Tải ngẫu nhiên câu hỏi:", chosenTemplate); // Dòng này giúp bạn kiểm tra
-    loadQuestion(chosenTemplate); 
+    // 1. Bắt đầu tải "Khuôn Mẫu Chủ"
+    loadQuestion('master_template_dang_1.json'); 
 });
 
 // "Vỏ Chung": Hàm tải "mảng lệnh" (JSON)
@@ -50,47 +43,96 @@ function renderQuestion(question) {
     document.getElementById('instruction-text').innerText = question.instruction;
     switch (question.type) {
         
-        // CHÚ Ý: Đổi tên 'type' để gọi "Khuôn" mới
-        case 'FILL_IN_BLANK_GENERATOR': 
-            renderFillInBlank_Generator(question.payload);
+        case 'FILL_IN_BLANK_MASTER': 
+            renderFillInBlank_Master(question.payload);
             break;
+
         default:
             console.error('Không nhận diện được type câu hỏi:', question.type);
     }
 }
 
-// "Khuôn" (Template) MỚI của dạng FILL_IN_BLANK
-// (Bây giờ là "Bộ não" tạo câu hỏi)
-function renderFillInBlank_Generator(payload) {
+
+// --- 🚀 BỘ NÃO NÂNG CẤP "GROUPING" CHO DẠNG 1 🚀 ---
+function renderFillInBlank_Master(payload) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
     sceneBox.innerHTML = '';
     promptArea.innerHTML = '';
 
-    // "Trí nhớ" để lưu các đáp án được tạo ra
-    const generatedAnswers = {};
-    // "Mảng lệnh" để gửi cho "Công cụ Sắp xếp"
-    const sceneObjectsToDraw = [];
+    const generatedAnswers = {};    
+    const sceneObjectsToDraw = [];  
+    const promptsToGenerate = [];   
+    const finalCorrectAnswers = {}; 
 
-    // --- 1. GIAI ĐOẠN TẠO SỐ NGẪU NHIÊN ---
-    payload.actors.forEach(actor => {
-        // a. Quyết định số lượng
-        const count = getRandomInt(actor.min, actor.max);
-        
-        // b. Lưu đáp án vào "trí nhớ"
-        generatedAnswers[actor.id] = count; // Ví dụ: generatedAnswers['crab'] = 7
-        
-        // c. Nếu > 0, thêm vào danh sách cần vẽ
-        if (count > 0) {
-            sceneObjectsToDraw.push({
-                image_url: actor.image_url,
-                count: count
-            });
-        }
+    // --- 1. GIAI ĐOẠN CHỌN CHỦ ĐỀ (THEME SELECTION) ---
+    const rules = payload.scene_rules;
+    const actorPool = payload.actor_pool;
+
+    // a. "Quét kho" để tìm các nhóm (group) duy nhất
+    const allGroups = [...new Set(actorPool.map(actor => actor.group))];
+    
+    // b. Bốc thăm ngẫu nhiên 1 nhóm
+    const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+
+    // c. Lọc "kho" chỉ lấy các con vật thuộc nhóm đó
+    const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+
+    // --- 2. GIAI ĐOẠN CHỌN CON VẬT (ACTOR SELECTION) ---
+    const chosenActors = []; // Các con vật được bốc thăm
+    
+    // Xáo trộn nhóm đã lọc
+    const shuffledActors = shuffleArray(filteredActorPool);
+    
+    // Bốc thăm 'num_actors_to_pick' con vật
+    // (Đảm bảo không bốc nhiều hơn số lượng có trong nhóm)
+    const numToPick = Math.min(rules.num_actors_to_pick, shuffledActors.length);
+
+    for (let i = 0; i < numToPick; i++) {
+        chosenActors.push(shuffledActors.pop());
+    }
+
+    // --- 3. GIAI ĐOẠN TẠO CẢNH (SCENE GENERATION) ---
+    chosenActors.forEach(actor => {
+        const count = getRandomInt(rules.count_min, rules.count_max);
+        generatedAnswers[actor.id] = count; 
+        sceneObjectsToDraw.push({
+            image_url: actor.image_url,
+            count: count
+        });
     });
 
-    // --- 2. GIAI ĐOẠN VẼ CÁC CON VẬT ---
-    // (Gọi "Công cụ Sắp xếp" - code này không đổi)
+    // --- 4. GIAI ĐOẠN TẠO CÂU HỎI (PROMPT GENERATION) ---
+    const promptRules = payload.prompt_rules;
+
+    // a. Hỏi về các con vật đã chọn
+    if (promptRules.ask_about_all_actors) {
+        chosenActors.forEach((actor, index) => {
+            promptsToGenerate.push({
+                id: `prompt_actor_${index}`,
+                name_vi: actor.name_vi,
+                answer_source: actor.id
+            });
+        });
+    }
+
+    // b. Thêm "Bẫy 0"
+    if (promptRules.add_zero_trap && payload.prompt_rules.zero_trap_pool.length > 0) {
+        const trapPool = payload.prompt_rules.zero_trap_pool;
+        const randomTrap = trapPool[Math.floor(Math.random() * trapPool.length)];
+        
+        promptsToGenerate.push({
+            id: 'prompt_trap_0',
+            name_vi: randomTrap.name_vi,
+            answer_source: randomTrap.id 
+        });
+    }
+
+    // Xáo trộn thứ tự các câu hỏi
+    shuffleArray(promptsToGenerate);
+
+    // --- 5. GIAI ĐOẠN VẼ CẢNH (SCENE DRAWING) ---
+    // (Sử dụng "Công cụ Sắp xếp Trí nhớ" y như cũ)
     const placedPositions = []; 
     const imgSize = 60; 
     const retryLimit = 20; 
@@ -128,41 +170,31 @@ function renderFillInBlank_Generator(payload) {
             sceneBox.appendChild(img);
         }
     });
-    // --- KẾT THÚC CÔNG CỤ SẮP XẾP ---
 
-
-    // --- 3. GIAI ĐOẠN TẠO CÂU HỎI VÀ ĐÁP ÁN ---
-    const finalCorrectAnswers = {}; // Đáp án cuối cùng để gửi cho "Máy chấm"
-
-    payload.prompts.forEach(prompt => {
+    // --- 6. GIAI ĐOẠN VẼ CÂU HỎI & TÌM ĐÁP ÁN (PROMPT RENDERING) ---
+    promptsToGenerate.forEach(prompt => {
         const line = document.createElement('div');
         line.className = 'prompt-line';
         
-        // a. Lấy thông tin từ "Khuôn Mẫu" (Template)
-        const textBefore = document.createTextNode(`${prompt.text_before} `);
+        const textBefore = document.createTextNode(`Hình trên có số `);
         const objectName = document.createElement('strong');
-        objectName.innerText = prompt.object_name;
-        const textAfter = document.createTextNode(` ${prompt.text_after} `);
-        const unit = document.createTextNode(` ${prompt.unit}`);
+        objectName.innerText = prompt.name_vi; 
+        const textAfter = document.createTextNode(` là`);
+        const unit = document.createTextNode(` con.`);
         
-        // b. Tạo ô điền
         const input = document.createElement('input');
         input.type = 'number';
         input.min = '0';
-        input.dataset.promptId = prompt.id; // Gán ID của prompt (ví dụ: 'prompt_1')
+        input.dataset.promptId = prompt.id; 
 
-        // c. Tìm đáp án đúng cho prompt này
-        const sourceId = prompt.answer_source; // Ví dụ: 'crab' hoặc 'crocodile'
+        const sourceId = prompt.answer_source; 
         
         if (generatedAnswers.hasOwnProperty(sourceId)) {
-            // Tìm thấy! (ví dụ: 'crab' có 7 con)
             finalCorrectAnswers[prompt.id] = generatedAnswers[sourceId];
         } else {
-            // Không tìm thấy "actor" (ví dụ: 'crocodile') -> Đáp án là 0
             finalCorrectAnswers[prompt.id] = 0;
         }
 
-        // d. Ghép tất cả lại
         line.appendChild(textBefore);
         line.appendChild(objectName);
         line.appendChild(textAfter);
@@ -171,7 +203,7 @@ function renderFillInBlank_Generator(payload) {
         promptArea.appendChild(line);
     });
 
-    // --- 4. GIAI ĐOẠN GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
+    // --- 7. GIAI ĐOẠN GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
     setupSubmitButton(finalCorrectAnswers);
 }
 
@@ -187,9 +219,9 @@ function setupSubmitButton(correctAnswer) {
         let allCorrect = true;
         
         inputs.forEach(input => {
-            const promptId = input.dataset.promptId; // Lấy 'prompt_1'
+            const promptId = input.dataset.promptId; 
             const userAnswer = parseInt(input.value) || 0;
-            const realAnswer = correctAnswer[promptId]; // Lấy đáp án (ví dụ: 7)
+            const realAnswer = correctAnswer[promptId];
             
             if (userAnswer !== realAnswer) {
                 allCorrect = false;
