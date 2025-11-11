@@ -5,9 +5,26 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// DÁN KHỐI CODE MỚI NÀY VÀO THAY THẾ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Bắt đầu tải "Khuôn Mẫu" (Template)
-    loadQuestion('template_fill_in_blank.json'); 
+
+    // --- 1. TẠO NGÂN HÀNG CÂU HỎI CHO DẠNG 1 ---
+    const questionBank_Dang1 = [
+        'template_fill_in_blank.json',  // Dạng 1b (Cua/Ếch/Cá sấu)
+        'template_1a_dem_ca.json',      // Dạng 1a (Đếm cá)
+        'template_1a_dem_trai_cay.json' // Dạng 1a (Đếm dưa hấu)
+    ];
+
+    // --- 2. CHỌN NGẪU NHIÊN MỘT CÂU HỎI ---
+    // (Tạo một số ngẫu nhiên từ 0 đến số lượng câu hỏi - 1)
+    const randomIndex = Math.floor(Math.random() * questionBank_Dang1.length);
+    
+    // (Lấy tên file câu hỏi đã được chọn)
+    const chosenTemplate = questionBank_Dang1[randomIndex];
+
+    // --- 3. TẢI CÂU HỎI ĐÃ CHỌN ---
+    console.log("Tải ngẫu nhiên câu hỏi:", chosenTemplate); // Dòng này giúp bạn kiểm tra
+    loadQuestion(chosenTemplate); 
 });
 
 // "Vỏ Chung": Hàm tải "mảng lệnh" (JSON)
