@@ -11,27 +11,7 @@ function shuffleArray(array) {
     }
     return array;
 }
-
-// --- 🚀 NÂNG CẤP MỚI: BỘ MÁY ĐỌC GIỌNG NÓI (TTS) 🚀 ---
-const tts = window.speechSynthesis;
-function speakMessage(text) {
-    // Dừng mọi âm thanh đang phát (nếu có)
-    tts.cancel();
-    
-    // Tạo một "câu nói" mới
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Thiết lập ngôn ngữ là Tiếng Việt
-    utterance.lang = 'vi-VN';
-    
-    // (Tùy chọn) Điều chỉnh tốc độ và cao độ
-    utterance.rate = 1.0; // Tốc độ (1.0 là bình thường)
-    utterance.pitch = 1.0; // Cao độ
-    
-    // Bắt đầu nói
-    tts.speak(utterance);
-}
-// --- KẾT THÚC BỘ MÁY ĐỌC ---
+// --- KẾT THÚC HÀM TIỆN ÍCH ---
 
 
 // --- "KHO DỮ LIỆU" VÀ "TRẠNG THÁI" TOÀN CỤC ---
@@ -41,20 +21,22 @@ let LAST_QUESTION_TYPE = null;
 let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
-// --- NGÂN HÀNG THÔNG BÁO ---
+// --- 🚀 NGÂN HÀNG THÔNG BÁO (THEO YÊU CẦU CỦA BẠN) 🚀 ---
 const PRAISE_MESSAGES = [
-    "Tuyệt vời!",
+    "🎉 Tuyệt vời!",
     "Con giỏi quá!",
     "Chính xác!",
     "Làm tốt lắm!",
     "Đúng rồi!"
 ];
 const WARNING_MESSAGES = [
-    "Chưa đúng rồi, con đếm lại nhé.",
+    "☹️ Chưa đúng rồi, con đếm lại nhé.",
     "Ôi, sai mất rồi! Con thử lại nào.",
     "Cố lên, con xem lại kỹ hơn nhé.",
     "Vẫn chưa chính xác."
 ];
+// --- KẾT THÚC NGÂN HÀNG THÔNG BÁO ---
+
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initializeApp() {
     try {
-        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM ---
+        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM (CHỈ 1 LẦN) ---
         const response = await fetch('kho_du_lieu.json');
         if (!response.ok) throw new Error('Không thể tải kho_du_lieu.json!');
         GAME_DATABASE = await response.json();
@@ -84,12 +66,12 @@ async function initializeApp() {
     }
 }
 
-// --- "BỘ NÃO" CHỌN CÂU HỎI ---
+// --- "BỘ NÃO" CHỌN CÂU HỎI (ĐÃ NÂNG CẤP) ---
 function loadNextQuestion() {
     // 1. Reset giao diện
-    document.getElementById('submit-button').style.display = 'block'; 
-    document.getElementById('submit-button').disabled = false; 
-    document.getElementById('feedback-message').innerText = ''; 
+    document.getElementById('submit-button').style.display = 'block'; // Hiện nút Trả lời
+    document.getElementById('submit-button').disabled = false; // Cho phép bấm
+    document.getElementById('feedback-message').innerText = ''; // Xóa thông báo cũ
     document.getElementById('feedback-message').className = '';
     
     // 2. Cập nhật số câu
@@ -136,6 +118,7 @@ async function loadQuestionTemplate(questionFile) {
 function renderQuestion(question, database) {
     document.getElementById('instruction-text').innerText = question.instruction;
     
+    // Xóa giao diện cũ
     document.getElementById('scene-box').innerHTML = '';
     document.getElementById('prompt-area').innerHTML = '';
     document.getElementById('scene-box').style.display = 'block';
@@ -155,6 +138,7 @@ function renderQuestion(question, database) {
             return;
     }
 
+    // Gửi "Đáp án đúng" cho "Máy chấm điểm"
     setupSubmitButton(correctAnswers);
 }
 
@@ -302,7 +286,7 @@ function generateSelectGroupMaster(payload, database) {
 }
 
 
-// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "BIẾT NÓI" 🚀 ---
+// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "AUTO-NEXT" 🚀 ---
 function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
@@ -345,26 +329,31 @@ function setupSubmitButton(correctAnswer) {
         // 3. XỬ LÝ KẾT QUẢ (ĐÚNG HOẶC SAI)
         if (allCorrect) {
             // ---- TRẢ LỜI ĐÚNG ----
+            
+            // Lấy 1 lời khen ngẫu nhiên
             const message = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
             feedbackMessage.innerText = message;
             feedbackMessage.className = 'correct';
-            speakMessage(message); // <-- 🚀 GỌI BỘ MÁY ĐỌC
             
+            // Cập nhật điểm
             CURRENT_SCORE += 10;
             document.getElementById('score').innerText = CURRENT_SCORE;
+
+            // Ẩn nút "Trả lời" (đã bị vô hiệu hóa)
             newButton.style.display = 'none';
 
             // HẸN GIỜ 2 GIÂY TỰ ĐỘNG CHUYỂN CÂU
             setTimeout(() => {
-                loadNextQuestion(); 
+                loadNextQuestion(); // Tải câu tiếp theo
             }, 2000); // 2000ms = 2 giây
 
         } else {
             // ---- TRẢ LỜI SAI ----
+            
+            // Lấy 1 cảnh báo ngẫu nhiên
             const message = WARNING_MESSAGES[Math.floor(Math.random() * WARNING_MESSAGES.length)];
             feedbackMessage.innerText = message;
             feedbackMessage.className = 'wrong';
-            speakMessage(message); // <-- 🚀 GỌI BỘ MÁY ĐỌC
 
             // Cho phép nút "Trả lời" hoạt động trở lại
             newButton.disabled = false;
