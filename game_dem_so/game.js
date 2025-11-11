@@ -12,27 +12,16 @@ function shuffleArray(array) {
     return array;
 }
 
-// --- 🚀 NÂNG CẤP MỚI: BỘ MÁY ĐỌC GIỌNG NÓI (TTS) 🚀 ---
+// --- BỘ MÁY ĐỌC GIỌNG NÓI (TTS) ---
 const tts = window.speechSynthesis;
 function speakMessage(text) {
-    // Dừng mọi âm thanh đang phát (nếu có)
     tts.cancel();
-    
-    // Tạo một "câu nói" mới
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Thiết lập ngôn ngữ là Tiếng Việt
     utterance.lang = 'vi-VN';
-    
-    // (Tùy chọn) Điều chỉnh tốc độ và cao độ
-    utterance.rate = 1.0; // Tốc độ (1.0 là bình thường)
-    utterance.pitch = 1.0; // Cao độ
-    
-    // Bắt đầu nói
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
     tts.speak(utterance);
 }
-// --- KẾT THÚC BỘ MÁY ĐỌC ---
-
 
 // --- "KHO DỮ LIỆU" VÀ "TRẠNG THÁI" TOÀN CỤC ---
 let GAME_DATABASE = null; 
@@ -42,19 +31,8 @@ let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
 // --- NGÂN HÀNG THÔNG BÁO ---
-const PRAISE_MESSAGES = [
-    "Tuyệt vời!",
-    "Con giỏi quá!",
-    "Chính xác!",
-    "Làm tốt lắm!",
-    "Đúng rồi!"
-];
-const WARNING_MESSAGES = [
-    "Chưa đúng rồi, con đếm lại nhé.",
-    "Ôi, sai mất rồi! Con thử lại nào.",
-    "Cố lên, con xem lại kỹ hơn nhé.",
-    "Vẫn chưa chính xác."
-];
+const PRAISE_MESSAGES = ["Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"];
+const WARNING_MESSAGES = ["Chưa đúng rồi, con đếm lại nhé.", "Ôi, sai mất rồi! Con thử lại nào.", "Cố lên, con xem lại kỹ hơn nhé.", "Vẫn chưa chính xác."];
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,21 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initializeApp() {
     try {
-        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM ---
         const response = await fetch('kho_du_lieu.json');
         if (!response.ok) throw new Error('Không thể tải kho_du_lieu.json!');
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" ---
         QUESTION_BANK = [
             'master_template_dang_1.json', // Dạng 1
             'master_template_1c.json'      // Dạng 1c
         ];
         
-        // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
         loadNextQuestion();
-
     } catch (error) {
         console.error("Lỗi khởi động nghiêm trọng:", error);
         document.getElementById('instruction-text').innerText = 'Lỗi tải KHO DỮ LIỆU. Không thể bắt đầu.';
@@ -86,19 +60,15 @@ async function initializeApp() {
 
 // --- "BỘ NÃO" CHỌN CÂU HỎI ---
 function loadNextQuestion() {
-    // 1. Reset giao diện
     document.getElementById('submit-button').style.display = 'block'; 
     document.getElementById('submit-button').disabled = false; 
     document.getElementById('feedback-message').innerText = ''; 
     document.getElementById('feedback-message').className = '';
     
-    // 2. Cập nhật số câu
     document.getElementById('question-count').innerText = QUESTION_NUMBER;
     QUESTION_NUMBER++;
 
     let chosenTemplateFile;
-
-    // 3. Logic "CHỐNG LẶP DẠNG BÀI"
     if (QUESTION_BANK.length > 1) {
         let attempts = 0;
         do {
@@ -112,7 +82,6 @@ function loadNextQuestion() {
     LAST_QUESTION_TYPE = chosenTemplateFile;
     console.log("Tải câu hỏi:", chosenTemplateFile);
     
-    // 4. Tải "Khuôn Mẫu" (Luật chơi)
     loadQuestionTemplate(chosenTemplateFile);
 }
 
@@ -128,7 +97,18 @@ async function loadQuestionTemplate(questionFile) {
 
     } catch (error) {
         console.error(error);
+        
+        // --- 🚀 SỬA LỖI "GIAO DIỆN MA" (BUG FIX) 🚀 ---
+        // 1. Hiển thị lỗi
         document.getElementById('instruction-text').innerText = 'Lỗi tải câu hỏi. Vui lòng thử lại.';
+        
+        // 2. XÓA GIAO DIỆN CŨ
+        document.getElementById('scene-box').innerHTML = '';
+        document.getElementById('prompt-area').innerHTML = '';
+        
+        // 3. Vô hiệu hóa nút "Trả lời"
+        document.getElementById('submit-button').style.display = 'none';
+        // --- KẾT THÚC SỬA LỖI ---
     }
 }
 
@@ -302,7 +282,7 @@ function generateSelectGroupMaster(payload, database) {
 }
 
 
-// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "BIẾT NÓI" 🚀 ---
+// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - NÂNG CẤP "AUTO-NEXT" 🚀 ---
 function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
@@ -312,7 +292,6 @@ function setupSubmitButton(correctAnswer) {
     submitButton.parentNode.replaceChild(newButton, newButton);
 
     newButton.addEventListener('click', () => {
-        // Vô hiệu hóa nút ngay lập tức
         newButton.disabled = true;
         let allCorrect = true; 
 
@@ -357,7 +336,7 @@ function setupSubmitButton(correctAnswer) {
             // HẸN GIỜ 2 GIÂY TỰ ĐỘNG CHUYỂN CÂU
             setTimeout(() => {
                 loadNextQuestion(); 
-            }, 2000); // 2000ms = 2 giây
+            }, 2000); 
 
         } else {
             // ---- TRẢ LỜI SAI ----
@@ -366,7 +345,6 @@ function setupSubmitButton(correctAnswer) {
             feedbackMessage.className = 'wrong';
             speakMessage(message); // <-- 🚀 GỌI BỘ MÁY ĐỌC
 
-            // Cho phép nút "Trả lời" hoạt động trở lại
             newButton.disabled = false;
         }
     });
