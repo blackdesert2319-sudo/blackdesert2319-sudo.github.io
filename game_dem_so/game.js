@@ -53,7 +53,7 @@ function renderQuestion(question) {
 }
 
 
-// --- 🚀 BỘ NÃO NÂNG CẤP "GROUPING" CHO DẠNG 1 🚀 ---
+// --- 🚀 BỘ NÃO NÂNG CẤP "BẪY THEO CHỦ ĐỀ" 🚀 ---
 function renderFillInBlank_Master(payload) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -74,20 +74,15 @@ function renderFillInBlank_Master(payload) {
     
     // b. Bốc thăm ngẫu nhiên 1 nhóm
     const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+    console.log("Đã chọn chủ đề:", chosenGroup); // Giúp bạn kiểm tra
 
     // c. Lọc "kho" chỉ lấy các con vật thuộc nhóm đó
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
 
     // --- 2. GIAI ĐOẠN CHỌN CON VẬT (ACTOR SELECTION) ---
-    const chosenActors = []; // Các con vật được bốc thăm
-    
-    // Xáo trộn nhóm đã lọc
+    const chosenActors = [];
     const shuffledActors = shuffleArray(filteredActorPool);
-    
-    // Bốc thăm 'num_actors_to_pick' con vật
-    // (Đảm bảo không bốc nhiều hơn số lượng có trong nhóm)
     const numToPick = Math.min(rules.num_actors_to_pick, shuffledActors.length);
-
     for (let i = 0; i < numToPick; i++) {
         chosenActors.push(shuffledActors.pop());
     }
@@ -116,34 +111,38 @@ function renderFillInBlank_Master(payload) {
         });
     }
 
-    // b. Thêm "Bẫy 0"
-    if (promptRules.add_zero_trap && payload.prompt_rules.zero_trap_pool.length > 0) {
-        const trapPool = payload.prompt_rules.zero_trap_pool;
-        const randomTrap = trapPool[Math.floor(Math.random() * trapPool.length)];
+    // b. Thêm "Bẫy 0" (ĐÃ NÂNG CẤP)
+    if (promptRules.add_zero_trap && payload.group_traps && payload.group_traps[chosenGroup]) {
         
-        promptsToGenerate.push({
-            id: 'prompt_trap_0',
-            name_vi: randomTrap.name_vi,
-            answer_source: randomTrap.id 
-        });
+        // Chỉ lấy "bẫy" từ nhóm đã chọn (ví dụ: "hoc_tap")
+        const trapPool = payload.group_traps[chosenGroup]; 
+        
+        if (trapPool.length > 0) {
+            // Bốc thăm ngẫu nhiên 1 "bẫy" trong nhóm đó
+            const randomTrap = trapPool[Math.floor(Math.random() * trapPool.length)];
+            
+            promptsToGenerate.push({
+                id: 'prompt_trap_0',
+                name_vi: randomTrap.name_vi, // (ví dụ: "cái com-pa")
+                answer_source: randomTrap.id // (ví dụ: "compass")
+            });
+        }
     }
 
     // Xáo trộn thứ tự các câu hỏi
     shuffleArray(promptsToGenerate);
 
     // --- 5. GIAI ĐOẠN VẼ CẢNH (SCENE DRAWING) ---
-    // (Sử dụng "Công cụ Sắp xếp Trí nhớ" y như cũ)
+    // (Không thay đổi - "Công cụ Sắp xếp Trí nhớ" y như cũ)
     const placedPositions = []; 
     const imgSize = 60; 
     const retryLimit = 20; 
     const minSafeDistance = imgSize * 0.9; 
-
     sceneObjectsToDraw.forEach(object => {
         for (let i = 0; i < object.count; i++) {
             const img = document.createElement('img');
             img.src = `./assets/${object.image_url}`; 
             img.alt = object.image_url;
-
             let newTop, newLeft, isOverlapping, attempts = 0;
             do {
                 const maxTop = sceneBox.clientHeight - imgSize;
@@ -161,7 +160,6 @@ function renderFillInBlank_Master(payload) {
                     }
                 }
             } while (isOverlapping && attempts < retryLimit);
-
             placedPositions.push({ top: newTop, left: newLeft });
             img.style.top = `${newTop}px`;
             img.style.left = `${newLeft}px`;
@@ -172,29 +170,25 @@ function renderFillInBlank_Master(payload) {
     });
 
     // --- 6. GIAI ĐOẠN VẼ CÂU HỎI & TÌM ĐÁP ÁN (PROMPT RENDERING) ---
+    // (Không thay đổi)
     promptsToGenerate.forEach(prompt => {
         const line = document.createElement('div');
         line.className = 'prompt-line';
-        
         const textBefore = document.createTextNode(`Hình trên có số `);
         const objectName = document.createElement('strong');
         objectName.innerText = prompt.name_vi; 
         const textAfter = document.createTextNode(` là`);
         const unit = document.createTextNode(` con.`);
-        
         const input = document.createElement('input');
         input.type = 'number';
         input.min = '0';
         input.dataset.promptId = prompt.id; 
-
         const sourceId = prompt.answer_source; 
-        
         if (generatedAnswers.hasOwnProperty(sourceId)) {
             finalCorrectAnswers[prompt.id] = generatedAnswers[sourceId];
         } else {
             finalCorrectAnswers[prompt.id] = 0;
         }
-
         line.appendChild(textBefore);
         line.appendChild(objectName);
         line.appendChild(textAfter);
@@ -204,6 +198,7 @@ function renderFillInBlank_Master(payload) {
     });
 
     // --- 7. GIAI ĐOẠN GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
+    // (Không thay đổi)
     setupSubmitButton(finalCorrectAnswers);
 }
 
