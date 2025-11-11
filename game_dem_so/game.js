@@ -66,12 +66,10 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ "LÀM LẠI TỪ ĐẦU") ---
         QUESTION_BANK = [
-            'templates/dang_1/1a_dem_that.json',
-            'templates/dang_1/1a_bay_0.json',
-            'templates/dang_1/1b_nhieu_o.json',
-            'templates/dang_1c/1c_chon_hinh.json'
+            'templates/ch_dang_1.json', // Dạng 1 (Mới)
+            'templates/ch_dang_2.json'  // Dạng 2 (Mới)
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -150,7 +148,7 @@ function renderQuestion(question, database) {
     let correctAnswers; 
 
     // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
-    // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
+    // các "Khuôn Mẫu" Dạng 1
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -167,7 +165,7 @@ function renderQuestion(question, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ SỬA LỖI LOGIC 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ SỬA LỖI LOGIC "LOẠN NHÓM" 🚀 ---
 function generateFillInBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
@@ -205,8 +203,6 @@ function generateFillInBlank(payload, database) {
         chosenActors.push(shuffledActors.pop()); 
     }
     
-    // (Code Giai đoạn 3, 4, 5, 6, 7... giữ nguyên y hệt)
-    // ...
     // --- 3. GIAI ĐOẠN TẠO CẢNH (SCENE GENERATION) ---
     chosenActors.forEach(actor => {
         const count = getRandomInt(rules.count_min, rules.count_max);
@@ -309,8 +305,6 @@ function generateSelectGroupMaster(payload, database) {
     const chosenActor = filteredActorPool[Math.floor(Math.random() * filteredActorPool.length)];
     actorName = chosenActor.name_vi; 
     
-    // (Code Giai đoạn 2, 3, 4, 5... giữ nguyên y hệt)
-    // ...
     // --- 2. TẠO SỐ LƯỢNG n, m (n KHÁC m) ---
     const n = getRandomInt(rules.count_min, rules.count_max);
     let m;
