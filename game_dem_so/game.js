@@ -49,10 +49,10 @@ let QUESTION_NUMBER = 1;
 
 // --- NGÂN HÀNG THÔNG BÁO ---
 const PRAISE_MESSAGES = [
-    "Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
+    "🎉 Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
 ];
 const WARNING_MESSAGES = [
-    "Chưa đúng rồi, con đếm lại nhé.", "Ôi, sai mất rồi! Con thử lại nào.", "Cố lên, con xem lại kỹ hơn nhé.", "Vẫn chưa chính xác."
+    "☹️ Chưa đúng rồi, con đếm lại nhé.", "Ôi, sai mất rồi! Con thử lại nào.", "Cố lên, con xem lại kỹ hơn nhé.", "Vẫn chưa chính xác."
 ];
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
@@ -70,13 +70,12 @@ async function initializeApp() {
         console.log("Đã tải Kho Dữ Liệu.");
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ SỬA LỖI - "KHỚP" VỚI FILE CỦA BẠN) ---
-        // SỬA LỖI 1: Cập nhật tên tệp cho đúng với thư mục /templates của bạn
         QUESTION_BANK = [
             'ch_dang_1.json',
             'ch_dang_2.json',
             'ch_dang_3.json',
             'ch_dang_4.json',
-	    'ch_dang_5.json' // <--- THÊM DÒNG NÀY
+            'ch_dang_5.json' // <-- Đã thêm Dạng 5 (và sửa lỗi dấu phẩy)
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -127,7 +126,7 @@ function loadNextQuestion() {
 // "Vỏ Chung": Hàm tải "mảng lệnh" (JSON)
 async function loadQuestionTemplate(questionFile) {
     try {
-        // SỬA LỖI 2: Thêm './templates/' vào trước tên tệp
+        // Sửa lỗi đường dẫn
         const response = await fetch('./templates/' + questionFile);
         if (!response.ok) throw new Error(`Không thể tải file câu hỏi: ${questionFile}`);
         const questionTemplate = await response.json();
@@ -145,7 +144,7 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch)
+// "Bộ Điều Phối" (Renderer Switch) - (ĐÂY LÀ HÀM "CHỖ 2" ĐÃ SỬA)
 function renderQuestion(question, database) {
     document.getElementById('instruction-text').innerText = question.instruction;
     
@@ -391,6 +390,10 @@ function generateSelectGroupMaster(payload, database) {
     // --- 5. GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
     return finalCorrectAnswers;
 }
+
+
+// --- (ĐÂY LÀ "CHỖ 3" ĐÃ DÁN VÀO ĐÚNG VỊ TRÍ) ---
+
 // --- 🚀 BỘ NÃO DẠNG 5 (COMPARE GROUPS) 🚀 ---
 function generateCompareGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
@@ -415,27 +418,27 @@ function generateCompareGroups(payload, database) {
     const actorName = chosenActor.name_vi;
     const actorImg = chosenActor.image_url;
 
-    // --- 2. TẠO SỐ LƯỢNG m, n (m KHÁC n) --- [cite: 54]
+    // --- 2. TẠO SỐ LƯỢNG m, n (m KHÁC n) ---
     const m_count = getRandomInt(rules.count_min, rules.count_max);
     let n_count;
     do {
         n_count = getRandomInt(rules.count_min, rules.count_max);
-    } while (m_count === n_count); // Đảm bảo m khác n [cite: 54]
+    } while (m_count === n_count); // Đảm bảo m khác n
 
     const groupContents = {
         [groups[0].id]: m_count, // Hình A
         [groups[1].id]: n_count  // Hình B
     };
 
-    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi "nhiều hơn" hay "ít hơn"?) --- [cite: 55]
+    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi "nhiều hơn" hay "ít hơn"?) ---
     const isMoreQuestion = Math.random() < 0.5;
     let questionText, correctGroupId;
 
     if (isMoreQuestion) {
-        questionText = `Hỏi số ${actorName} ở hình nào nhiều hơn?`; [cite: 46]
+        questionText = `Hỏi số ${actorName} ở hình nào nhiều hơn?`;
         correctGroupId = (m_count > n_count) ? groups[0].id : groups[1].id;
     } else {
-        questionText = `Hỏi số ${actorName} ở hình nào ít hơn?`; [cite: 50]
+        questionText = `Hỏi số ${actorName} ở hình nào ít hơn?`;
         correctGroupId = (m_count < n_count) ? groups[0].id : groups[1].id;
     }
     
@@ -444,7 +447,7 @@ function generateCompareGroups(payload, database) {
     const container = document.createElement('div');
     container.className = 'group-select-container';
 
-    // Vẽ 2 hộp Hình A và Hình B [cite: 53]
+    // Vẽ 2 hộp Hình A và Hình B
     groups.forEach(group => {
         const groupDiv = document.createElement('div');
         groupDiv.className = 'group-box'; // Tái sử dụng CSS Dạng 4
@@ -548,6 +551,7 @@ function handleChoiceClick(userChoiceId, correctChoiceId, container) {
         }, 2000);
     }
 }
+
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
 function setupSubmitButton(correctAnswer) {
