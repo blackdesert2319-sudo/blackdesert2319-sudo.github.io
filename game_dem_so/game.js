@@ -41,13 +41,13 @@ function speakMessage(text) {
 
 
 // --- "KHO DỮ LIỆU" VÀ "TRẠNG THÁI" TOÀN CỤC ---
-// (KHÔNG CÒN GAME_DATABASE NỮA)
+let GAME_DATABASE = null; // "Kho dữ liệu" trung tâm
 let QUESTION_BANK = []; 
 let LAST_QUESTION_TYPE = null; 
 let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
-// --- 🚀 NGÂN HÀNG THÔNG BÁO 🚀 ---
+// --- NGÂN HÀNG THÔNG BÁO ---
 const PRAISE_MESSAGES = [
     "🎉 Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
 ];
@@ -57,25 +57,32 @@ const WARNING_MESSAGES = [
 
 // --- TRÌNH TỰ KHỞI ĐỘNG (BOOT SEQUENCE) ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadVoices(); // Tải giọng đọc
+    loadVoices(); 
     initializeApp();
 });
 
 async function initializeApp() {
     try {
-        // --- BƯỚC 1: KHAI BÁO "NGÂN HÀNG CÂU HỎI" ---
-        // (Chúng ta KHÔNG tải kho_du_lieu.json nữa)
+        // --- BƯỚC 1: Tải "KHO DỮ LIỆU" TRUNG TÂM ---
+        const response = await fetch('kho_du_lieu.json');
+        if (!response.ok) throw new Error('Không thể tải kho_du_lieu.json!');
+        GAME_DATABASE = await response.json();
+        console.log("Đã tải Kho Dữ Liệu.");
+
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (Đã "dọn dẹp") ---
         QUESTION_BANK = [
-            'master_template_dang_1.json', // Dạng 1
-            'master_template_1c.json'      // Dạng 1c
+            'templates/dang_1/1a_dem_that.json',
+            'templates/dang_1/1a_bay_0.json',
+            'templates/dang_1/1b_nhieu_o.json',
+            'templates/dang_1c/1c_chon_hinh.json'
         ];
         
-        // --- BƯỚC 2: TẢI CÂU HỎI ĐẦU TIÊN ---
+        // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
         loadNextQuestion();
 
     } catch (error) {
         console.error("Lỗi khởi động nghiêm trọng:", error);
-        document.getElementById('instruction-text').innerText = 'Lỗi không xác định. Không thể bắt đầu.';
+        document.getElementById('instruction-text').innerText = 'Lỗi tải KHO DỮ LIỆU. Không thể bắt đầu.';
     }
 }
 
@@ -120,10 +127,9 @@ async function loadQuestionTemplate(questionFile) {
     try {
         const response = await fetch(questionFile);
         if (!response.ok) throw new Error(`Không thể tải file câu hỏi: ${questionFile}`);
-        const questionTemplate = await response.json(); // Tải "Khuôn Mẫu"
+        const questionTemplate = await response.json();
         
-        // "Bộ điều phối" KHÔNG cần "database" nữa
-        renderQuestion(questionTemplate); 
+        renderQuestion(questionTemplate, GAME_DATABASE);
 
     } catch (error) {
         console.error(error);
@@ -136,22 +142,22 @@ async function loadQuestionTemplate(questionFile) {
 }
 
 // "Bộ Điều Phối" (Renderer Switch)
-function renderQuestion(question) { // KHÔNG CẦN "database"
+function renderQuestion(question, database) {
     document.getElementById('instruction-text').innerText = question.instruction;
     
     document.getElementById('scene-box').innerHTML = '';
     document.getElementById('prompt-area').innerHTML = '';
     document.getElementById('scene-box').style.display = 'block';
 
-    let payload = question.payload; // "Luật chơi" (BÊN TRONG CÓ actor_pool)
+    let payload = question.payload; 
     let correctAnswers; 
 
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
-            correctAnswers = generateFillInBlank(payload); // KHÔNG CẦN "database"
+            correctAnswers = generateFillInBlank(payload, database);
             break;
         case 'SELECT_GROUP_MASTER':
-            correctAnswers = generateSelectGroupMaster(payload); // KHÔNG CẦN "database"
+            correctAnswers = generateSelectGroupMaster(payload, database);
             break;
         default:
             console.error('Không nhận diện được type câu hỏi:', question.type);
@@ -162,45 +168,80 @@ function renderQuestion(question) { // KHÔNG CẦN "database"
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) 🚀 ---
-function generateFillInBlank(payload) { // KHÔNG CẦN "database"
+// --- 🚀 BỘ NÃO DẠNG 1 (MASTER) - ĐÃ SỬA LỖI LOGIC "LOẠN NHÓM" 🚀 ---
+function generateFillInBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
     
+    // --- 1. GIAI ĐOẠN CHỌN CHỦ ĐỀ (THEME SELECTION) - ĐÃ NÂNG CẤP ---
     const rules = payload.scene_rules;
-    const actorPool = payload.actor_pool; // LẤY TỪ "payload" (file JSON)
+    const actorPool = database.actor_pool; 
+    const numToPick = rules.num_actors_to_pick; 
+
+    // a. "Quét kho" VÀ "Đếm"
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+
+    // b. Lọc ra các nhóm (group) "Đủ điều kiện"
+    const validGroups = Object.keys(groupCounts).filter(group => 
+        groupCounts[group] >= numToPick
+    );
+
+    if (validGroups.length === 0) {
+        console.error("Không tìm thấy nhóm nào đủ điều kiện!", rules);
+        return; 
+    }
     
-    const allGroups = [...new Set(actorPool.map(actor => actor.group))];
-    const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+    // c. Bốc thăm ngẫu nhiên 1 nhóm "Hợp lệ"
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
-    const chosenActors = []; const shuffledActors = shuffleArray(filteredActorPool);
-    const numToPick = Math.min(rules.num_actors_to_pick, shuffledActors.length);
-    for (let i = 0; i < numToPick; i++) { chosenActors.push(shuffledActors.pop()); }
+
+    // --- 2. GIAI ĐOẠN CHỌN CON VẬT (ACTOR SELECTION) ---
+    const chosenActors = [];
+    const shuffledActors = shuffleArray(filteredActorPool);
+    for (let i = 0; i < numToPick; i++) { 
+        chosenActors.push(shuffledActors.pop()); 
+    }
+    
+    // --- 3. GIAI ĐOẠN TẠO CẢNH (SCENE GENERATION) ---
     chosenActors.forEach(actor => {
         const count = getRandomInt(rules.count_min, rules.count_max);
         generatedAnswers[actor.id] = count; 
         sceneObjectsToDraw.push({ image_url: actor.image_url, count: count });
     });
+
+    // --- 4. GIAI ĐOẠN TẠO CÂU HỎI (PROMPT GENERATION) ---
     const promptRules = payload.prompt_rules;
     if (promptRules.ask_about_all_actors) {
         chosenActors.forEach((actor, index) => {
             promptsToGenerate.push({ id: `prompt_actor_${index}`, name_vi: actor.name_vi, answer_source: actor.id });
         });
+    } else if (promptRules.num_actors_to_ask > 0) {
+        const shuffledToAsk = shuffleArray([...chosenActors]);
+        const numToAsk = Math.min(promptRules.num_actors_to_ask, shuffledToAsk.length);
+        for (let i = 0; i < numToAsk; i++) {
+            const actor = shuffledToAsk.pop(); 
+            promptsToGenerate.push({ id: `prompt_actor_${i}`, name_vi: actor.name_vi, answer_source: actor.id });
+        }
     }
-    // LẤY "BẪY" TỪ "payload" (file JSON)
-    if (promptRules.add_zero_trap && payload.group_traps && payload.group_traps[chosenGroup]) {
-        const trapPool = payload.group_traps[chosenGroup]; 
+    if (promptRules.add_zero_trap && database.group_traps && database.group_traps[chosenGroup]) {
+        const trapPool = database.group_traps[chosenGroup]; 
         if (trapPool.length > 0) {
             const randomTrap = trapPool[Math.floor(Math.random() * trapPool.length)];
             promptsToGenerate.push({ id: 'prompt_trap_0', name_vi: randomTrap.name_vi, answer_source: randomTrap.id });
         }
     }
     shuffleArray(promptsToGenerate);
-    // (Phần code VẼ CẢNH và VẼ CÂU HỎI giữ nguyên)
+
+    // --- 5. GIAI ĐOẠN VẼ CẢNH (SCENE DRAWING) ---
     const placedPositions = []; const imgSize = 60; const retryLimit = 20; const minSafeDistance = imgSize * 0.9; 
     sceneObjectsToDraw.forEach(object => {
         for (let i = 0; i < object.count; i++) {
-            const img = document.createElement('img'); img.src = `./assets/${object.image_url}`; img.alt = object.image_url;
+            const img = document.createElement('img');
+            img.src = `./assets/${object.image_url}`; 
+            img.alt = object.image_url;
             let newTop, newLeft, isOverlapping, attempts = 0;
             do {
                 const maxTop = sceneBox.clientHeight - imgSize; const maxLeft = sceneBox.clientWidth - imgSize;
@@ -213,16 +254,22 @@ function generateFillInBlank(payload) { // KHÔNG CẦN "database"
             } while (isOverlapping && attempts < retryLimit);
             placedPositions.push({ top: newTop, left: newLeft });
             img.style.top = `${newTop}px`; img.style.left = `${newLeft}px`;
-            const randomRotation = (Math.random() - 0.5) * 30; img.style.transform = `rotate(${randomRotation}deg)`;
+            const randomRotation = (Math.random() - 0.5) * 30; 
+            img.style.transform = `rotate(${randomRotation}deg)`;
             sceneBox.appendChild(img);
         }
     });
+
+    // --- 6. GIAI ĐOẠN VẼ CÂU HỎI & TÌM ĐÁP ÁN (PROMPT RENDERING) ---
     promptsToGenerate.forEach(prompt => {
-        const line = document.createElement('div'); line.className = 'prompt-line';
+        const line = document.createElement('div');
+        line.className = 'prompt-line';
         const textBefore = document.createTextNode(`Hình trên có số `);
         const objectName = document.createElement('strong'); objectName.innerText = prompt.name_vi; 
-        const textAfter = document.createTextNode(` là`); const unit = document.createTextNode(` con.`);
-        const input = document.createElement('input'); input.type = 'number'; input.min = '0'; input.dataset.promptId = prompt.id; 
+        const textAfter = document.createTextNode(` là`);
+        const unit = document.createTextNode(` con.`);
+        const input = document.createElement('input');
+        input.type = 'number'; input.min = '0'; input.dataset.promptId = prompt.id; 
         const sourceId = prompt.answer_source; 
         if (generatedAnswers.hasOwnProperty(sourceId)) { finalCorrectAnswers[prompt.id] = generatedAnswers[sourceId]; }
         else { finalCorrectAnswers[prompt.id] = 0; }
@@ -233,57 +280,90 @@ function generateFillInBlank(payload) { // KHÔNG CẦN "database"
     return finalCorrectAnswers;
 }
 
-// --- 🚀 BỘ NÃO DẠNG 1C (MASTER) 🚀 ---
-function generateSelectGroupMaster(payload) { // KHÔNG CẦN "database"
+// --- 🚀 BỘ NÃO DẠNG 1C (MASTER) - ĐÃ SỬA LỖI LOGIC 🚀 ---
+function generateSelectGroupMaster(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
     const rules = payload.rules; const groups = shuffleArray([...payload.groups]); 
     const finalCorrectAnswers = {}; const groupContents = {};
     let targetCount, targetGroup, actorName;
-    
-    const actorPool = payload.actor_pool; // LẤY TỪ "payload" (file JSON)
 
-    const allGroups = [...new Set(actorPool.map(actor => actor.group))];
-    const chosenGroup = allGroups[Math.floor(Math.random() * allGroups.length)];
+    // --- 1. CHỌN "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN - ĐÃ NÂNG CẤP ---
+    const actorPool = database.actor_pool; 
+    
+    // a. "Quét kho" VÀ "Đếm" (Dạng 1c chỉ cần 1 actor, nên numToPick = 1)
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+    // b. Lọc ra các nhóm "Đủ điều kiện" (có ít nhất 1 con vật)
+    const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 1);
+    
+    // c. Bốc thăm 1 nhóm "Hợp lệ"
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+    
+    // d. Bốc thăm 1 con vật
     const chosenActor = filteredActorPool[Math.floor(Math.random() * filteredActorPool.length)];
     actorName = chosenActor.name_vi; 
+    
+    // --- 2. TẠO SỐ LƯỢNG n, m (n KHÁC m) ---
     const n = getRandomInt(rules.count_min, rules.count_max);
     let m;
     do { m = getRandomInt(rules.count_min, rules.count_max); } while (m === n); 
     groupContents[groups[0].id] = n; 
     groupContents[groups[1].id] = m; 
+
+    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi n hay m?) ---
     if (Math.random() < 0.5) { targetCount = n; targetGroup = groups[0].id; }
     else { targetCount = m; targetGroup = groups[1].id; }
     finalCorrectAnswers['group_select'] = targetGroup;
-    // (Phần code VẼ GIAO DIỆN giữ nguyên)
-    const container = document.createElement('div'); container.className = 'group-select-container';
+
+    // --- 4. VẼ GIAO DIỆN HTML (Bên trong promptArea) ---
+    const container = document.createElement('div');
+    container.className = 'group-select-container';
     payload.groups.forEach(group => {
-        const groupDiv = document.createElement('div'); groupDiv.className = 'group-box';
-        const label = document.createElement('div'); label.className = 'group-label'; label.innerText = group.label; 
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'group-box';
+        const label = document.createElement('div');
+        label.className = 'group-label';
+        label.innerText = group.label; 
         groupDiv.appendChild(label);
         const itemCount = groupContents[group.id];
-        const itemContainer = document.createElement('div'); itemContainer.className = 'item-container';
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'item-container';
         for (let i = 0; i < itemCount; i++) {
-            const img = document.createElement('img'); img.src = `./assets/${chosenActor.image_url}`;
-            img.alt = chosenActor.name_vi; img.className = 'item-in-group';
+            const img = document.createElement('img');
+            img.src = `./assets/${chosenActor.image_url}`;
+            img.alt = chosenActor.name_vi;
+            img.className = 'item-in-group';
             itemContainer.appendChild(img);
         }
-        groupDiv.appendChild(itemContainer); container.appendChild(groupDiv);
+        groupDiv.appendChild(itemContainer);
+        container.appendChild(groupDiv);
     });
-    const questionLine = document.createElement('div'); questionLine.className = 'prompt-line';
+    const questionLine = document.createElement('div');
+    questionLine.className = 'prompt-line';
     const questionText = `Hình có ${targetCount} ${actorName} là hình`; 
     questionLine.appendChild(document.createTextNode(questionText));
-    const selectMenu = document.createElement('select'); selectMenu.id = 'group_select_input'; 
+    const selectMenu = document.createElement('select');
+    selectMenu.id = 'group_select_input'; 
     selectMenu.dataset.promptId = 'group_select'; 
-    const defaultOption = document.createElement('option'); defaultOption.value = ""; defaultOption.innerText = "Chọn";
+    const defaultOption = document.createElement('option');
+    defaultOption.value = ""; 
+    defaultOption.innerText = "Chọn";
     selectMenu.appendChild(defaultOption);
     payload.groups.forEach(group => {
-        const option = document.createElement('option'); option.value = group.id; option.innerText = group.label; 
+        const option = document.createElement('option');
+        option.value = group.id; 
+        option.innerText = group.label; 
         selectMenu.appendChild(option);
     });
-    questionLine.appendChild(selectMenu); container.appendChild(questionLine);
+    questionLine.appendChild(selectMenu);
+    container.appendChild(questionLine);
     promptArea.appendChild(container);
+
+    // --- 5. GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
     return finalCorrectAnswers;
 }
 
