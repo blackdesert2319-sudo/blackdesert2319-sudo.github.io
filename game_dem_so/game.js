@@ -47,7 +47,7 @@ let LAST_QUESTION_TYPE = null;
 let CURRENT_SCORE = 0;
 let QUESTION_NUMBER = 1;
 
-// --- NGÂN HÀNG THÔNG BÁO ---
+// --- NGÂN HÀNG THÔNG BÁO (ĐÃ BỎ EMOJI) ---
 const PRAISE_MESSAGES = [
     "Tuyệt vời!", "Con giỏi quá!", "Chính xác!", "Làm tốt lắm!", "Đúng rồi!"
 ];
@@ -69,9 +69,14 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ SỬA LỖI - "KHỚP" VỚI FILE CỦA BẠN) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ THÊM DẠNG 5, 6) ---
         QUESTION_BANK = [
-            'ch_dang_6.json' // <--- THÊM DÒNG NÀY
+            'ch_dang_1.json',
+            'ch_dang_2.json',
+            'ch_dang_3.json',
+            'ch_dang_4.json',
+            'ch_dang_5.json',
+            'ch_dang_6.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -140,7 +145,7 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (ĐÂY LÀ HÀM "CHỖ 2" ĐÃ SỬA)
+// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ THÊM DẠNG 5, 6)
 function renderQuestion(question, database) {
     document.getElementById('instruction-text').innerText = question.instruction;
     
@@ -151,11 +156,8 @@ function renderQuestion(question, database) {
     let payload = question.payload; 
     let correctAnswers; 
     
-    // BIẾN MỚI: Quyết định xem có dùng nút "Trả lời" chung không
     let useMainSubmitButton = true; 
 
-    // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
-    // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
     switch (question.type) {
         case 'FILL_IN_BLANK_MASTER': 
             correctAnswers = generateFillInBlank(payload, database);
@@ -163,27 +165,22 @@ function renderQuestion(question, database) {
         case 'SELECT_GROUP_MASTER':
             correctAnswers = generateSelectGroupMaster(payload, database);
             break;
-        // --- CASE MỚI CHO DẠNG 5 ---
         case 'COMPARE_GROUPS_MASTER':
             correctAnswers = generateCompareGroups(payload, database);
-            useMainSubmitButton = false; // Dạng này tự xử lý click
+            useMainSubmitButton = false; // Dạng 5 tự xử lý click
             break;
-// --- THÊM CASE MỚI CHO DẠNG 6 ---
         case 'COMPARE_ITEMS_SELECT':
             correctAnswers = generateCompareItemsSelect(payload, database);
-            useMainSubmitButton = true; // Dùng nút "Trả lời" chung
+            useMainSubmitButton = true; // Dạng 6 dùng nút chung
             break;
-        // --- KẾT THÚC PHẦN THÊM ---
         default:
             console.error('Không nhận diện được type câu hỏi:', question.type);
             return;
     }
 
-    // Chỉ cài đặt nút "Trả lời" chung nếu được yêu cầu
     if (useMainSubmitButton) {
         setupSubmitButton(correctAnswers);
     } else {
-        // Ẩn nút "Trả lời" chung đi
         document.getElementById('submit-button').style.display = 'none';
     }
 }
@@ -227,8 +224,6 @@ function generateFillInBlank(payload, database) {
         chosenActors.push(shuffledActors.pop()); 
     }
     
-    // (Code Giai đoạn 3, 4, 5, 6, 7... giữ nguyên y hệt)
-    // ...
     // --- 3. GIAI ĐOẠN TẠO CẢNH (SCENE GENERATION) ---
     chosenActors.forEach(actor => {
         const count = getRandomInt(rules.count_min, rules.count_max);
@@ -304,7 +299,7 @@ function generateFillInBlank(payload, database) {
     return finalCorrectAnswers;
 }
 
-// --- 🚀 BỘ NÃO DẠNG 1C (MASTER) - ĐÃ SỬA LỖI LOGIC 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 1C / DẠNG 4 (MASTER) 🚀 ---
 function generateSelectGroupMaster(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
@@ -315,24 +310,18 @@ function generateSelectGroupMaster(payload, database) {
     // --- 1. CHỌN "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN - ĐÃ NÂNG CẤP ---
     const actorPool = database.actor_pool; 
     
-    // a. "Quét kho" VÀ "Đếm" (Dạng 1c chỉ cần 1 actor, nên numToPick = 1)
     const groupCounts = {};
     actorPool.forEach(actor => {
         groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
     });
-    // b. Lọc ra các nhóm "Đủ điều kiện" (có ít nhất 1 con vật)
     const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 1);
     
-    // c. Bốc thăm 1 nhóm "Hợp lệ"
     const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
     const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
     
-    // d. Bốc thăm 1 con vật
     const chosenActor = filteredActorPool[Math.floor(Math.random() * filteredActorPool.length)];
     actorName = chosenActor.name_vi; 
     
-    // (Code Giai đoạn 2, 3, 4, 5... giữ nguyên y hệt)
-    // ...
     // --- 2. TẠO SỐ LƯỢNG n, m (n KHÁC m) ---
     const n = getRandomInt(rules.count_min, rules.count_max);
     let m;
@@ -394,8 +383,6 @@ function generateSelectGroupMaster(payload, database) {
 }
 
 
-// --- (ĐÂY LÀ "CHỖ 3" ĐÃ DÁN VÀO ĐÚNG VỊ TRÍ) ---
-
 // --- 🚀 BỘ NÃO DẠNG 5 (COMPARE GROUPS) 🚀 ---
 function generateCompareGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
@@ -407,7 +394,6 @@ function generateCompareGroups(payload, database) {
     const finalCorrectAnswers = {};
 
     // --- 1. CHỌN 1 "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN ---
-    // (Logic y hệt Dạng 4 - Dạng 1C)
     const actorPool = database.actor_pool; 
     const groupCounts = {};
     actorPool.forEach(actor => {
@@ -445,7 +431,6 @@ function generateCompareGroups(payload, database) {
     }
     
     // --- 4. VẼ GIAO DIỆN HTML ---
-    // Container chính (giống Dạng 4)
     const container = document.createElement('div');
     container.className = 'group-select-container';
 
@@ -553,8 +538,6 @@ function handleChoiceClick(userChoiceId, correctChoiceId, container) {
         }, 2000);
     }
 }
-// ... (code của hàm handleChoiceClick) ...
-} // <-- Dấu } kết thúc hàm handleChoiceClick
 
 
 // --- 🚀 BỘ NÃO DẠNG 6 (COMPARE ITEMS SELECT) 🚀 ---
@@ -667,10 +650,6 @@ function generateCompareItemsSelect(payload, database) {
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
 function setupSubmitButton(correctAnswer) {
-// ... (Hàm này giữ nguyên, không cần sửa) ...
-
-// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
-function setupSubmitButton(correctAnswer) {
     const submitButton = document.getElementById('submit-button');
     const feedbackMessage = document.getElementById('feedback-message');
     
@@ -695,7 +674,7 @@ function setupSubmitButton(correctAnswer) {
             }
         });
 
-        // 2. ĐỌC TỪ MENU THẢ XUỐNG (CHO DẠNG 1C)
+        // 2. ĐỌC TỪ MENU THẢ XUỐNG (CHO DẠNG 1C, DẠNG 6)
         const selectInputs = document.querySelectorAll('#prompt-area select');
         selectInputs.forEach(select => {
             const promptId = select.dataset.promptId; 
