@@ -1,21 +1,22 @@
 {
   "actor_pool": [ 
     { "id": "crab", "name_vi": "con cua", "image_url": "con_cua.png", "group": "duoi_nuoc" },
-    { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
     { "id": "starfish", "name_vi": "con sao biển", "image_url": "sao_bien.png", "group": "duoi_nuoc" },
     { "id": "fish", "name_vi": "con cá", "image_url": "con_ca.png", "group": "duoi_nuoc" },
-    
-    { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
-    { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" },
-
     { "id": "dolphin", "name_vi": "con cá heo", "image_url": "con_ca_heo.png", "group": "duoi_nuoc" },
     { "id": "shark", "name_vi": "con cá mập", "image_url": "con_ca_map.png", "group": "duoi_nuoc" },
 
+    { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
+    { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" },
     
     { "id": "apple", "name_vi": "quả táo", "image_url": "qua_tao.png", "group": "hoa_qua" },
     { "id": "orange", "name_vi": "quả cam", "image_url": "qua_cam.png", "group": "hoa_qua" },
     { "id": "banana", "name_vi": "quả chuối", "image_url": "qua_chuoi.png", "group": "hoa_qua" },
-    { "id": "grape", "name_vi": "chùm nho", "image_url": "chum_nho.png", "group": "hoa_qua" }
+    { "id": "grape", "name_vi": "chùm nho", "image_url": "chum_nho.png", "group": "hoa_qua" },
+
+    { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
+    { "id": "lion", "name_vi": "con sư tử", "image_url": "con_su_tu.png", "group": "tren_can" },
+    { "id": "tiger", "name_vi": "con hổ", "image_url": "con_ho.png", "group": "tren_can" }
   ],
 
   "group_traps": {
@@ -24,16 +25,15 @@
       { "id": "whale", "name_vi": "con cá voi" }
     ],
     "tren_can": [
-      { "id": "lion", "name_vi": "con sư tử" },
-      { "id": "tiger", "name_vi": "con hổ" }
+      { "id": "bear", "name_vi": "con gấu" },
+      { "id": "elephant", "name_vi": "con voi" }
     ],
     "hoc_tap": [
       { "id": "compass", "name_vi": "cái com-pa" },
       { "id": "backpack", "name_vi": "cái ba lô" }
     ],
-
     "hoa_qua": [
-      { "id": "grape", "name_vi": "quả bưởi" },
+      { "id": "pomelo", "name_vi": "quả bưởi" },
       { "id": "lemon", "name_vi": "quả chanh" }
     ]
   }
