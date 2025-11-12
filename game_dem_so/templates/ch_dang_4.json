@@ -1,0 +1,17 @@
+{
+  "id": "DANG_4",
+  "type": "SELECT_GROUP_MASTER",
+  "instruction": "Bạn hãy chọn đáp án thích hợp để điền vào ô trống.",
+  
+  "payload": {
+    "groups": [
+      { "id": "A", "label": "Hình A" },
+      { "id": "B", "label": "Hình B" }
+    ],
+
+    "rules": {
+      "count_min": 1, 
+      "count_max": 10 
+    }
+  }
+}
