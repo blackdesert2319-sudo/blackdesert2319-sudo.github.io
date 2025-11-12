@@ -249,3 +249,82 @@ body {
     margin-top: 15px;
     text-align: center;
 }
+/* --- CSS MỚI CHO DẠNG 8 (MULTI-SELECT) --- */
+.multi-choice-container {
+    display: flex;
+    flex-direction: column; /* Xếp 4 đáp án theo cột */
+    gap: 10px;
+    width: 90%;
+    margin: 15px auto 0 auto;
+}
+
+.choice-button-multi {
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: left;
+    background-color: #f0f0f0;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    position: relative;
+    padding-left: 50px; /* Chỗ cho checkbox */
+}
+
+/* Tạo hình checkbox giả */
+.choice-button-multi::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.choice-button-multi:hover {
+    background-color: #e0e0e0;
+    border-color: #007bff;
+}
+
+/* Trạng thái ĐÃ CHỌN */
+.choice-button-multi.selected {
+    background-color: #e6f0ff;
+    border-color: #007bff;
+}
+/* Dấu tick "V" khi đã chọn */
+.choice-button-multi.selected::after {
+    content: '✔';
+    position: absolute;
+    left: 18px;
+    top: 48%;
+    transform: translateY(-50%);
+    font-size: 1.4em;
+    color: #007bff;
+}
+
+/* Trạng thái ĐÚNG/SAI (khi chấm điểm) */
+.choice-button-multi.correct {
+    background-color: #d4edda;
+    border-color: #155724;
+    color: #155724;
+}
+.choice-button-multi.correct::after {
+    color: #155724; /* Tick V màu xanh */
+}
+
+.choice-button-multi.wrong {
+    background-color: #f8d7da;
+    border-color: #721c24;
+    color: #721c24;
+}
+.choice-button-multi.wrong::after {
+    content: '✖'; /* Dấu X */
+    color: #721c24;
+    font-size: 1.4em;
+    left: 19px;
+}

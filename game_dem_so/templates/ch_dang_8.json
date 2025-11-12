@@ -1,0 +1,11 @@
+{
+  "type": "MULTI_SELECT_COMPARE",
+  "instruction": "Bạn hãy chọn tất cả đáp án đúng.",
+  "payload": {
+    "rules": {
+      "count_min": 1,
+      "count_max": 9,
+      "force_unequal": true
+    }
+  }
+}
