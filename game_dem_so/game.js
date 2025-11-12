@@ -70,11 +70,12 @@ async function initializeApp() {
         console.log("Đã tải Kho Dữ Liệu.");
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ SỬA LỖI - "KHỚP" VỚI FILE CỦA BẠN) ---
+        // SỬA LỖI 1: Cập nhật tên tệp cho đúng với thư mục /templates của bạn
         QUESTION_BANK = [
-            'master_template_1a.json',
-            'master_template_1a_trap.json',
-            'master_template_1c.json',
-            'master_template_dang_1.json'
+            'ch_dang_1.json',
+            'ch_dang_2.json',
+            'ch_dang_3.json',
+            'ch_dang_4.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -125,7 +126,8 @@ function loadNextQuestion() {
 // "Vỏ Chung": Hàm tải "mảng lệnh" (JSON)
 async function loadQuestionTemplate(questionFile) {
     try {
-        const response = await fetch(questionFile);
+        // SỬA LỖI 2: Thêm './templates/' vào trước tên tệp
+        const response = await fetch('./templates/' + questionFile);
         if (!response.ok) throw new Error(`Không thể tải file câu hỏi: ${questionFile}`);
         const questionTemplate = await response.json();
         
