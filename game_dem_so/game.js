@@ -76,6 +76,7 @@ async function initializeApp() {
             'ch_dang_2.json',
             'ch_dang_3.json',
             'ch_dang_4.json'
+	    'ch_dang_5.json' // <--- THÊM DÒNG NÀY
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -154,6 +155,9 @@ function renderQuestion(question, database) {
 
     let payload = question.payload; 
     let correctAnswers; 
+    
+    // BIẾN MỚI: Quyết định xem có dùng nút "Trả lời" chung không
+    let useMainSubmitButton = true; 
 
     // "Bộ não" FILL_IN_BLANK_MASTER đủ thông minh để xử lý
     // cả 3 "Khuôn Mẫu" Dạng 1 (1a, 1b, 1a_trap)
@@ -164,12 +168,23 @@ function renderQuestion(question, database) {
         case 'SELECT_GROUP_MASTER':
             correctAnswers = generateSelectGroupMaster(payload, database);
             break;
+        // --- CASE MỚI CHO DẠNG 5 ---
+        case 'COMPARE_GROUPS_MASTER':
+            correctAnswers = generateCompareGroups(payload, database);
+            useMainSubmitButton = false; // Dạng này tự xử lý click
+            break;
         default:
             console.error('Không nhận diện được type câu hỏi:', question.type);
             return;
     }
 
-    setupSubmitButton(correctAnswers);
+    // Chỉ cài đặt nút "Trả lời" chung nếu được yêu cầu
+    if (useMainSubmitButton) {
+        setupSubmitButton(correctAnswers);
+    } else {
+        // Ẩn nút "Trả lời" chung đi
+        document.getElementById('submit-button').style.display = 'none';
+    }
 }
 
 
@@ -376,7 +391,163 @@ function generateSelectGroupMaster(payload, database) {
     // --- 5. GỬI ĐÁP ÁN ĐÚNG CHO "MÁY CHẤM" ---
     return finalCorrectAnswers;
 }
+// --- 🚀 BỘ NÃO DẠNG 5 (COMPARE GROUPS) 🚀 ---
+function generateCompareGroups(payload, database) {
+    const sceneBox = document.getElementById('scene-box');
+    const promptArea = document.getElementById('prompt-area');
+    sceneBox.style.display = 'none'; // Dạng này không dùng scene-box
+    
+    const rules = payload.rules;
+    const groups = payload.groups; // [{id: "a", label: "Hình A"}, {id: "b", label: "Hình B"}]
+    const finalCorrectAnswers = {};
 
+    // --- 1. CHỌN 1 "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN ---
+    // (Logic y hệt Dạng 4 - Dạng 1C)
+    const actorPool = database.actor_pool; 
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+    const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 1);
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
+    const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+    const chosenActor = filteredActorPool[Math.floor(Math.random() * filteredActorPool.length)];
+    const actorName = chosenActor.name_vi;
+    const actorImg = chosenActor.image_url;
+
+    // --- 2. TẠO SỐ LƯỢNG m, n (m KHÁC n) --- [cite: 54]
+    const m_count = getRandomInt(rules.count_min, rules.count_max);
+    let n_count;
+    do {
+        n_count = getRandomInt(rules.count_min, rules.count_max);
+    } while (m_count === n_count); // Đảm bảo m khác n [cite: 54]
+
+    const groupContents = {
+        [groups[0].id]: m_count, // Hình A
+        [groups[1].id]: n_count  // Hình B
+    };
+
+    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi "nhiều hơn" hay "ít hơn"?) --- [cite: 55]
+    const isMoreQuestion = Math.random() < 0.5;
+    let questionText, correctGroupId;
+
+    if (isMoreQuestion) {
+        questionText = `Hỏi số ${actorName} ở hình nào nhiều hơn?`; [cite: 46]
+        correctGroupId = (m_count > n_count) ? groups[0].id : groups[1].id;
+    } else {
+        questionText = `Hỏi số ${actorName} ở hình nào ít hơn?`; [cite: 50]
+        correctGroupId = (m_count < n_count) ? groups[0].id : groups[1].id;
+    }
+    
+    // --- 4. VẼ GIAO DIỆN HTML ---
+    // Container chính (giống Dạng 4)
+    const container = document.createElement('div');
+    container.className = 'group-select-container';
+
+    // Vẽ 2 hộp Hình A và Hình B [cite: 53]
+    groups.forEach(group => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'group-box'; // Tái sử dụng CSS Dạng 4
+        
+        const label = document.createElement('div');
+        label.className = 'group-label';
+        label.innerText = group.label; // "Hình A" hoặc "Hình B"
+        groupDiv.appendChild(label);
+        
+        const itemCount = groupContents[group.id];
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'item-container';
+        
+        for (let i = 0; i < itemCount; i++) {
+            const img = document.createElement('img');
+            img.src = `./assets/${actorImg}`;
+            img.alt = actorName;
+            img.className = 'item-in-group'; // Tái sử dụng CSS Dạng 4
+            itemContainer.appendChild(img);
+        }
+        groupDiv.appendChild(itemContainer);
+        container.appendChild(groupDiv);
+    });
+    
+    // Vẽ câu hỏi
+    const questionEl = document.createElement('p');
+    questionEl.className = 'question-prompt';
+    questionEl.innerText = questionText;
+    container.appendChild(questionEl);
+
+    // Vẽ các nút chọn đáp án
+    const choiceContainer = document.createElement('div');
+    choiceContainer.className = 'choice-container';
+    
+    groups.forEach(group => {
+        const choiceButton = document.createElement('button');
+        choiceButton.className = 'choice-button';
+        choiceButton.innerText = group.label; // "Hình A"
+        choiceButton.dataset.choiceId = group.id; // "a"
+
+        // --- 5. TẠO "MÁY CHẤM ĐIỂM" RIÊNG CHO DẠNG NÀY ---
+        choiceButton.addEventListener('click', () => {
+            handleChoiceClick(group.id, correctGroupId, choiceContainer);
+        });
+        choiceContainer.appendChild(choiceButton);
+    });
+    
+    container.appendChild(choiceContainer);
+    promptArea.appendChild(container);
+
+    // Dạng này không trả về đáp án cho "máy chấm" chung
+    return null; 
+}
+
+// Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5
+function handleChoiceClick(userChoiceId, correctChoiceId, container) {
+    const allButtons = container.querySelectorAll('.choice-button');
+    const clickedButton = container.querySelector(`[data-choice-id="${userChoiceId}"]`);
+    const feedbackMessage = document.getElementById('feedback-message');
+
+    // Vô hiệu hóa tất cả các nút ngay khi chọn
+    allButtons.forEach(btn => btn.disabled = true);
+
+    if (userChoiceId === correctChoiceId) {
+        // ---- TRẢ LỜI ĐÚNG ----
+        clickedButton.classList.add('correct');
+        const message = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+        feedbackMessage.innerText = message;
+        feedbackMessage.className = 'visible correct';
+        speakMessage(message);
+        
+        CURRENT_SCORE += 10;
+        document.getElementById('score').innerText = CURRENT_SCORE;
+
+        // Tự động chuyển câu sau 2 giây
+        setTimeout(() => {
+            loadNextQuestion(); 
+        }, 2000);
+
+    } else {
+        // ---- TRẢ LỜI SAI ----
+        clickedButton.classList.add('wrong');
+        // Tìm và highlight đáp án đúng
+        const correctButton = container.querySelector(`[data-choice-id="${correctChoiceId}"]`);
+        if (correctButton) {
+            correctButton.classList.add('correct');
+        }
+        
+        const message = WARNING_MESSAGES[Math.floor(Math.random() * WARNING_MESSAGES.length)];
+        feedbackMessage.innerText = message;
+        feedbackMessage.className = 'visible wrong';
+        speakMessage(message);
+
+        // Cho phép thử lại sau 2 giây (giống logic của nút "Trả lời" cũ)
+        setTimeout(() => {
+            allButtons.forEach(btn => {
+                btn.disabled = false; // Bật lại nút
+                btn.classList.remove('correct', 'wrong'); // Xóa màu
+            });
+            feedbackMessage.className = ''; // Ẩn thông báo
+        }, 2000);
+    }
+}
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
 function setupSubmitButton(correctAnswer) {
