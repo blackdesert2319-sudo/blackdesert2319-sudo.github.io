@@ -15,6 +15,7 @@
     { "id": "apple", "name_vi": "quả táo", "image_url": "qua_tao.png", "group": "hoa_qua" },
     { "id": "orange", "name_vi": "quả cam", "image_url": "qua_cam.png", "group": "hoa_qua" },
     { "id": "banana", "name_vi": "quả chuối", "image_url": "qua_chuoi.png", "group": "hoa_qua" }
+	{ "id": "grape", "name_vi": "chùm nho", "image_url": "chum_nho.png", "group": "hoa_qua" }
   ],
 
   "group_traps": {
