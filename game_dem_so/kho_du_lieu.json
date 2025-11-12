@@ -9,7 +9,12 @@
     { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" },
 
     { "id": "dolphin", "name_vi": "con cá heo", "image_url": "con_ca_heo.png", "group": "duoi_nuoc" },
-    { "id": "shark", "name_vi": "con cá mập", "image_url": "con_ca_map.png", "group": "duoi_nuoc" }
+    { "id": "shark", "name_vi": "con cá mập", "image_url": "con_ca_map.png", "group": "duoi_nuoc" },
+
+    
+    { "id": "apple", "name_vi": "quả táo", "image_url": "qua_tao.png", "group": "hoa_qua" },
+    { "id": "orange", "name_vi": "quả cam", "image_url": "qua_cam.png", "group": "hoa_qua" },
+    { "id": "banana", "name_vi": "quả chuối", "image_url": "qua_chuoi.png", "group": "hoa_qua" }
   ],
 
   "group_traps": {
@@ -24,6 +29,11 @@
     "hoc_tap": [
       { "id": "compass", "name_vi": "cái com-pa" },
       { "id": "backpack", "name_vi": "cái ba lô" }
+    ],
+
+    "hoa_qua": [
+      { "id": "grape", "name_vi": "quả nho" },
+      { "id": "lemon", "name_vi": "quả chanh" }
     ]
   }
 }
