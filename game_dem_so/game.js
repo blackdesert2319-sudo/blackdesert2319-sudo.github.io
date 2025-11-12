@@ -75,7 +75,7 @@ async function initializeApp() {
             'ch_dang_1.json',
             'ch_dang_2.json',
             'ch_dang_3.json',
-            'ch_dang_4.json'
+            'ch_dang_4.json',
 	    'ch_dang_5.json' // <--- THÊM DÒNG NÀY
         ];
         
