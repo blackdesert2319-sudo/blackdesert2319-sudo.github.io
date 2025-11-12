@@ -4,14 +4,18 @@
     { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
     { "id": "starfish", "name_vi": "con sao biển", "image_url": "sao_bien.png", "group": "duoi_nuoc" },
     { "id": "fish", "name_vi": "con cá", "image_url": "con_ca.png", "group": "duoi_nuoc" },
+    
     { "id": "book", "name_vi": "quyển sách", "image_url": "quyen_sach.png", "group": "hoc_tap" },
-    { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" }
+    { "id": "pen", "name_vi": "cái bút", "image_url": "cai_but.png", "group": "hoc_tap" },
+
+    { "id": "dolphin", "name_vi": "con cá heo", "image_url": "con_ca_heo.png", "group": "duoi_nuoc" },
+    { "id": "shark", "name_vi": "con cá mập", "image_url": "con_ca_map.png", "group": "duoi_nuoc" }
   ],
 
   "group_traps": {
     "duoi_nuoc": [
-      { "id": "shark", "name_vi": "con cá mập" },
-      { "id": "octopus", "name_vi": "con bạch tuộc" }
+      { "id": "octopus", "name_vi": "con bạch tuộc" },
+      { "id": "whale", "name_vi": "con cá voi" }
     ],
     "tren_can": [
       { "id": "lion", "name_vi": "con sư tử" },
