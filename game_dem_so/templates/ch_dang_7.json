@@ -1,0 +1,11 @@
+{
+  "type": "COMPARE_ITEMS_BUTTONS",
+  "instruction": "Bạn hãy chọn đáp án đúng.",
+  "payload": {
+    "rules": {
+      "count_min": 1,
+      "count_max": 9,
+      "force_unequal": true
+    }
+  }
+}
