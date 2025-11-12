@@ -32,7 +32,7 @@
     ],
 
     "hoa_qua": [
-      { "id": "grape", "name_vi": "quả nho" },
+      { "id": "grape", "name_vi": "quả bưởi" },
       { "id": "lemon", "name_vi": "quả chanh" }
     ]
   }
