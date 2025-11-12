@@ -75,7 +75,8 @@ async function initializeApp() {
             'ch_dang_2.json',
             'ch_dang_3.json',
             'ch_dang_4.json',
-            'ch_dang_5.json' // <-- Đã thêm Dạng 5 (và sửa lỗi dấu phẩy)
+            'ch_dang_5.json',
+            'ch_dang_6.json' // <--- THÊM DÒNG NÀY
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -172,6 +173,12 @@ function renderQuestion(question, database) {
             correctAnswers = generateCompareGroups(payload, database);
             useMainSubmitButton = false; // Dạng này tự xử lý click
             break;
+// --- THÊM CASE MỚI CHO DẠNG 6 ---
+        case 'COMPARE_ITEMS_SELECT':
+            correctAnswers = generateCompareItemsSelect(payload, database);
+            useMainSubmitButton = true; // Dùng nút "Trả lời" chung
+            break;
+        // --- KẾT THÚC PHẦN THÊM ---
         default:
             console.error('Không nhận diện được type câu hỏi:', question.type);
             return;
@@ -551,7 +558,121 @@ function handleChoiceClick(userChoiceId, correctChoiceId, container) {
         }, 2000);
     }
 }
+// ... (code của hàm handleChoiceClick) ...
+} // <-- Dấu } kết thúc hàm handleChoiceClick
 
+
+// --- 🚀 BỘ NÃO DẠNG 6 (COMPARE ITEMS SELECT) 🚀 ---
+function generateCompareItemsSelect(payload, database) {
+    const sceneBox = document.getElementById('scene-box');
+    const promptArea = document.getElementById('prompt-area');
+    sceneBox.style.display = 'none'; // Dạng này không dùng scene-box
+    
+    const rules = payload.rules;
+    const options = payload.options; // [{id: "nhieu_hon", ...}, ...]
+    const finalCorrectAnswers = {};
+
+    // --- 1. CHỌN NHÓM VÀ 2 "DIỄN VIÊN" (ACTORS) KHÁC NHAU ---
+    const actorPool = database.actor_pool;
+    
+    // a. Quét kho, lọc nhóm có >= 2 item (ví dụ: 'hoc_tap' có 2 item)
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+    const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 2);
+    
+    if (validGroups.length === 0) {
+        console.error("Không tìm thấy nhóm nào đủ 2 item cho Dạng 6!");
+        return; // Dừng
+    }
+
+    // b. Bốc thăm 1 nhóm (ví dụ: 'hoc_tap')
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
+    const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+    
+    // c. Bốc thăm 2 item *khác nhau* từ nhóm đó
+    const shuffledActors = shuffleArray(filteredActorPool);
+    const actor1 = shuffledActors.pop(); // Ví dụ: quyển sách
+    const actor2 = shuffledActors.pop(); // Ví dụ: cái bút
+
+    // --- 2. TẠO SỐ LƯỢNG m, n (CÓ THỂ BẰNG NHAU) ---
+    const m_count = getRandomInt(rules.count_min, rules.count_max); // Số lượng sách
+    const n_count = getRandomInt(rules.count_min, rules.count_max); // Số lượng bút
+
+    // --- 3. QUYẾT ĐỊNH ĐÁP ÁN ĐÚNG ---
+    let correctOptionId;
+    if (m_count > n_count) {
+        correctOptionId = 'nhieu_hon';
+    } else if (m_count < n_count) {
+        correctOptionId = 'it_hon';
+    } else {
+        correctOptionId = 'bang';
+    }
+    finalCorrectAnswers['comparison_select'] = correctOptionId; // Gửi cho máy chấm
+
+    // --- 4. VẼ GIAO DIỆN HTML (THEO KIỂU 2 HÀNG) ---
+    const container = document.createElement('div');
+    container.className = 'comparison-container';
+
+    // Hàng 1 (cho actor1 - sách)
+    const row1 = document.createElement('div');
+    row1.className = 'comparison-row';
+    for (let i = 0; i < m_count; i++) {
+        const img = document.createElement('img');
+        img.src = `./assets/${actor1.image_url}`;
+        img.alt = actor1.name_vi;
+        row1.appendChild(img);
+    }
+    container.appendChild(row1);
+
+    // Hàng 2 (cho actor2 - bút)
+    const row2 = document.createElement('div');
+    row2.className = 'comparison-row';
+    for (let i = 0; i < n_count; i++) {
+        const img = document.createElement('img');
+        img.src = `./assets/${actor2.image_url}`;
+        img.alt = actor2.name_vi;
+        row2.appendChild(img);
+    }
+    container.appendChild(row2);
+
+    // Vẽ câu hỏi (VD: "Số [quyển sách]... [select] ... số [cái bút]")
+    const questionLine = document.createElement('div');
+    questionLine.className = 'prompt-line'; 
+    
+    // Đảm bảo thứ tự câu hỏi khớp với hàng (actor1 ở trên, actor2 ở dưới)
+    questionLine.appendChild(document.createTextNode(`Từ hình trên, ta thấy số ${actor1.name_vi} `));
+    
+    const selectMenu = document.createElement('select');
+    selectMenu.dataset.promptId = 'comparison_select'; // ID để máy chấm
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = ""; 
+    defaultOption.innerText = "Chọn";
+    selectMenu.appendChild(defaultOption);
+    
+    options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.id; // "nhieu_hon", "it_hon", "bang"
+        option.innerText = opt.text_vi; 
+        selectMenu.appendChild(option);
+    });
+    
+    questionLine.appendChild(selectMenu);
+    questionLine.appendChild(document.createTextNode(` số ${actor2.name_vi}.`));
+    
+    container.appendChild(questionLine);
+    promptArea.appendChild(container);
+
+    // --- 5. GỬI ĐÁP ÁN CHO "MÁY CHẤM" CHUNG ---
+    return finalCorrectAnswers;
+}
+
+
+// --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
+function setupSubmitButton(correctAnswer) {
+// ... (Hàm này giữ nguyên, không cần sửa) ...
 
 // --- 🚀 MÁY CHẤM ĐIỂM (GRADER) - ĐÃ SỬA LỖI HOÀN CHỈNH 🚀 ---
 function setupSubmitButton(correctAnswer) {

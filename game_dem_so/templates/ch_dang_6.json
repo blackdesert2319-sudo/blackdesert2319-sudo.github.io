@@ -1,0 +1,15 @@
+{
+  "type": "COMPARE_ITEMS_SELECT",
+  "instruction": "Bạn hãy chọn đáp án thích hợp để điền vào ô trống.",
+  "payload": {
+    "rules": {
+      "count_min": 1,
+      "count_max": 9
+    },
+    "options": [
+      { "id": "nhieu_hon", "text_vi": "nhiều hơn" },
+      { "id": "it_hon", "text_vi": "ít hơn" },
+      { "id": "bang", "text_vi": "bằng" }
+    ]
+  }
+}
