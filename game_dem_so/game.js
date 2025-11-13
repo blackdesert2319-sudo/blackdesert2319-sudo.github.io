@@ -68,9 +68,20 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ THÊM DẠNG 12) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
-            'ch_dang_12.json', // <--- THÊM MỚI
+            'ch_dang_1.json',
+            'ch_dang_2.json',
+            'ch_dang_3.json',
+            'ch_dang_4.json',
+            'ch_dang_5.json',
+            'ch_dang_6.json',
+            'ch_dang_7.json',
+            'ch_dang_8.json',
+            'ch_dang_9.json',
+            'ch_dang_10.json', 
+            'ch_dang_11.json', 
+            'ch_dang_12.json', // <--- Dạng 12 đã được sửa
             'ch_dang_18.json'
         ];
         
@@ -130,7 +141,7 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (*** ĐÃ SỬA LỖI DỌN DẸP DẠNG 11 ***)
+// "Bộ Điều Phối" (Renderer Switch) - (*** ĐÃ SỬA LỖI DỌN DẸP DẠNG 11 & DẠNG 12 ***)
 function renderQuestion(question, database) {
 
     // --- BƯỚC DỌN DẸP MỚI (SỬA LỖI) ---
@@ -189,8 +200,8 @@ function renderQuestion(question, database) {
             useMainSubmitButton = false;
             break;
         // --- CASE MỚI CHO DẠNG 12 ---
-        case 'MATCH_EQUATION_TO_GROUP':
-            correctAnswers = generateMatchEquationToGroup(payload, database);
+        case 'MATCH_EQUATION_EXAMPLE':
+            correctAnswers = generateMatchEquationExample(payload, database);
             useMainSubmitButton = false;
             break;
         default:
@@ -207,6 +218,7 @@ function renderQuestion(question, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) ---
+// ... (Giữ nguyên)
 function generateFillInBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
@@ -310,6 +322,7 @@ function generateFillInBlank(payload, database) {
 }
 
 // --- 🚀 BỘ NÃO DẠNG 1C / DẠNG 4 (MASTER) 🚀 ---
+// ... (Giữ nguyên)
 function generateSelectGroupMaster(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
@@ -387,8 +400,8 @@ function generateSelectGroupMaster(payload, database) {
     return finalCorrectAnswers;
 }
 
-
 // --- 🚀 BỘ NÃO DẠNG 5 (COMPARE GROUPS) 🚀 ---
+// ... (Giữ nguyên)
 function generateCompareGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -485,7 +498,8 @@ function generateCompareGroups(payload, database) {
     return null; 
 }
 
-// Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9, 10, 11, 12, 18
+// --- Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9, 10, 11, 12, 18 ---
+// ... (Giữ nguyên)
 function handleChoiceClick(userChoiceId, correctChoiceId, container) {
     const allButtons = container.querySelectorAll('.choice-button'); 
     const clickedButton = container.querySelector(`[data-choice-id="${userChoiceId}"]`);
@@ -531,6 +545,7 @@ function handleChoiceClick(userChoiceId, correctChoiceId, container) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 6 (COMPARE ITEMS SELECT) 🚀 ---
+// ... (Giữ nguyên)
 function generateCompareItemsSelect(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -627,6 +642,7 @@ function generateCompareItemsSelect(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 7 (COMPARE ITEMS BUTTONS) 🚀 ---
+// ... (Giữ nguyên)
 function generateCompareItemsButtons(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -729,6 +745,7 @@ function generateCompareItemsButtons(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 8 (MULTI-SELECT COMPARE) 🚀 ---
+// ... (Giữ nguyên)
 function generateMultiSelectCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -821,6 +838,7 @@ function generateMultiSelectCompare(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 9 (ĐÃ SỬA LỖI LOGIC) 🚀 ---
+// ... (Giữ nguyên)
 function generateSelectNumberCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -923,6 +941,7 @@ function generateSelectNumberCompare(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 10 (MỚI - Sóc/Thông) 🚀 ---
+// ... (Giữ nguyên)
 function generateComparePairsMultiGroup(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1022,6 +1041,7 @@ function generateComparePairsMultiGroup(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 18 (CŨ - Cupcake) 🚀 ---
+// ... (Giữ nguyên)
 function generateCompareMultiGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1119,6 +1139,7 @@ function generateCompareMultiGroups(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 11 (ADD/SUBTRACT PICTORIAL) 🚀 ---
+// ... (Giữ nguyên)
 function generateAddSubtractPictorial(payload, database) {
     // 1. Thay scene-box bằng container-scene
     const sceneBox = document.getElementById('scene-box');
@@ -1231,115 +1252,145 @@ function generateAddSubtractPictorial(payload, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 12 (MATCH EQUATION) 🚀 ---
-function generateMatchEquationToGroup(payload, database) {
+// --- 🚀 BỘ NÃO DẠNG 12 (ĐÃ SỬA THEO "MẪU") 🚀 ---
+function generateMatchEquationExample(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none';
     
     const rules = payload.rules;
-    const groups = payload.groups;
-
-    // --- 1. CHỌN 1 "DIỄN VIÊN" (ACTOR) NGẪU NHIÊN ---
     const actorPool = database.actor_pool;
-    const chosenActor = actorPool[Math.floor(Math.random() * actorPool.length)];
-    const actorName = chosenActor.name_vi;
-    const actorImg = chosenActor.image_url;
+
+    // --- 1. CHỌN 2 "DIỄN VIÊN" KHÁC NHAU CÙNG 1 NHÓM ---
+    // (Tìm nhóm có ít nhất 2 item, ví dụ: hoa_qua)
+    const groupCounts = {};
+    actorPool.forEach(actor => {
+        groupCounts[actor.group] = (groupCounts[actor.group] || 0) + 1;
+    });
+    const validGroups = Object.keys(groupCounts).filter(group => groupCounts[group] >= 2);
     
-    // --- 2. TẠO CÁC SỐ (n, m, s, v) SAO CHO (n+m) != (s+v) ---
-    let n, m, s, v;
+    if (validGroups.length === 0) {
+        console.error("Không tìm thấy nhóm nào đủ 2 item cho Dạng 12!");
+        return;
+    }
+    const chosenGroup = validGroups[Math.floor(Math.random() * validGroups.length)];
+    const filteredActorPool = actorPool.filter(actor => actor.group === chosenGroup);
+    
+    const shuffledActors = shuffleArray(filteredActorPool);
+    const actorExample = shuffledActors.pop(); // Ví dụ: Táo
+    const actorQuestion = shuffledActors.pop(); // Ví dụ: Dâu
+
+    // --- 2. CHỌN 1 "CONTAINER" (Rổ/Đĩa) ---
+    // (Vì Dạng 11 đã thêm 'containers', ta có thể dùng nó)
+    const container = database.containers.find(c => c.allowed_group === chosenGroup) || { name_vi: "khay", image_url: "cai_ro.png" };
+
+    // --- 3. TẠO SỐ LIỆU (n1, m1) CHO MẪU ---
+    const n1_in = getRandomInt(rules.n_min, rules.n_max); // 3
+    const m1_out = getRandomInt(rules.m_min, rules.m_max); // 1
+    const exampleEquation = `${n1_in} + ${m1_out}`; // "3 + 1"
+
+    // --- 4. TẠO SỐ LIỆU (n2, m2) CHO CÂU HỎI ---
+    let n2_in, m2_out;
     do {
-        n = getRandomInt(rules.count_min, rules.count_max);
-        m = getRandomInt(rules.count_min, rules.count_max);
-        s = getRandomInt(rules.count_min, rules.count_max);
-        v = getRandomInt(rules.count_min, rules.count_max);
-    } while ( (n === s && m === v) || (n === v && m === s) ); // Đảm bảo 2 hình khác nhau
+        n2_in = getRandomInt(rules.n_min, rules.n_max); // 5
+        m2_out = getRandomInt(rules.m_min, rules.m_max); // 1
+    } while (n2_in === n1_in && m2_out === m1_out); // Đảm bảo khác Mẫu
+
+    // --- 5. TẠO 3 LỰA CHỌN PHÉP TÍNH ---
+    const correctOptionText = `${n2_in} + ${m2_out}`; // "5 + 1"
+    const reverseOptionText = `${m2_out} + ${n2_in}`; // "1 + 5"
+    let wrongOptionText;
+    do {
+        let wrong_n = getRandomInt(rules.n_min, rules.n_max);
+        let wrong_m = getRandomInt(rules.m_min, rules.m_max);
+        wrongOptionText = `${wrong_n} + ${wrong_m}`;
+    } while (wrongOptionText === correctOptionText || wrongOptionText === reverseOptionText);
     
-    const groupContents = {
-        [groups[0].id]: [n, m], // Hình A: [3, 4]
-        [groups[1].id]: [s, v]  // Hình B: [2, 5]
-    };
+    let options = [
+        { id: 'correct', text: correctOptionText },
+        { id: 'reverse', text: reverseOptionText },
+        { id: 'wrong', text: wrongOptionText }
+    ];
+    shuffleArray(options);
 
-    // --- 3. QUYẾT ĐỊNH CÂU HỎI (Hỏi Hình A hay Hình B?) ---
-    const askForA = Math.random() < 0.5;
-    let questionText, correctGroupId;
+    // --- 6. VẼ GIAO DIỆN HTML ---
+    const containerEl = document.createElement('div');
+    containerEl.className = 'equation-example-container';
+    promptArea.appendChild(containerEl);
 
-    if (askForA) {
-        questionText = `Phép cộng ${n} + ${m} phù hợp với hình nào dưới đây?`;
-        correctGroupId = groups[0].id; // "a"
-    } else {
-        questionText = `Phép cộng ${s} + ${v} phù hợp với hình nào dưới đây?`;
-        correctGroupId = groups[1].id; // "b"
+    // A. VẼ HỘP MẪU
+    const exampleDiv = document.createElement('div');
+    exampleDiv.className = 'example-box';
+    exampleDiv.innerHTML = `<div class="example-box-label">Mẫu:</div>
+                            <div class="example-container-inner"></div>
+                            <div class="example-arrow">➔</div>
+                            <div class="example-equation">${exampleEquation}</div>`;
+    containerEl.appendChild(exampleDiv);
+    
+    // B. VẼ HỘP CÂU HỎI
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question-box';
+     questionDiv.innerHTML = `<div class="example-box-label">Hình này tương ứng:</div>
+                            <div class="example-container-inner"></div>
+                            <div class="example-arrow">➔</div>
+                            <div class="example-equation">?</div>`;
+    containerEl.appendChild(questionDiv);
+
+    // --- 7. VẼ CÁC ITEM VÀO HỘP ---
+    // Vẽ item Mẫu (Táo)
+    const exampleInner = exampleDiv.querySelector('.example-container-inner');
+    const exampleItemOutside = document.createElement('img');
+    exampleItemOutside.src = `./assets/${actorExample.image_url}`;
+    exampleItemOutside.className = 'example-item-outside';
+    exampleDiv.appendChild(exampleItemOutside);
+    for (let i = 0; i < n1_in; i++) {
+        const img = document.createElement('img');
+        img.src = `./assets/${actorExample.image_url}`;
+        img.className = 'example-item-inside';
+        img.style.top = `${getRandomInt(10, 50)}%`;
+        img.style.left = `${getRandomInt(10, 70)}%`;
+        exampleInner.appendChild(img);
     }
     
-    // --- 4. VẼ GIAO DIỆN HTML (TÁI SỬ DỤNG CSS DẠNG 5) ---
-    const container = document.createElement('div');
-    container.className = 'group-select-container';
+    // Vẽ item Câu hỏi (Dâu)
+    const questionInner = questionDiv.querySelector('.example-container-inner');
+    const questionItemOutside = document.createElement('img');
+    questionItemOutside.src = `./assets/${actorQuestion.image_url}`;
+    questionItemOutside.className = 'example-item-outside';
+    questionDiv.appendChild(questionItemOutside);
+    for (let i = 0; i < n2_in; i++) {
+        const img = document.createElement('img');
+        img.src = `./assets/${actorQuestion.image_url}`;
+        img.className = 'example-item-inside';
+        img.style.top = `${getRandomInt(10, 50)}%`;
+        img.style.left = `${getRandomInt(10, 70)}%`;
+        questionInner.appendChild(img);
+    }
 
-    // Vẽ 2 hộp (Hình A, Hình B)
-    groups.forEach(group => {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'group-box';
-        
-        const label = document.createElement('div');
-        label.className = 'group-label';
-        label.innerText = group.label;
-        groupDiv.appendChild(label);
-        
-        // VẼ 2 HÀNG BÊN TRONG
-        const counts = groupContents[group.id]; // [n, m]
-        
-        // Hàng trên
-        const row1 = document.createElement('div');
-        row1.className = 'equation-row';
-        for (let i = 0; i < counts[0]; i++) {
-            const img = document.createElement('img');
-            img.src = `./assets/${actorImg}`;
-            img.alt = actorName;
-            row1.appendChild(img);
-        }
-        groupDiv.appendChild(row1);
-        
-        // Hàng dưới
-        const row2 = document.createElement('div');
-        row2.className = 'equation-row';
-         for (let i = 0; i < counts[1]; i++) {
-            const img = document.createElement('img');
-            img.src = `./assets/${actorImg}`;
-            img.alt = actorName;
-            row2.appendChild(img);
-        }
-        groupDiv.appendChild(row2);
-        
-        container.appendChild(groupDiv);
-    });
-    
-    // Vẽ câu hỏi
+    // --- 8. VẼ CÁC NÚT ĐÁP ÁN ---
     const questionEl = document.createElement('p');
     questionEl.className = 'question-prompt';
-    questionEl.innerText = questionText;
-    container.appendChild(questionEl);
+    questionEl.innerText = `Dựa vào mẫu, phép cộng nào thích hợp điền vào dấu ? trong hình trên?`;
+    promptArea.appendChild(questionEl);
 
-    // Vẽ các nút chọn đáp án
     const choiceContainer = document.createElement('div');
-    choiceContainer.className = 'choice-container';
+    choiceContainer.className = 'multi-choice-container'; // Xếp dọc
     
-    groups.forEach(group => {
+    options.forEach(opt => {
         const choiceButton = document.createElement('button');
         choiceButton.className = 'choice-button';
-        choiceButton.innerText = group.label;
-        choiceButton.dataset.choiceId = group.id;
+        choiceButton.innerText = opt.text;
+        choiceButton.dataset.choiceId = opt.id; 
 
         choiceButton.addEventListener('click', () => {
-            handleChoiceClick(group.id, correctGroupId, choiceContainer);
+            handleChoiceClick(opt.id, 'correct', choiceContainer);
         });
         choiceContainer.appendChild(choiceButton);
     });
     
-    container.appendChild(choiceContainer);
-    promptArea.appendChild(container);
+    promptArea.appendChild(choiceContainer);
 
-    return null; 
+    return null;
 }
 
 
