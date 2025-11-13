@@ -70,7 +70,7 @@ async function initializeApp() {
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
-            'ch_dang_17.json'
+            'ch_dang_14.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
