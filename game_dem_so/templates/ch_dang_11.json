@@ -1,0 +1,14 @@
+{
+  "type": "ADD_SUBTRACT_PICTORIAL",
+  "instruction": "Bạn hãy chọn đáp án đúng.",
+  "payload": {
+    "question_type": "add",
+    "rules": {
+      "n_min": 1, 
+      "n_max": 5, 
+      "m_min": 6, 
+      "m_max": 10,
+      "num_options": 3
+    }
+  }
+}
