@@ -461,24 +461,67 @@ body {
     object-fit: contain;
     margin: 0 2px;
 }
-/* --- CSS MỚI CHO DẠNG 12 (Equation Rows) --- */
-.equation-row {
+/* --- CSS MỚI CHO DẠNG 12 (MATCH EQUATION EXAMPLE) --- */
+.equation-example-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
-    min-height: 40px;
+    justify-content: space-around;
+    align-items: flex-start; /* Căn trên */
     width: 100%;
+    margin-bottom: 20px;
+    gap: 15px;
 }
-/* Thêm một đường gạch ngang nhỏ giữa 2 hàng */
-.group-box .equation-row:first-of-type {
-    border-bottom: 2px dashed #eee;
+.example-box, .question-box {
+    width: 45%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    min-height: 200px;
+    position: relative;
+}
+.example-box-label {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #007bff;
     margin-bottom: 5px;
-    padding-bottom: 5px;
+    text-align: center;
 }
-.equation-row img {
+.example-container-inner {
+    width: 90%;
+    height: 100px;
+    border: 2px dashed #999;
+    border-radius: 5px;
+    position: relative;
+    margin: 10px auto;
+}
+.example-item-inside {
+    position: absolute;
     width: 35px;
     height: 35px;
     object-fit: contain;
+}
+.example-item-outside {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    left: -45px; /* Đặt bên ngoài */
+    top: 30px;
+}
+.example-arrow {
+    position: absolute;
+    left: -18px;
+    top: 35px;
+    font-size: 24px;
+    color: #007bff;
+    transform: rotate(-30deg);
+}
+.example-equation {
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+}
+/* Dạng 12 sẽ tái sử dụng .multi-choice-container và .choice-button */
+.multi-choice-container .choice-button {
+    text-align: center; /* Đảm bảo phép tính căn giữa */
+    font-size: 1.2em;
 }
