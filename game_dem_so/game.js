@@ -68,7 +68,7 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ THÊM DẠNG 11) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
             'ch_dang_1.json',
             'ch_dang_2.json',
@@ -80,7 +80,7 @@ async function initializeApp() {
             'ch_dang_8.json',
             'ch_dang_9.json',
             'ch_dang_10.json', 
-            'ch_dang_11.json', // <--- THÊM MỚI
+            'ch_dang_11.json', 
             'ch_dang_18.json'
         ];
         
@@ -140,7 +140,7 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ SỬA LỖI DỌN DẸP DẠNG 11)
+// "Bộ Điều Phối" (Renderer Switch) - (*** ĐÃ SỬA LỖI DỌN DẸP DẠNG 11 ***)
 function renderQuestion(question, database) {
 
     // --- BƯỚC DỌN DẸP MỚI (SỬA LỖI) ---
