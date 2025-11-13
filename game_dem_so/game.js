@@ -70,7 +70,25 @@ async function initializeApp() {
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
-            'ch_dang_14.json'
+            'ch_dang_1.json',
+            'ch_dang_2.json',
+            'ch_dang_3.json',
+            'ch_dang_4.json',
+            'ch_dang_5.json',
+            'ch_dang_6.json',
+            'ch_dang_7.json',
+            'ch_dang_8.json',
+            'ch_dang_9.json',
+            'ch_dang_10.json', 
+            'ch_dang_11.json', 
+            'ch_dang_12.json',
+            'ch_dang_13.json',
+            'ch_dang_14.json',
+            'ch_dang_15.json',
+            'ch_dang_16.json',
+            'ch_dang_17.json',
+            'ch_dang_18.json',
+            'ch_dang_19.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -129,19 +147,28 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (*** ĐÃ SỬA LỖI DỌN DẸP DẠNG 11 & THÊM 5 DẠNG MỚI ***)
+// "Bộ Điều Phối" (Renderer Switch) - (*** ĐÃ SỬA LỖI DỌN DẸP DẠNG 11 & 14 ***)
 function renderQuestion(question, database) {
 
     // --- BƯỚC DỌN DẸP MỚI (SỬA LỖI) ---
+    // 1. Tìm và xóa "cái rổ" (.container-scene) cũ của Dạng 11
     const oldContainerScene = document.querySelector('.container-scene');
     if (oldContainerScene) {
         oldContainerScene.remove();
     }
+    // 2. Tìm và xóa scene (.tach-gop-scene) cũ của Dạng 14
+    const oldTachGopScene = document.querySelector('.tach-gop-scene');
+    if (oldTachGopScene) {
+        oldTachGopScene.remove();
+    }
+    
+    // 3. Dọn dẹp các khu vực tiêu chuẩn
     document.getElementById('instruction-text').innerText = question.instruction;
     document.getElementById('scene-box').innerHTML = ''; 
     document.getElementById('prompt-area').innerHTML = ''; 
     document.getElementById('scene-box').style.display = 'block'; 
     // --- KẾT THÚC SỬA LỖI ---
+
 
     let payload = question.payload; 
     let correctAnswers; 
@@ -232,7 +259,7 @@ function renderQuestion(question, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 1 (MASTER) ---
-// ... (GIỮ NGUYÊN)
+// ... (TẤT CẢ CÁC BỘ NÃO TỪ 1 ĐẾN 12 GIỮ NGUYÊN) ...
 function generateFillInBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     const generatedAnswers = {}; const sceneObjectsToDraw = []; const promptsToGenerate = []; const finalCorrectAnswers = {};
@@ -336,7 +363,6 @@ function generateFillInBlank(payload, database) {
 }
 
 // --- 🚀 BỘ NÃO DẠNG 1C / DẠNG 4 (MASTER) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateSelectGroupMaster(payload, database) {
     const sceneBox = document.getElementById('scene-box'); const promptArea = document.getElementById('prompt-area');
     sceneBox.style.display = 'none'; 
@@ -414,8 +440,8 @@ function generateSelectGroupMaster(payload, database) {
     return finalCorrectAnswers;
 }
 
+
 // --- 🚀 BỘ NÃO DẠNG 5 (COMPARE GROUPS) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateCompareGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -513,7 +539,6 @@ function generateCompareGroups(payload, database) {
 }
 
 // --- Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9, 10, 11, 12, 15, 16, 18, 19 ---
-// ... (GIỮ NGUYÊN)
 function handleChoiceClick(userChoiceId, correctChoiceId, container) {
     const allButtons = container.querySelectorAll('.choice-button'); 
     const clickedButton = container.querySelector(`[data-choice-id="${userChoiceId}"]`);
@@ -559,7 +584,6 @@ function handleChoiceClick(userChoiceId, correctChoiceId, container) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 6 (COMPARE ITEMS SELECT) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateCompareItemsSelect(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -656,7 +680,6 @@ function generateCompareItemsSelect(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 7 (COMPARE ITEMS BUTTONS) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateCompareItemsButtons(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -759,7 +782,6 @@ function generateCompareItemsButtons(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 8 (MULTI-SELECT COMPARE) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateMultiSelectCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -852,7 +874,6 @@ function generateMultiSelectCompare(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 9 (ĐÃ SỬA LỖI LOGIC) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateSelectNumberCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -955,7 +976,6 @@ function generateSelectNumberCompare(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 10 (MỚI - Sóc/Thông) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateComparePairsMultiGroup(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1055,7 +1075,6 @@ function generateComparePairsMultiGroup(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 18 (CŨ - Cupcake) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateCompareMultiGroups(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1153,7 +1172,6 @@ function generateCompareMultiGroups(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 11 (ADD/SUBTRACT PICTORIAL) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateAddSubtractPictorial(payload, database) {
     // 1. Thay scene-box bằng container-scene
     const sceneBox = document.getElementById('scene-box');
@@ -1267,7 +1285,6 @@ function generateAddSubtractPictorial(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 12 (ĐÃ SỬA THEO "MẪU") 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateMatchEquationExample(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1408,7 +1425,6 @@ function generateMatchEquationExample(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 19 (KHÔI PHỤC - HÌNH A/B) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateMatchEquationToGroup(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1521,7 +1537,6 @@ function generateMatchEquationToGroup(payload, database) {
 
 
 // --- 🚀 BỘ NÃO DẠNG 13 (GỘP) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateGopBlank(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1581,39 +1596,43 @@ function generateGopBlank(payload, database) {
     return finalCorrectAnswers;
 }
 
-// --- 🚀 BỘ NÃO DẠNG 14 (TÁCH) 🚀 ---
-// ... (GIỮ NGUYÊN)
+// --- 🚀 BỘ NÃO DẠNG 14 (TÁCH) (*** ĐÃ SỬA LỖI HIỂN THỊ ***) 🚀 ---
 function generateTachGopBlank(payload, database) {
+    // 1. ẨN scene-box VÀ TẠO SCENE MỚI (SỬA LỖI)
     const sceneBox = document.getElementById('scene-box');
+    sceneBox.style.display = 'none'; // Ẩn scene-box
+    const tachGopScene = document.createElement('div');
+    tachGopScene.className = 'tach-gop-scene'; // Dùng style mới
+    document.getElementById('question-area').insertBefore(tachGopScene, document.getElementById('prompt-area'));
+
     const promptArea = document.getElementById('prompt-area');
     
     const rules = payload.rules;
     const finalCorrectAnswers = {};
 
-    // 1. Chọn 1 actor
+    // 2. Chọn 1 actor
     const actorPool = database.actor_pool;
     const chosenActor = actorPool[Math.floor(Math.random() * actorPool.length)];
     const actorImg = chosenActor.image_url;
 
-    // 2. Tạo số total (t)
+    // 3. Tạo số total (t)
     const t = getRandomInt(rules.total_min, rules.total_max); // 3-10
     
-    // 3. Tách t thành n và m (n > m và n+m = t)
+    // 4. Tách t thành n và m (n > m và n+m = t)
     const n = getRandomInt(Math.ceil(t / 2), t - 1); // Đảm bảo n > m
     const m = t - n;
     
     finalCorrectAnswers['tach_n_red'] = n;
     finalCorrectAnswers['tach_m_yellow'] = m;
 
-    // 4. Vẽ t item lên scene-box
-    sceneBox.className = 'tach-gop-scene'; // Dùng style mới
+    // 5. Vẽ t item lên scene MỚI
     for (let i = 0; i < t; i++) {
         const img = document.createElement('img');
         img.src = `./assets/${actorImg}`;
-        sceneBox.appendChild(img);
+        tachGopScene.appendChild(img); // Thêm vào scene mới
     }
 
-    // 5. Vẽ cây sơ đồ
+    // 6. Vẽ cây sơ đồ
     const container = document.createElement('div');
     container.className = 'tach-gop-container';
     
@@ -1632,7 +1651,7 @@ function generateTachGopBlank(payload, database) {
     `;
     promptArea.appendChild(container);
 
-    // 6. Vẽ câu hỏi (theo PDF)
+    // 7. Vẽ câu hỏi (theo PDF)
     const note = document.createElement('p');
     note.style.textAlign = 'center';
     note.style.fontSize = '0.9em';
@@ -1644,7 +1663,6 @@ function generateTachGopBlank(payload, database) {
 }
 
 // --- 🚀 BỘ NÃO DẠNG 15 (CHỌN TÊN THEO SỐ LƯỢNG) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateSelectActorByCount(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -1743,7 +1761,6 @@ function generateSelectActorByCount(payload, database) {
 }
 
 // --- 🚀 BỘ NÃO DẠNG 16 (ĐẾM TRONG CONTAINER) 🚀 ---
-// ... (GIỮ NGUYÊN)
 function generateCountInContainer(payload, database) {
     // 1. Thay scene-box bằng container-scene
     const sceneBox = document.getElementById('scene-box');
@@ -1994,7 +2011,7 @@ function setupSubmitButton(correctAnswer) {
             
             // Chỉ chấm điểm nếu ô đó có đáp án
             if (correctAnswer.hasOwnProperty(promptId)) {
-                if (userAnswer !== realAnswer && !(isNaN(userAnswer) && realAnswer === 0)) { // Chấp nhận ô trống là 0 nếu đáp án là 0
+                if (userAnswer !== realAnswer && !(isNaN(userAnswer) && realAnswer === 0)) { 
                      if (isNaN(userAnswer) && realAnswer === 0) {
                         // Bỏ qua, đây là trường hợp đúng (ô trống = 0)
                      } else {
