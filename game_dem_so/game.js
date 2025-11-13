@@ -11,8 +11,6 @@ function shuffleArray(array) {
     }
     return array;
 }
-// (Đã xóa hàm generateNumberOptions vì nó gây lỗi logic)
-
 
 // --- 🚀 BỘ MÁY ĐỌC GIỌNG NÓI (TTS) - ĐÃ SỬA LỖI 🚀 ---
 const tts = window.speechSynthesis;
@@ -70,7 +68,7 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ THÊM DẠNG 11) ---
         QUESTION_BANK = [
             'ch_dang_1.json',
             'ch_dang_2.json',
@@ -81,9 +79,11 @@ async function initializeApp() {
             'ch_dang_7.json',
             'ch_dang_8.json',
             'ch_dang_9.json',
-            'ch_dang_10.json',
+            'ch_dang_10.json', 
+            'ch_dang_11.json', // <--- THÊM MỚI
             'ch_dang_18.json'
-        ];        
+        ];
+        
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
         loadNextQuestion();
 
@@ -140,7 +140,7 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ THÊM DẠNG 10, 18)
+// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ THÊM DẠNG 11)
 function renderQuestion(question, database) {
     document.getElementById('instruction-text').innerText = question.instruction;
     
@@ -180,14 +180,17 @@ function renderQuestion(question, database) {
             correctAnswers = generateSelectNumberCompare(payload, database);
             useMainSubmitButton = false;
             break;
-        // --- DẠNG 10 MỚI (Sóc) ---
         case 'COMPARE_PAIRS_MULTI_GROUP':
             correctAnswers = generateComparePairsMultiGroup(payload, database);
             useMainSubmitButton = false;
             break;
-        // --- DẠNG 18 MỚI (Cupcake) ---
         case 'COMPARE_MULTI_GROUPS':
             correctAnswers = generateCompareMultiGroups(payload, database);
+            useMainSubmitButton = false;
+            break;
+        // --- CASE MỚI CHO DẠNG 11 ---
+        case 'ADD_SUBTRACT_PICTORIAL':
+            correctAnswers = generateAddSubtractPictorial(payload, database);
             useMainSubmitButton = false;
             break;
         default:
@@ -482,7 +485,7 @@ function generateCompareGroups(payload, database) {
     return null; 
 }
 
-// Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9, 10, 18
+// Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9, 10, 11, 18
 function handleChoiceClick(userChoiceId, correctChoiceId, container) {
     const allButtons = container.querySelectorAll('.choice-button'); 
     const clickedButton = container.querySelector(`[data-choice-id="${userChoiceId}"]`);
@@ -1112,6 +1115,119 @@ function generateCompareMultiGroups(payload, database) {
     promptArea.appendChild(choiceContainer);
 
     return null; 
+}
+
+
+// --- 🚀 BỘ NÃO DẠNG 11 (ADD/SUBTRACT PICTORIAL) 🚀 ---
+function generateAddSubtractPictorial(payload, database) {
+    // 1. Thay scene-box bằng container-scene
+    const sceneBox = document.getElementById('scene-box');
+    sceneBox.style.display = 'none';
+    const containerScene = document.createElement('div');
+    containerScene.className = 'container-scene';
+    document.getElementById('question-area').insertBefore(containerScene, document.getElementById('prompt-area'));
+    
+    const promptArea = document.getElementById('prompt-area');
+    const rules = payload.rules;
+
+    // 2. Chọn 1 container (ví dụ: rổ)
+    if (!database.containers || database.containers.length === 0) {
+        console.error("Không tìm thấy 'containers' trong kho_du_lieu.json!");
+        return;
+    }
+    const chosenContainer = database.containers[Math.floor(Math.random() * database.containers.length)];
+    
+    // 3. Chọn 1 item (ví dụ: táo)
+    const allowedGroup = chosenContainer.allowed_group;
+    const actorPool = database.actor_pool.filter(actor => actor.group === allowedGroup);
+    if (actorPool.length === 0) {
+        console.error(`Không tìm thấy actor nào thuộc nhóm '${allowedGroup}'`);
+        return;
+    }
+    const chosenActor = actorPool[Math.floor(Math.random() * actorPool.length)];
+    const actorName = chosenActor.name_vi;
+    const actorImg = chosenActor.image_url;
+
+    // 4. Tạo số lượng n (ban đầu) và m (kết quả)
+    const n = getRandomInt(rules.n_min, rules.n_max); // 1-5
+    const m = getRandomInt(rules.m_min, rules.m_max); // 6-10
+    
+    // 5. Tính toán câu hỏi và đáp án
+    let questionText = "";
+    let correctAnswer = 0;
+    
+    if (payload.question_type === 'add') {
+        correctAnswer = m - n; // 10 - 5 = 5
+        questionText = `Trên ${chosenContainer.name_vi} có ${n} ${actorName}. Cần cho thêm bao nhiêu ${actorName} vào ${chosenContainer.name_vi} để có ${m} ${actorName}?`;
+    } else {
+        // (Logic cho câu hỏi "bớt đi" sẽ ở đây)
+    }
+
+    // 6. Tạo 3 lựa chọn (1 đúng, 2 sai)
+    let options = [];
+    options.push({ id: 'correct', number: correctAnswer });
+    
+    let wrongAnswer1;
+    do { wrongAnswer1 = getRandomInt(1, 9); } while (wrongAnswer1 === correctAnswer);
+    options.push({ id: 'wrong1', number: wrongAnswer1 });
+    
+    let wrongAnswer2;
+    do { wrongAnswer2 = getRandomInt(1, 9); } while (wrongAnswer2 === correctAnswer || wrongAnswer2 === wrongAnswer1);
+    options.push({ id: 'wrong2', number: wrongAnswer2 });
+    
+    shuffleArray(options);
+
+    // 7. VẼ CẢNH (Rổ + Táo)
+    // Vẽ rổ
+    const bgImg = document.createElement('img');
+    bgImg.src = `./assets/${chosenContainer.image_url}`;
+    bgImg.className = 'container-bg';
+    containerScene.appendChild(bgImg);
+    
+    // Vẽ n quả táo
+    for (let i = 0; i < n; i++) {
+        const itemImg = document.createElement('img');
+        itemImg.src = `./assets/${actorImg}`;
+        itemImg.className = 'item-in-container';
+        
+        // Đặt vị trí ngẫu nhiên bên trong rổ (giả định rổ chiếm 60% giữa)
+        itemImg.style.top = `${getRandomInt(20, 70)}%`;
+        itemImg.style.left = `${getRandomInt(20, 70)}%`;
+        itemImg.style.transform = `rotate(${(Math.random() - 0.5) * 40}deg)`;
+        containerScene.appendChild(itemImg);
+    }
+
+    // 8. VẼ CÂU HỎI VÀ ĐÁP ÁN
+    const questionEl = document.createElement('p');
+    questionEl.className = 'question-prompt';
+    questionEl.innerText = questionText;
+    promptArea.appendChild(questionEl);
+
+    // Tái sử dụng .multi-choice-container (Dạng 8)
+    const choiceContainer = document.createElement('div');
+    choiceContainer.className = 'multi-choice-container'; 
+    
+    options.forEach(opt => {
+        const choiceButton = document.createElement('button');
+        choiceButton.className = 'choice-button'; // Tái sử dụng style Dạng 5/9
+        choiceButton.dataset.choiceId = opt.id; 
+
+        // Thêm hình ảnh vào nút
+        for (let i = 0; i < opt.number; i++) {
+            const img = document.createElement('img');
+            img.src = `./assets/${actorImg}`;
+            choiceButton.appendChild(img);
+        }
+
+        choiceButton.addEventListener('click', () => {
+            handleChoiceClick(opt.id, 'correct', choiceContainer);
+        });
+        choiceContainer.appendChild(choiceButton);
+    });
+    
+    promptArea.appendChild(choiceContainer);
+
+    return null;
 }
 
 
