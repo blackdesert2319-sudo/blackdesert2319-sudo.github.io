@@ -70,10 +70,20 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (*** CHỈ TEST DẠNG 10 & 18 ***) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
-            'ch_dang_10.json', // <--- Chỉ test Dạng 10
-            'ch_dang_18.json' // <--- Chỉ test Dạng 18
+            'ch_dang_1.json',
+            'ch_dang_2.json',
+            'ch_dang_3.json',
+            'ch_dang_4.json',
+            'ch_dang_5.json',
+            'ch_dang_6.json',
+            'ch_dang_7.json',
+            'ch_dang_8.json',
+            'ch_dang_9.json',
+            'ch_dang_10.json',
+            'ch_dang_18.json'
+        ];
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
