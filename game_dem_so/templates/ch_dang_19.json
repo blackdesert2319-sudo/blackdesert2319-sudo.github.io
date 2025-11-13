@@ -1,0 +1,14 @@
+{
+  "type": "MATCH_EQUATION_TO_GROUP",
+  "instruction": "Bạn hãy chọn đáp án đúng.",
+  "payload": {
+    "groups": [
+      { "id": "a", "label": "Hình A" },
+      { "id": "b", "label": "Hình B" }
+    ],
+    "rules": {
+      "count_min": 1,
+      "count_max": 5
+    }
+  }
+}
