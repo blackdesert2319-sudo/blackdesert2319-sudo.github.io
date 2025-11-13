@@ -1,0 +1,10 @@
+{
+  "type": "TACH_GOP_BLANK",
+  "instruction": "Bạn hãy điền số thích hợp vào ô trống.",
+  "payload": {
+    "rules": {
+      "total_min": 3,
+      "total_max": 10
+    }
+  }
+}

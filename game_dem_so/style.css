@@ -546,3 +546,93 @@ body {
     height: 35px;
     object-fit: contain;
 }
+/* --- CSS MỚI CHO DẠNG 14 (Tách Gộp) --- */
+.tach-gop-scene {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+    margin-bottom: 10px;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+.tach-gop-scene img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.tach-gop-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px auto;
+    position: relative;
+    width: 200px;
+    height: 150px;
+}
+.tach-gop-total {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+.tach-gop-branch {
+    position: absolute;
+    width: 3px;
+    height: 50px;
+    background-color: #999;
+    z-index: 1;
+}
+.tach-gop-branch.left {
+    top: 40px;
+    left: 70px;
+    transform: rotate(30deg);
+}
+.tach-gop-branch.right {
+    top: 40px;
+    right: 70px;
+    transform: rotate(-30deg);
+}
+.tach-gop-inputs {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    position: absolute;
+    bottom: 20px;
+}
+.tach-gop-inputs .input-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tach-gop-inputs .input-box.red {
+    background-color: #f8d7da; /* Màu đỏ nhạt */
+}
+.tach-gop-inputs .input-box.yellow {
+    background-color: #fff3cd; /* Màu vàng nhạt */
+}
+.tach-gop-inputs input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2em;
+    border: none;
+    background: none;
+    padding: 0;
+}
+/* Dạng 15/16: Nút đáp án có cả số và chữ */
+.multi-choice-container .choice-button.text-with-number {
+    text-align: left;
+    font-size: 1.1em;
+}

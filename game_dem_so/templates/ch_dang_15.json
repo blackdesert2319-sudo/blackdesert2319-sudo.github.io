@@ -1,0 +1,11 @@
+{
+  "type": "SELECT_ACTOR_BY_COUNT",
+  "instruction": "Bạn hãy chọn đáp án đúng.",
+  "payload": {
+    "num_actors": 3,
+    "rules": {
+      "count_min": 1,
+      "count_max": 10
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "GOP_BLANK",
+  "instruction": "Bạn hãy điền số thích hợp vào ô trống.",
+  "payload": {
+    "rules": {
+      "count_min": 1,
+      "count_max": 5
+    }
+  }
+}

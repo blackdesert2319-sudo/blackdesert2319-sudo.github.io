@@ -1,0 +1,10 @@
+{
+  "type": "COUNT_IN_CONTAINER",
+  "instruction": "Bạn hãy chọn đáp án đúng.",
+  "payload": {
+    "rules": {
+      "in_min": 3, "in_max": 8,
+      "out_min": 1, "out_max": 3
+    }
+  }
+}
