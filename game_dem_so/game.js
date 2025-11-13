@@ -140,13 +140,23 @@ async function loadQuestionTemplate(questionFile) {
     }
 }
 
-// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ THÊM DẠNG 11)
+// "Bộ Điều Phối" (Renderer Switch) - (ĐÃ SỬA LỖI DỌN DẸP DẠNG 11)
 function renderQuestion(question, database) {
-    document.getElementById('instruction-text').innerText = question.instruction;
+
+    // --- BƯỚC DỌN DẸP MỚI (SỬA LỖI) ---
+    // 1. Tìm và xóa "cái rổ" (.container-scene) cũ của Dạng 11 nếu có
+    const oldContainerScene = document.querySelector('.container-scene');
+    if (oldContainerScene) {
+        oldContainerScene.remove();
+    }
     
-    document.getElementById('scene-box').innerHTML = '';
-    document.getElementById('prompt-area').innerHTML = '';
-    document.getElementById('scene-box').style.display = 'block';
+    // 2. Dọn dẹp các khu vực tiêu chuẩn
+    document.getElementById('instruction-text').innerText = question.instruction;
+    document.getElementById('scene-box').innerHTML = ''; // Xóa scene-box cũ
+    document.getElementById('prompt-area').innerHTML = ''; // Xóa prompt cũ
+    document.getElementById('scene-box').style.display = 'block'; // *Quan trọng*: Hiện lại scene-box (vì Dạng 11 đã ẩn nó đi)
+    // --- KẾT THÚC SỬA LỖI ---
+
 
     let payload = question.payload; 
     let correctAnswers; 
@@ -188,7 +198,6 @@ function renderQuestion(question, database) {
             correctAnswers = generateCompareMultiGroups(payload, database);
             useMainSubmitButton = false;
             break;
-        // --- CASE MỚI CHO DẠNG 11 ---
         case 'ADD_SUBTRACT_PICTORIAL':
             correctAnswers = generateAddSubtractPictorial(payload, database);
             useMainSubmitButton = false;
