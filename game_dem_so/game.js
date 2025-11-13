@@ -11,29 +11,7 @@ function shuffleArray(array) {
     }
     return array;
 }
-// *** HÀM TIỆN ÍCH MỚI CHO DẠNG 9 ***
-function generateNumberOptions(correctAnswer, min, max, count = 4) {
-    let options = [];
-    options.push({ id: 'correct', number: correctAnswer });
-
-    // Tạo một mảng các số có thể sai
-    let wrongNumbers = [];
-    for (let i = min; i <= max; i++) {
-        if (i !== correctAnswer) {
-            wrongNumbers.push(i);
-        }
-    }
-    shuffleArray(wrongNumbers);
-
-    // Lấy 3 số sai
-    for (let i = 0; i < count - 1; i++) {
-        if (wrongNumbers.length > 0) {
-            options.push({ id: 'wrong', number: wrongNumbers.pop() });
-        }
-    }
-    return shuffleArray(options);
-}
-
+// (Đã xóa hàm generateNumberOptions vì nó gây lỗi logic)
 
 // --- 🚀 BỘ MÁY ĐỌC GIỌNG NÓI (TTS) - ĐÃ SỬA LỖI 🚀 ---
 const tts = window.speechSynthesis;
@@ -101,7 +79,7 @@ async function initializeApp() {
             'ch_dang_6.json',
             'ch_dang_7.json',
             'ch_dang_8.json',
-            'ch_dang_9.json' // <--- THÊM MỚI
+            'ch_dang_9.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -196,7 +174,6 @@ function renderQuestion(question, database) {
             correctAnswers = generateMultiSelectCompare(payload, database);
             useMainSubmitButton = true;
             break;
-        // --- CASE MỚI CHO DẠNG 9 ---
         case 'SELECT_NUMBER_COMPARE':
             correctAnswers = generateSelectNumberCompare(payload, database);
             useMainSubmitButton = false; // Dạng 9 tự xử lý
@@ -495,7 +472,7 @@ function generateCompareGroups(payload, database) {
 
 // Hàm xử lý "MÁY CHẤM ĐIỂM" của Dạng 5, 7, 9
 function handleChoiceClick(userChoiceId, correctChoiceId, container) {
-    const allButtons = container.querySelectorAll('.choice-button, .choice-button-single-line'); // Cập nhật để tìm cả nút Dạng 9
+    const allButtons = container.querySelectorAll('.choice-button'); // CSS Dạng 5/7/9
     const clickedButton = container.querySelector(`[data-choice-id="${userChoiceId}"]`);
     const feedbackMessage = document.getElementById('feedback-message');
 
@@ -828,7 +805,7 @@ function generateMultiSelectCompare(payload, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 9 (SELECT NUMBER COMPARE) 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 9 (SELECT NUMBER COMPARE) - (*** ĐÃ SỬA LỖI LOGIC ***) 🚀 ---
 function generateSelectNumberCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -843,24 +820,72 @@ function generateSelectNumberCompare(payload, database) {
     const actorImg = chosenActor.image_url;
 
     // --- 2. TẠO SỐ LƯỢNG m (1-9) ---
-    const m_count = getRandomInt(rules.count_min, rules.count_max);
+    const m_count = getRandomInt(rules.count_min, rules.count_max); // Ví dụ: m_count = 2
 
     // --- 3. QUYẾT ĐỊNH CÂU HỎI (lớn hơn/nhỏ hơn) ---
     const isMoreQuestion = Math.random() < 0.5;
-    let questionText, correctChoiceId, correctAnswerNumber;
+    let questionText;
+    let options = []; // Mảng chứa 4 lựa chọn cuối cùng
+
+    // --- 4. TẠO 4 LỰA CHỌN SỐ (LOGIC MỚI ĐÃ SỬA) ---
+    let possibleCorrect = [];
+    let possibleWrong = [];
 
     if (isMoreQuestion) {
+        // Ví dụ: Hỏi "Số nào lớn hơn 2?"
         questionText = `Số nào lớn hơn số ${actorName} trong hình?`;
-        // Lấy 1 số ngẫu nhiên > m (từ m+1 đến 10)
-        correctAnswerNumber = getRandomInt(m_count + 1, rules.option_max);
+        // Tập hợp các số ĐÚNG (lớn hơn m)
+        for (let i = m_count + 1; i <= rules.option_max; i++) {
+            possibleCorrect.push(i); // [3, 4, 5, 6, 7, 8, 9, 10]
+        }
+        // Tập hợp các số SAI (nhỏ hơn hoặc bằng m)
+        for (let i = rules.option_min; i <= m_count; i++) {
+            possibleWrong.push(i); // [0, 1, 2]
+        }
     } else {
+        // Ví dụ: Hỏi "Số nào nhỏ hơn 2?"
         questionText = `Số nào nhỏ hơn số ${actorName} trong hình?`;
-        // Lấy 1 số ngẫu nhiên < m (từ 0 đến m-1)
-        correctAnswerNumber = getRandomInt(rules.option_min, m_count - 1);
+        // Tập hợp các số ĐÚNG (nhỏ hơn m)
+        for (let i = rules.option_min; i < m_count; i++) {
+            possibleCorrect.push(i); // [0, 1]
+        }
+        // Tập hợp các số SAI (lớn hơn hoặc bằng m)
+        for (let i = m_count; i <= rules.option_max; i++) {
+            possibleWrong.push(i); // [2, 3, 4, 5, 6, 7, 8, 9, 10]
+        }
+    }
+
+    // Xáo trộn các tập hợp
+    shuffleArray(possibleCorrect);
+    shuffleArray(possibleWrong);
+
+    // Lấy 1 đáp án ĐÚNG (ví dụ: 9)
+    if (possibleCorrect.length > 0) {
+        options.push({ id: 'correct', number: possibleCorrect.pop() });
+    } else {
+        // Trường hợp hiếm (ví dụ m=10 và hỏi "lớn hơn")
+        console.error("Không tìm thấy đáp án đúng cho Dạng 9!");
+        options.push({ id: 'correct', number: isMoreQuestion ? m_count + 1 : m_count - 1 });
+    }
+
+    // Lấy 3 đáp án SAI (ví dụ: 1, 2, 0)
+    for (let i = 0; i < 3; i++) {
+        if (possibleWrong.length > 0) {
+            options.push({ id: 'wrong', number: possibleWrong.pop() });
+        } else {
+            // Trường hợp hiếm (ví dụ m=0 và hỏi "lớn hơn")
+            console.warn("Không đủ đáp án sai cho Dạng 9, đang tạo ngẫu nhiên");
+            let randomWrong;
+            do {
+                randomWrong = getRandomInt(rules.option_min, rules.option_max);
+            } while (randomWrong === options[0].number); // Đảm bảo không trùng đáp án đúng
+            options.push({ id: 'wrong', number: randomWrong });
+        }
     }
     
-    // --- 4. TẠO 4 LỰA CHỌN SỐ ---
-    const options = generateNumberOptions(correctAnswerNumber, rules.option_min, rules.option_max, 4);
+    // Xáo trộn 4 lựa chọn cuối cùng [9, 1, 2, 0] -> [1, 9, 0, 2]
+    shuffleArray(options);
+
 
     // --- 5. VẼ GIAO DIỆN HTML ---
     // Hiển thị các item
@@ -882,14 +907,15 @@ function generateSelectNumberCompare(payload, database) {
 
     // Vẽ các nút chọn đáp án (Tái sử dụng CSS Dạng 8 và 5)
     const choiceContainer = document.createElement('div');
-    choiceContainer.className = 'multi-choice-container';
+    choiceContainer.className = 'multi-choice-container'; // Tái sử dụng CSS Dạng 8
     
     options.forEach(opt => {
         const choiceButton = document.createElement('button');
-        choiceButton.className = 'choice-button'; // Tái sử dụng style Dạng 5
+        choiceButton.className = 'choice-button'; // Tái sử dụng CSS Dạng 5
         choiceButton.innerText = opt.number; // Hiển thị số
         choiceButton.dataset.choiceId = opt.id; // 'correct' hoặc 'wrong'
 
+        // Tái sử dụng máy chấm điểm của Dạng 5/7
         choiceButton.addEventListener('click', () => {
             handleChoiceClick(opt.id, 'correct', choiceContainer);
         });
