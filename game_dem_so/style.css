@@ -615,3 +615,20 @@ body {
     width: 35px;
     height: 35px;
 }
+/* --- SỬA LỖI HIỂN THỊ CHO DẠNG 14 --- */
+.tach-gop-scene {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+    margin-bottom: 10px;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.tach-gop-scene img {
+    position: relative; /* <-- Dòng này SỬA LỖI */
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
