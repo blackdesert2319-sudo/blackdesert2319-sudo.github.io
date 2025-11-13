@@ -461,3 +461,24 @@ body {
     object-fit: contain;
     margin: 0 2px;
 }
+/* --- CSS MỚI CHO DẠNG 12 (Equation Rows) --- */
+.equation-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 40px;
+    width: 100%;
+}
+/* Thêm một đường gạch ngang nhỏ giữa 2 hàng */
+.group-box .equation-row:first-of-type {
+    border-bottom: 2px dashed #eee;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+.equation-row img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
