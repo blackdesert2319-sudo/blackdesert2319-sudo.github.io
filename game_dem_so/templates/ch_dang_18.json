@@ -1,0 +1,13 @@
+{
+  "type": "COMPARE_MULTI_GROUPS",
+  "instruction": "Bạn hãy chọn câu trả lời đúng.",
+  "payload": {
+    "num_groups": 3,
+    "labels": ["Hình 1", "Hình 2", "Hình 3"],
+    "ids": ["hinh_1", "hinh_2", "hinh_3"],
+    "rules": {
+      "count_min": 1,
+      "count_max": 9
+    }
+  }
+}

@@ -361,3 +361,67 @@ body {
     text-align: center; /* Căn giữa các con số */
     font-size: 1.3em;
 }
+/* --- CSS CHO DẠNG 10 VÀ 18 (Multi-Group Compare) --- */
+.multi-group-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.multi-group-box {
+    width: 90%;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.multi-group-box .group-label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+/* Tái sử dụng .item-grid-container của Dạng 9, nhưng bỏ border */
+.multi-group-box .item-grid-container {
+    border: none;
+    padding: 0;
+    width: 100%;
+    min-height: 40px;
+    gap: 5px;
+    justify-content: flex-start; /* Căn trái các item */
+}
+
+.multi-group-box .item-grid-container img {
+    width: 35px;
+    height: 35px;
+}
+
+/* --- CSS TÁI SỬ DỤNG TỪ DẠNG 9 --- */
+.item-grid-container {
+    width: 90%;
+    margin: 15px auto;
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    min-height: 100px;
+}
+.item-grid-container img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+.multi-choice-container .choice-button {
+    width: 100%; /* Bắt buộc nút full-width */
+    flex: none;  /* Ghi đè 'flex: 1' của Dạng 5 */
+    text-align: center; /* Căn giữa các con số */
+    font-size: 1.3em;
+}
