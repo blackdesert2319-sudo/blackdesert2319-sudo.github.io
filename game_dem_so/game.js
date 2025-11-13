@@ -70,25 +70,7 @@ async function initializeApp() {
 
         // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐẦY ĐỦ) ---
         QUESTION_BANK = [
-            'ch_dang_1.json',
-            'ch_dang_2.json',
-            'ch_dang_3.json',
-            'ch_dang_4.json',
-            'ch_dang_5.json',
-            'ch_dang_6.json',
-            'ch_dang_7.json',
-            'ch_dang_8.json',
-            'ch_dang_9.json',
-            'ch_dang_10.json', 
-            'ch_dang_11.json', 
-            'ch_dang_12.json',
-            'ch_dang_13.json',
-            'ch_dang_14.json',
-            'ch_dang_15.json',
-            'ch_dang_16.json',
-            'ch_dang_17.json',
-            'ch_dang_18.json',
-            'ch_dang_19.json'
+            'ch_dang_17.json'
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
