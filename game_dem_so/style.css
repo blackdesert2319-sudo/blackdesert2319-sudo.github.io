@@ -328,3 +328,36 @@ body {
     font-size: 1.4em;
     left: 19px;
 }
+/* --- CSS MỚI CHO DẠNG 9 (Item Grid) --- */
+.item-grid-container {
+    width: 90%;
+    margin: 15px auto;
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    min-height: 100px;
+}
+.item-grid-container img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* --- CSS MỚI CHO DẠNG 9 (Nút đáp án) --- */
+/* * Chúng ta sẽ tái sử dụng container của Dạng 8 (.multi-choice-container) 
+ * để xếp các nút theo chiều dọc.
+ *
+ * Chúng ta sẽ tái sử dụng các nút của Dạng 5/7 (.choice-button)
+ * và điều chỉnh lại một chút cho Dạng 9.
+*/
+.multi-choice-container .choice-button {
+    width: 100%; /* Bắt buộc nút full-width */
+    flex: none;  /* Ghi đè 'flex: 1' của Dạng 5 */
+    text-align: center; /* Căn giữa các con số */
+    font-size: 1.3em;
+}
