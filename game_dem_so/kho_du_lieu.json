@@ -15,8 +15,8 @@
     { "id": "grape", "name_vi": "chùm nho", "image_url": "chum_nho.png", "group": "hoa_qua" },
 
     { "id": "frog", "name_vi": "con ếch", "image_url": "con_ech.png", "group": "tren_can" },
-    { "id": "lion", "name_vi": "con sư tử", "image_url": "con_su_tu.png", "group": "tren_can" },
-    { "id": "tiger", "name_vi": "con hổ", "image_url": "con_ho.png", "group": "tren_can" },
+    { "id": "squirrel", "name_vi": "con sóc", "image_url": "con_soc.png", "group": "tren_can" },
+    { "id": "pinecone", "name_vi": "quả thông", "image_url": "qua_thong.png", "group": "tren_can" },
 
     { "id": "cup", "name_vi": "cái cốc", "image_url": "cai_coc.png", "group": "gia_dinh" },
     { "id": "spoon", "name_vi": "cái thìa", "image_url": "cai_thia.png", "group": "gia_dinh" }
@@ -24,7 +24,7 @@
 
   "group_traps": {
     "duoi_nuoc": [ { "id": "octopus", "name_vi": "con bạch tuộc" }, { "id": "whale", "name_vi": "con cá voi" } ],
-    "tren_can": [ { "id": "bear", "name_vi": "con gấu" }, { "id": "elephant", "name_vi": "con voi" } ],
+    "tren_can": [ { "id": "lion", "name_vi": "con sư tử" }, { "id": "tiger", "name_vi": "con hổ" } ],
     "hoc_tap": [ { "id": "compass", "name_vi": "cái com-pa" }, { "id": "backpack", "name_vi": "cái ba lô" } ],
     "hoa_qua": [ { "id": "pomelo", "name_vi": "quả bưởi" }, { "id": "lemon", "name_vi": "quả chanh" } ],
     "gia_dinh": [ { "id": "fork", "name_vi": "cái dĩa" }, { "id": "plate", "name_vi": "cái đĩa" } ]
@@ -32,6 +32,22 @@
 
   "item_pairs": [
     ["book", "pen"],
-    ["cup", "spoon"]
+    ["cup", "spoon"],
+    ["squirrel", "pinecone"]
+  ],
+
+  "containers": [
+    { 
+      "id": "basket_fruit", 
+      "name_vi": "cái rổ", 
+      "image_url": "cai_ro.png", 
+      "allowed_group": "hoa_qua"
+    },
+    {
+      "id": "box_school",
+      "name_vi": "cái hộp",
+      "image_url": "cai_hop.png",
+      "allowed_group": "hoc_tap"
+    }
   ]
 }
