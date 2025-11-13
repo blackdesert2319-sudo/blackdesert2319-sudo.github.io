@@ -70,10 +70,10 @@ async function initializeApp() {
         GAME_DATABASE = await response.json();
         console.log("Đã tải Kho Dữ Liệu.");
 
-        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (ĐÃ THÊM DẠNG 10, 18) ---
+        // --- BƯỚC 2: KHAI BÁO "NGÂN HÀNG CÂU HỎI" (*** CHỈ TEST DẠNG 10 & 18 ***) ---
         QUESTION_BANK = [
-            'ch_dang_10.json', 
-            'ch_dang_18.json'
+            'ch_dang_10.json', // <--- Chỉ test Dạng 10
+            'ch_dang_18.json' // <--- Chỉ test Dạng 18
         ];
         
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
@@ -172,10 +172,12 @@ function renderQuestion(question, database) {
             correctAnswers = generateSelectNumberCompare(payload, database);
             useMainSubmitButton = false;
             break;
+        // --- DẠNG 10 MỚI (Sóc) ---
         case 'COMPARE_PAIRS_MULTI_GROUP':
             correctAnswers = generateComparePairsMultiGroup(payload, database);
             useMainSubmitButton = false;
             break;
+        // --- DẠNG 18 MỚI (Cupcake) ---
         case 'COMPARE_MULTI_GROUPS':
             correctAnswers = generateCompareMultiGroups(payload, database);
             useMainSubmitButton = false;
@@ -807,7 +809,7 @@ function generateMultiSelectCompare(payload, database) {
 }
 
 
-// --- 🚀 BỘ NÃO DẠNG 9 (KHÔI PHỤC PHIÊN BẢN ỔN ĐỊNH) 🚀 ---
+// --- 🚀 BỘ NÃO DẠNG 9 (ĐÃ SỬA LỖI LOGIC) 🚀 ---
 function generateSelectNumberCompare(payload, database) {
     const sceneBox = document.getElementById('scene-box');
     const promptArea = document.getElementById('prompt-area');
@@ -820,20 +822,58 @@ function generateSelectNumberCompare(payload, database) {
     const actorName = chosenActor.name_vi;
     const actorImg = chosenActor.image_url;
 
-    const m_count = getRandomInt(rules.count_min, rules.count_max);
+    const m_count = getRandomInt(rules.count_min, rules.count_max); 
 
     const isMoreQuestion = Math.random() < 0.5;
-    let questionText, correctChoiceId, correctAnswerNumber;
+    let questionText;
+    let options = []; 
+
+    let possibleCorrect = [];
+    let possibleWrong = [];
 
     if (isMoreQuestion) {
         questionText = `Số nào lớn hơn số ${actorName} trong hình?`;
-        correctAnswerNumber = getRandomInt(m_count + 1, rules.option_max);
+        for (let i = m_count + 1; i <= rules.option_max; i++) {
+            possibleCorrect.push(i);
+        }
+        for (let i = rules.option_min; i <= m_count; i++) {
+            possibleWrong.push(i);
+        }
     } else {
         questionText = `Số nào nhỏ hơn số ${actorName} trong hình?`;
-        correctAnswerNumber = getRandomInt(rules.option_min, m_count - 1);
+        for (let i = rules.option_min; i < m_count; i++) {
+            possibleCorrect.push(i);
+        }
+        for (let i = m_count; i <= rules.option_max; i++) {
+            possibleWrong.push(i);
+        }
+    }
+
+    shuffleArray(possibleCorrect);
+    shuffleArray(possibleWrong);
+
+    if (possibleCorrect.length > 0) {
+        options.push({ id: 'correct', number: possibleCorrect.pop() });
+    } else {
+        console.error("Không tìm thấy đáp án đúng cho Dạng 9!");
+        options.push({ id: 'correct', number: isMoreQuestion ? m_count + 1 : m_count - 1 });
+    }
+
+    for (let i = 0; i < 3; i++) {
+        if (possibleWrong.length > 0) {
+            options.push({ id: 'wrong', number: possibleWrong.pop() });
+        } else {
+            console.warn("Không đủ đáp án sai cho Dạng 9, đang tạo ngẫu nhiên");
+            let randomWrong;
+            do {
+                randomWrong = getRandomInt(rules.option_min, rules.option_max);
+            } while (randomWrong === options[0].number);
+            options.push({ id: 'wrong', number: randomWrong });
+        }
     }
     
-    const options = generateNumberOptions(correctAnswerNumber, rules.option_min, rules.option_max, 4);
+    shuffleArray(options);
+
 
     const itemGrid = document.createElement('div');
     itemGrid.className = 'item-grid-container';
@@ -882,12 +922,10 @@ function generateComparePairsMultiGroup(payload, database) {
     const labels = payload.labels;
     const groupIds = payload.ids;
 
-    // --- 1. CHỌN 1 CẶP (PAIR) TỪ "KHO" ---
     if (!database.item_pairs || database.item_pairs.length === 0) {
         console.error("Không tìm thấy 'item_pairs' trong kho_du_lieu.json!");
         return;
     }
-    // Tìm cặp (ví dụ: sóc, thông)
     const randomPairIds = database.item_pairs[Math.floor(Math.random() * database.item_pairs.length)];
     const actor1 = database.actor_pool.find(actor => actor.id === randomPairIds[0]);
     const actor2 = database.actor_pool.find(actor => actor.id === randomPairIds[1]);
@@ -897,18 +935,15 @@ function generateComparePairsMultiGroup(payload, database) {
         return;
     }
 
-    // --- 2. TẠO SỐ LƯỢNG CHO 3 HÌNH ---
     let groupContents = [];
-    let correctGroupId = groupIds[Math.floor(Math.random() * numGroups)]; // Chọn 1 hình ngẫu nhiên (A, B, C) làm đáp án đúng
+    let correctGroupId = groupIds[Math.floor(Math.random() * numGroups)]; 
 
     for (let i = 0; i < numGroups; i++) {
         let count1, count2;
         if (groupIds[i] === correctGroupId) {
-            // Đây là hình ĐÚNG -> 2 số phải bằng nhau
             count1 = getRandomInt(rules.count_min, rules.count_max);
             count2 = count1;
         } else {
-            // Đây là hình SAI -> 2 số phải khác nhau
             count1 = getRandomInt(rules.count_min, rules.count_max);
             do {
                 count2 = getRandomInt(rules.count_min, rules.count_max);
@@ -917,30 +952,26 @@ function generateComparePairsMultiGroup(payload, database) {
         groupContents.push({ id: groupIds[i], count1: count1, count2: count2 });
     }
 
-    // --- 3. VẼ GIAO DIỆN HTML (TÁI SỬ DỤNG CSS DẠNG 18) ---
     const container = document.createElement('div');
     container.className = 'multi-group-container';
 
-    // Vẽ 3 hộp (Hình A, B, C)
     groupContents.forEach((group, index) => {
         const groupDiv = document.createElement('div');
         groupDiv.className = 'multi-group-box';
 
         const label = document.createElement('div');
         label.className = 'group-label';
-        label.innerText = labels[index]; // "Hình A"
+        label.innerText = labels[index]; 
         groupDiv.appendChild(label);
 
         const itemGrid = document.createElement('div');
         itemGrid.className = 'item-grid-container';
-        // Vẽ actor 1 (sóc)
         for (let j = 0; j < group.count1; j++) {
             const img = document.createElement('img');
             img.src = `./assets/${actor1.image_url}`;
             img.alt = actor1.name_vi;
             itemGrid.appendChild(img);
         }
-        // Vẽ actor 2 (thông)
         for (let j = 0; j < group.count2; j++) {
             const img = document.createElement('img');
             img.src = `./assets/${actor2.image_url}`;
@@ -952,7 +983,6 @@ function generateComparePairsMultiGroup(payload, database) {
     });
     promptArea.appendChild(container);
 
-    // --- 4. VẼ CÂU HỎI VÀ NÚT ĐÁP ÁN ---
     const questionText = `Trong các hình dưới đây, hình nào có số ${actor1.name_vi} bằng số ${actor2.name_vi}?`;
     const questionEl = document.createElement('p');
     questionEl.className = 'question-prompt';
@@ -960,13 +990,13 @@ function generateComparePairsMultiGroup(payload, database) {
     promptArea.appendChild(questionEl);
 
     const choiceContainer = document.createElement('div');
-    choiceContainer.className = 'multi-choice-container'; // Xếp dọc
+    choiceContainer.className = 'multi-choice-container'; 
     
     groupIds.forEach((id, index) => {
         const choiceButton = document.createElement('button');
-        choiceButton.className = 'choice-button'; // Nút bấm
-        choiceButton.innerText = labels[index]; // "Hình A"
-        choiceButton.dataset.choiceId = id; // "hinh_a"
+        choiceButton.className = 'choice-button'; 
+        choiceButton.innerText = labels[index]; 
+        choiceButton.dataset.choiceId = id; 
 
         choiceButton.addEventListener('click', () => {
             handleChoiceClick(id, correctGroupId, choiceContainer);
