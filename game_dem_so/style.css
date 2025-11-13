@@ -162,6 +162,7 @@ body {
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
 }
+
 /* --- CSS MỚI CHO DẠNG 5 (COMPARE GROUPS) --- */
 .question-prompt {
     font-size: 1.3em;
@@ -218,6 +219,7 @@ body {
     width: 90%;
     margin-bottom: 10px;
 }
+
 /* --- CSS MỚI CHO DẠNG 6 (COMPARE ITEMS) --- */
 .comparison-container {
     width: 90%;
@@ -249,6 +251,7 @@ body {
     margin-top: 15px;
     text-align: center;
 }
+
 /* --- CSS MỚI CHO DẠNG 8 (MULTI-SELECT) --- */
 .multi-choice-container {
     display: flex;
@@ -328,6 +331,7 @@ body {
     font-size: 1.4em;
     left: 19px;
 }
+
 /* --- CSS MỚI CHO DẠNG 9 (Item Grid) --- */
 .item-grid-container {
     width: 90%;
@@ -349,82 +353,13 @@ body {
 }
 
 /* --- CSS MỚI CHO DẠNG 9 (Nút đáp án) --- */
-/* * Chúng ta sẽ tái sử dụng container của Dạng 8 (.multi-choice-container) 
- * để xếp các nút theo chiều dọc.
- *
- * Chúng ta sẽ tái sử dụng các nút của Dạng 5/7 (.choice-button)
- * và điều chỉnh lại một chút cho Dạng 9.
-*/
 .multi-choice-container .choice-button {
     width: 100%; /* Bắt buộc nút full-width */
     flex: none;  /* Ghi đè 'flex: 1' của Dạng 5 */
     text-align: center; /* Căn giữa các con số */
     font-size: 1.3em;
 }
-/* --- CSS CHO DẠNG 10 VÀ 18 (Multi-Group Compare) --- */
-.multi-group-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-}
 
-.multi-group-box {
-    width: 90%;
-    border: 2px solid #007bff;
-    border-radius: 10px;
-    padding: 10px;
-    background-color: #f8f9fa;
-}
-
-.multi-group-box .group-label {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #007bff;
-    margin-bottom: 10px;
-}
-
-/* Tái sử dụng .item-grid-container của Dạng 9, nhưng bỏ border */
-.multi-group-box .item-grid-container {
-    border: none;
-    padding: 0;
-    width: 100%;
-    min-height: 40px;
-    gap: 5px;
-    justify-content: flex-start; /* Căn trái các item */
-}
-
-.multi-group-box .item-grid-container img {
-    width: 35px;
-    height: 35px;
-}
-
-/* --- CSS TÁI SỬ DỤNG TỪ DẠNG 9 --- */
-.item-grid-container {
-    width: 90%;
-    margin: 15px auto;
-    padding: 10px;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    min-height: 100px;
-}
-.item-grid-container img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-}
-.multi-choice-container .choice-button {
-    width: 100%; /* Bắt buộc nút full-width */
-    flex: none;  /* Ghi đè 'flex: 1' của Dạng 5 */
-    text-align: center; /* Căn giữa các con số */
-    font-size: 1.3em;
-}
 /* --- CSS MỚI CHO DẠNG 11 (Add/Subtract) --- */
 .container-scene {
     width: 90%;
@@ -461,6 +396,29 @@ body {
     object-fit: contain;
     margin: 0 2px;
 }
+
+/* --- CSS MỚI CHO DẠNG 19 (Equation Rows) --- */
+.equation-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 40px;
+    width: 100%;
+}
+/* Thêm một đường gạch ngang nhỏ giữa 2 hàng */
+.group-box .equation-row:first-of-type {
+    border-bottom: 2px dashed #eee;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+.equation-row img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
 /* --- CSS MỚI CHO DẠNG 12 (MATCH EQUATION EXAMPLE) --- */
 .equation-example-container {
     display: flex;
@@ -525,28 +483,8 @@ body {
     text-align: center; /* Đảm bảo phép tính căn giữa */
     font-size: 1.2em;
 }
-/* --- CSS MỚI CHO DẠNG 19 (Equation Rows) --- */
-.equation-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
-    min-height: 40px;
-    width: 100%;
-}
-/* Thêm một đường gạch ngang nhỏ giữa 2 hàng */
-.group-box .equation-row:first-of-type {
-    border-bottom: 2px dashed #eee;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-}
-.equation-row img {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
-}
-/* --- CSS MỚI CHO DẠNG 14 (Tách Gộp) --- */
+
+/* --- (*** SỬA LỖI DẠNG 14 ***) --- */
 .tach-gop-scene {
     display: flex;
     justify-content: center;
@@ -557,10 +495,12 @@ body {
     flex-wrap: wrap;
 }
 .tach-gop-scene img {
+    position: relative; /* <-- ĐÂY LÀ DÒNG SỬA LỖI */
     width: 30px;
     height: 30px;
     object-fit: contain;
 }
+/* --- (*** KẾT THÚC SỬA LỖI DẠNG 14 ***) --- */
 
 .tach-gop-container {
     display: flex;
@@ -635,4 +575,43 @@ body {
 .multi-choice-container .choice-button.text-with-number {
     text-align: left;
     font-size: 1.1em;
+}
+
+/* --- CSS CHO DẠNG 10 VÀ 18 (Multi-Group Compare) --- */
+.multi-group-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.multi-group-box {
+    width: 90%;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.multi-group-box .group-label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+/* Tái sử dụng item-grid-container của Dạng 9, nhưng bỏ border */
+.multi-group-box .item-grid-container {
+    border: none;
+    padding: 0;
+    width: 100%;
+    min-height: 40px;
+    gap: 5px;
+    justify-content: flex-start; /* Căn trái các item */
+}
+
+.multi-group-box .item-grid-container img {
+    width: 35px;
+    height: 35px;
 }
