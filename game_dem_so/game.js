@@ -83,9 +83,7 @@ async function initializeApp() {
             'ch_dang_9.json',
             'ch_dang_10.json',
             'ch_dang_18.json'
-        ];
-        ];
-        
+        ];        
         // --- BƯỚC 3: TẢI CÂU HỎI ĐẦU TIÊN ---
         loadNextQuestion();
 
