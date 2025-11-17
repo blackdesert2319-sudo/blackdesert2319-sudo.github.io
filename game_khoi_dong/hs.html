@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Player Giao Diện (HS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f0f0f0; }
+        .player-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; text-align: center; }
+        .player-screen.active { display: flex; }
+        .team-btn { width: 100%; padding: 1.5rem; font-size: 1.5rem; font-weight: 700; border-radius: 0.5rem; color: white; cursor: pointer; }
+        .answer-btn { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; color: white; border-radius: 0.5rem; cursor: pointer; }
+    </style>
+</head>
+<body class="h-full">
+
+    <script type="module">
+        // --- ĐÃ THÊM firebaseConfig CỦA BẠN ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeKHAaY58XKouzucFq9NJuKSD5oZI0Yyw",
+            authDomain: "khoidog12c3.firebaseapp.com",
+            projectId: "khoidog12c3",
+            storageBucket: "khoidog12c3.firebasestorage.app",
+            messagingSenderId: "177773503964",
+            appId: "1:177773503964:web:3986f366bba3d3e6909b19",
+            measurementId: "G-WFHZ5RXYL4"
+        };
+        // -----------------------------------------------------------
+
+        // Import
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Khởi tạo
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Đăng nhập ẩn danh cho HS
+        signInAnonymously(auth).catch((error) => console.error("Lỗi đăng nhập HS:", error));
+
+        // Biến toàn cục
+        let myTeam = null;
+        let gameId = null;
+        let currentQuestionIndex = -1;
+        let hasAnswered = false;
+        let gameListener = null; // Biến để giữ listener
+
+        // DOM
+        const screens = {
+            join: document.getElementById('screen-join'),
+            wait: document.getElementById('screen-wait'),
+            play_mcq: document.getElementById('screen-play-mcq'),
+            play_fill: document.getElementById('screen-play-fill'),
+            submitted: document.getElementById('screen-submitted'),
+            result: document.getElementById('screen-result'),
+            end: document.getElementById('screen-end')
+        };
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            if (screens[screenId]) screens[screenId].classList.add('active');
+        }
+
+        // 1. Tham gia phòng
+        async function joinGame() {
+            const gameIdInput = document.getElementById('game-id-input').value.toUpperCase();
+            const selectedTeam = document.querySelector('input[name="team"]:checked');
+            
+            if (!gameIdInput || !selectedTeam) {
+                alert("Vui lòng nhập Mã phòng và Chọn đội!");
+                return;
+            }
+
+            gameId = gameIdInput;
+            myTeam = selectedTeam.value;
+            
+            try {
+                // 2. Báo cho GV biết là mình đã tham gia
+                // (Chúng ta sẽ ghi vào collection "players" của phòng gameId)
+                const playerRef = doc(db, "games", gameId, "players", myTeam);
+                await setDoc(playerRef, {
+                    joined: true,
+                    userId: auth.currentUser.uid
+                });
+                
+                document.getElementById('team-name').textContent = `Đội ${myTeam}`;
+                document.getElementById('team-name').style.color = myTeam;
+                showScreen('wait');
+
+                // 3. Bắt đầu lắng nghe trạng thái của phòng
+                listenToGame();
+
+            } catch (e) {
+                console.error("Lỗi tham gia phòng:", e);
+                alert("Không thể tham gia phòng! Kiểm tra lại Mã phòng.");
+            }
+        }
+
+        // 3. Lắng nghe tín hiệu từ GV
+        function listenToGame() {
+            if (gameListener) gameListener(); // Hủy listener cũ
+
+            gameListener = onSnapshot(doc(db, "games", gameId), (docSnap) => {
+                if (!docSnap.exists()) {
+                    alert("Phòng không tồn tại hoặc đã bị xóa!");
+                    if (gameListener) gameListener(); // Dừng lắng nghe
+                    showScreen('join');
+                    return;
+                }
+
+                const data = docSnap.data();
+                
+                // Cập nhật điểm
+                if (data.scores && data.scores[myTeam] !== undefined) {
+                    document.getElementById('player-score').textContent = data.scores[myTeam];
+                }
+
+                // Chuyển màn hình
+                switch (data.status) {
+                    case 'lobby':
+                        showScreen('wait');
+                        break;
+                    
+                    case 'question':
+                        // Chỉ chạy khi đây là câu hỏi mới
+                        if (data.currentQuestion !== currentQuestionIndex) {
+                            currentQuestionIndex = data.currentQuestion;
+                            hasAnswered = false;
+                            
+                            if (data.questionType === 'MCQ') {
+                                showScreen('play_mcq');
+                            } else {
+                                document.getElementById('fill-answer-input').value = '';
+                                showScreen('play_fill');
+                            }
+                        }
+                        break;
+                    
+                    case 'answer':
+                        showScreen('result');
+                        const resultTextEl = document.getElementById('result-text');
+                        resultTextEl.textContent = `Đáp án đúng: ${data.correctAnswer}`;
+                        break;
+
+                    case 'end':
+                        showScreen('end');
+                        // Lấy điểm cuối
+                        const finalScores = data.scores;
+                        const sortedScores = Object.entries(finalScores).sort((a, b) => b[1] - a[1]);
+                        const myRank = sortedScores.findIndex(entry => entry[0] === myTeam) + 1;
+                        document.getElementById('final-rank').textContent = `Hạng: ${myRank}`;
+                        document.getElementById('final-score').textContent = `Điểm: ${finalScores[myTeam]}`;
+                        if (gameListener) gameListener(); // Dừng lắng nghe khi game kết thúc
+                        break;
+                }
+            });
+        }
+
+        // 4. Gửi câu trả lời
+        async function submitAnswer(answer) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+
+            try {
+                // Ghi câu trả lời vào collection answers_[số câu]
+                const answerRef = doc(db, "games", gameId, `answers_${currentQuestionIndex}`, myTeam);
+                await setDoc(answerRef, {
+                    answer: answer,
+                    timestamp: Date.now() // Dùng timestamp của client cho nhanh
+                });
+                showScreen('submitted');
+            } catch (e) {
+                console.error("Lỗi gửi trả lời:", e);
+                hasAnswered = false; // Cho phép thử lại
+            }
+        }
+
+        // Gắn sự kiện vào window để có thể gọi từ HTML
+        window.joinGame = joinGame;
+        window.submitAnswer = submitAnswer;
+
+        // Gắn nút gửi câu điền từ
+        document.getElementById('btn-submit-fill').addEventListener('click', () => {
+            const answer = document.getElementById('fill-answer-input').value;
+            if (answer) submitAnswer(answer);
+        });
+        
+        // Chống gian lận (demo) - Vô hiệu hóa khi chuyển tab
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Tự động nộp 1 đáp án sai khi chuyển tab
+                // submitAnswer('CHEATING');
+                console.log("Phát hiện chuyển tab!");
+            }
+        });
+
+        // Khởi động
+        window.onload = () => showScreen('join');
+
+    </script>
+    
+    <div id="screen-join" class="player-screen active justify-start pt-10">
+        <h1 class="text-3xl font-bold mb-6">Tham gia Trò chơi</h1>
+        <input type="text" id="game-id-input" class="w-full max-w-md text-3xl p-4 border-4 border-gray-400 rounded-lg text-center uppercase" placeholder="MÃ PHÒNG" maxlength="5">
+        
+        <p class="text-xl font-semibold my-6">Chọn đội của bạn:</p>
+        <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+            <label class="team-btn bg-green-600 has-[:checked]:ring-4 ring-white">
+                <input type="radio" name="team" value="green" class="hidden"> Đội Xanh Lá
+            </label>
+            <label class="team-btn bg-red-600 has-[:checked]:ring-4 ring-white">
+                <input type="radio" name="team" value="red" class="hidden"> Đội Đỏ
+            </label>
+            <label class="team-btn bg-orange-500 has-[:checked]:ring-4 ring-white">
+                <input type="radio" name="team" value="orange" class="hidden"> Đội Cam
+            </label>
+            <label class="team-btn bg-purple-600 has-[:checked]:ring-4 ring-white">
+                <input type="radio" name="team" value="purple" class="hidden"> Đội Tím
+            </label>
+        </div>
+        
+        <button onclick="joinGame()" class="team-btn bg-blue-600 max-w-md mt-8">THAM GIA</button>
+    </div>
+
+    <div id="screen-wait" class="player-screen">
+        <h2 class="text-3xl font-bold mb-4">Bạn đã tham gia với tư cách <span id="team-name" class="font-bold"></span>!</h2>
+        <p class="text-xl">Chờ giáo viên bắt đầu...</p>
+        <div class="mt-8 animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+    </div>
+
+    <div id="screen-play-mcq" class="player-screen !p-2">
+        <div class="grid grid-cols-2 gap-2 w-full h-full">
+            <button onclick="submitAnswer('A')" class="answer-btn bg-red-600"></button>
+            <button onclick="submitAnswer('B')" class="answer-btn bg-blue-600"></button>
+            <button onclick="submitAnswer('C')" class="answer-btn bg-yellow-500"></button>
+            <button onclick="submitAnswer('D')" class="answer-btn bg-green-600"></button>
+        </div>
+    </div>
+
+    <div id="screen-play-fill" class="player-screen justify-start pt-20">
+        <h2 class="text-3xl font-bold mb-8">Điền vào ô trống</h2>
+        <input type="text" id="fill-answer-input" class="w-full max-w-md text-3xl p-4 border-4 border-gray-400 rounded-lg text-center" placeholder="(x;y)">
+        <button id="btn-submit-fill" class="team-btn bg-blue-600 max-w-md mt-6">GỬI</button>
+    </div>
+
+    <div id="screen-submitted" class="player-screen">
+        <h2 class="text-3xl font-bold">Đã gửi câu trả lời!</h2>
+        <p class="text-xl">Chờ các đội khác...</p>
+    </div>
+
+    <div id="screen-result" class="player-screen">
+        <h2 id="result-text" class="text-4xl font-bold mb-8">...</h2>
+        <p class="text-2xl">Điểm của bạn: <span id="player-score" class="font-bold">0</span></p>
+    </div>
+
+    <div id="screen-end" class="player-screen">
+        <h2 class="text-4xl font-bold mb-8">TRÒ CHƠI KẾT THÚC!</h2>
+        <p id="final-rank" class="text-2xl"></p>
+        <p id="final-score" class="text-xl"></p>
+    </div>
+</body>
+</html>
