@@ -28,25 +28,25 @@
         };
         // -----------------------------------------------------------
 
-        // Import
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-        // Khởi tạo
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Đăng nhập ẩn danh cho HS
         signInAnonymously(auth).catch((error) => console.error("Lỗi đăng nhập HS:", error));
+
+        // --- ID PHÒNG CỐ ĐỊNH ---
+        const GAME_ID = "active_game_room"; 
 
         // Biến toàn cục
         let myTeam = null;
-        let gameId = null;
+        let gameId = GAME_ID; // Gán ID cố định
         let currentQuestionIndex = -1;
         let hasAnswered = false;
-        let gameListener = null; // Biến để giữ listener
+        let gameListener = null;
 
         // DOM
         const screens = {
@@ -63,29 +63,19 @@
             if (screens[screenId]) screens[screenId].classList.add('active');
         }
 
-        // 1. Tham gia phòng
-        async function joinGame() {
-            const gameIdInput = document.getElementById('game-id-input').value.toUpperCase();
-            const selectedTeam = document.querySelector('input[name="team"]:checked');
-            
-            if (!gameIdInput || !selectedTeam) {
-                alert("Vui lòng nhập Mã phòng và Chọn đội!");
-                return;
-            }
-
-            gameId = gameIdInput;
-            myTeam = selectedTeam.value;
+        // 1. Học sinh chọn đội
+        async function selectTeam(teamName) {
+            myTeam = teamName;
             
             try {
                 // 2. Báo cho GV biết là mình đã tham gia
-                // (Chúng ta sẽ ghi vào collection "players" của phòng gameId)
                 const playerRef = doc(db, "games", gameId, "players", myTeam);
                 await setDoc(playerRef, {
                     joined: true,
                     userId: auth.currentUser.uid
                 });
                 
-                document.getElementById('team-name').textContent = `Đội ${myTeam}`;
+                document.getElementById('team-name').textContent = `Đội ${myTeam.charAt(0).toUpperCase() + myTeam.slice(1)}`;
                 document.getElementById('team-name').style.color = myTeam;
                 showScreen('wait');
 
@@ -94,7 +84,8 @@
 
             } catch (e) {
                 console.error("Lỗi tham gia phòng:", e);
-                alert("Không thể tham gia phòng! Kiểm tra lại Mã phòng.");
+                // Lỗi này có thể xảy ra nếu GV chưa mở file GV.html
+                alert("Không thể tham gia phòng! Giáo viên đã mở phòng chưa?");
             }
         }
 
@@ -124,7 +115,6 @@
                         break;
                     
                     case 'question':
-                        // Chỉ chạy khi đây là câu hỏi mới
                         if (data.currentQuestion !== currentQuestionIndex) {
                             currentQuestionIndex = data.currentQuestion;
                             hasAnswered = false;
@@ -146,13 +136,12 @@
 
                     case 'end':
                         showScreen('end');
-                        // Lấy điểm cuối
                         const finalScores = data.scores;
                         const sortedScores = Object.entries(finalScores).sort((a, b) => b[1] - a[1]);
                         const myRank = sortedScores.findIndex(entry => entry[0] === myTeam) + 1;
                         document.getElementById('final-rank').textContent = `Hạng: ${myRank}`;
                         document.getElementById('final-score').textContent = `Điểm: ${finalScores[myTeam]}`;
-                        if (gameListener) gameListener(); // Dừng lắng nghe khi game kết thúc
+                        if (gameListener) gameListener();
                         break;
                 }
             });
@@ -164,21 +153,20 @@
             hasAnswered = true;
 
             try {
-                // Ghi câu trả lời vào collection answers_[số câu]
                 const answerRef = doc(db, "games", gameId, `answers_${currentQuestionIndex}`, myTeam);
                 await setDoc(answerRef, {
                     answer: answer,
-                    timestamp: Date.now() // Dùng timestamp của client cho nhanh
+                    timestamp: Date.now()
                 });
                 showScreen('submitted');
             } catch (e) {
                 console.error("Lỗi gửi trả lời:", e);
-                hasAnswered = false; // Cho phép thử lại
+                hasAnswered = false;
             }
         }
 
         // Gắn sự kiện vào window để có thể gọi từ HTML
-        window.joinGame = joinGame;
+        window.selectTeam = selectTeam;
         window.submitAnswer = submitAnswer;
 
         // Gắn nút gửi câu điền từ
@@ -187,11 +175,9 @@
             if (answer) submitAnswer(answer);
         });
         
-        // Chống gian lận (demo) - Vô hiệu hóa khi chuyển tab
+        // Chống gian lận
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                // Tự động nộp 1 đáp án sai khi chuyển tab
-                // submitAnswer('CHEATING');
                 console.log("Phát hiện chuyển tab!");
             }
         });
@@ -202,26 +188,23 @@
     </script>
     
     <div id="screen-join" class="player-screen active justify-start pt-10">
-        <h1 class="text-3xl font-bold mb-6">Tham gia Trò chơi</h1>
-        <input type="text" id="game-id-input" class="w-full max-w-md text-3xl p-4 border-4 border-gray-400 rounded-lg text-center uppercase" placeholder="MÃ PHÒNG" maxlength="5">
+        <h1 class="text-3xl font-bold mb-10">Chọn đội của bạn</h1>
         
-        <p class="text-xl font-semibold my-6">Chọn đội của bạn:</p>
         <div class="grid grid-cols-2 gap-4 w-full max-w-md">
-            <label class="team-btn bg-green-600 has-[:checked]:ring-4 ring-white">
-                <input type="radio" name="team" value="green" class="hidden"> Đội Xanh Lá
-            </label>
-            <label class="team-btn bg-red-600 has-[:checked]:ring-4 ring-white">
-                <input type="radio" name="team" value="red" class="hidden"> Đội Đỏ
-            </label>
-            <label class="team-btn bg-orange-500 has-[:checked]:ring-4 ring-white">
-                <input type="radio" name="team" value="orange" class="hidden"> Đội Cam
-            </label>
-            <label class="team-btn bg-purple-600 has-[:checked]:ring-4 ring-white">
-                <input type="radio" name="team" value="purple" class="hidden"> Đội Tím
-            </label>
+            <button onclick="selectTeam('green')" class="team-btn bg-green-600">
+                Đội Xanh Lá
+            </button>
+            <button onclick="selectTeam('red')" class="team-btn bg-red-600">
+                Đội Đỏ
+            </button>
+            <button onclick="selectTeam('orange')" class="team-btn bg-orange-500">
+                Đội Cam
+            </button>
+            <button onclick="selectTeam('purple')" class="team-btn bg-purple-600">
+                Đội Tím
+            </button>
         </div>
         
-        <button onclick="joinGame()" class="team-btn bg-blue-600 max-w-md mt-8">THAM GIA</button>
     </div>
 
     <div id="screen-wait" class="player-screen">
