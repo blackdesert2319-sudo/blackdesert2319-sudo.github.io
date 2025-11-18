@@ -348,7 +348,13 @@
     </div>
 
     <div id="textArea" class="text-answer" style="display:none;">
-      <input type="text" id="textAnswerInput" placeholder="Nhập đáp án…" />
+      <input
+        type="text"
+        id="textAnswerInput"
+        placeholder="Nhập đáp án…"
+        readonly
+        inputmode="none"
+      />
       <div class="math-keypad">
         <button class="key-btn" data-value="7">7</button>
         <button class="key-btn" data-value="8">8</button>
@@ -531,7 +537,6 @@
     }
     const data = snap.data();
 
-    // force kick logic
     const fk = Number(data.forceKick || 0);
     if (fk && fk !== lastForceKick) {
       localStorage.setItem("lastForceKick", String(fk));
@@ -766,24 +771,20 @@
     handleAnswerText();
   });
 
-  // math keypad
   document.querySelectorAll(".key-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const action = btn.getAttribute("data-action");
       if (action === "backspace") {
         textAnswerInput.value = textAnswerInput.value.slice(0, -1);
-        textAnswerInput.focus();
         return;
       }
       if (action === "clear") {
         textAnswerInput.value = "";
-        textAnswerInput.focus();
         return;
       }
       const val = btn.getAttribute("data-value");
       if (val) {
         textAnswerInput.value += val;
-        textAnswerInput.focus();
       }
     });
   });
