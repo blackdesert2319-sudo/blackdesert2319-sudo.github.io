@@ -1,4 +1,4 @@
-[
+export const QUESTIONS = [
   {
     "type": "choice",
     "text": "Cho vector a = (2; −1; 3). Độ dài của a bằng:",
@@ -25,7 +25,7 @@
   },
   {
     "type": "choice",
-    "text": "Cho 3 điểm A(2; 1; −1), B(1; −3; 4). Vector AB bằng:",
+    "text": "Cho 2 điểm A(2; 1; −1), B(1; −3; 4). Vector AB bằng:",
     "options": {
       "A": "(1; 4; −5)",
       "B": "(−1; −4; 5)",
@@ -167,4 +167,4 @@
     "correctOption": "C",
     "timeLimit": 40
   }
-]
+];
