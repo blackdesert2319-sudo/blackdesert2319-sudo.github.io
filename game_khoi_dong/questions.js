@@ -12,9 +12,9 @@ export const QUESTIONS = [
     type: "choice",
     text: "Câu 2. Khẳng định nào sau đây SAI?",
     options: {
-      A: "$|\\vec{i}|$ bằng 1.",
-      B: "$|\\vec{k}|$ bằng 1.",
-      C: "Điểm O có tọa độ (0;0;0).",
+      A: "$|\\vec{i}|$ = 1.",
+      B: "$|\\vec{k}|$ = 1.",
+      C: "Điểm O(0;0;0).",
       D: "$|\\vec{i}+\\vec{j}+\\vec{k}|$=1."
     },
     correctOption: "D", // vì ||3i + j + k|| = sqrt(11) ≠ 1
@@ -24,21 +24,21 @@ export const QUESTIONS = [
   // Câu 3 – quy tắc ba điểm
   {
     type: "choice",
-    text: "Câu 3. Cho ba điểm A, B, C và gốc tọa độ O. Khẳng định nào sau đây ĐÚNG (quy tắc ba điểm)?",
+    text: "Câu 3. Cho ba điểm A, B, C bất kì, Khẳng định nào sau đây ĐÚNG?",
     options: {
-      A: "$\\overrightarrow{AB} = \\overrightarrow{AO} - \\overrightarrow{BO}$",
-      B: "$\\overrightarrow{AB} = \\overrightarrow{OB} - \\overrightarrow{OA}$",
-      C: "$\\overrightarrow{AB} = \\overrightarrow{AO} + \\overrightarrow{OB}$",
-      D: "$\\overrightarrow{AB} = \\overrightarrow{OA} + \\overrightarrow{BO}$"
+      A: "$\\overrightarrow{AB} = \\overrightarrow{AC} - \\overrightarrow{BC}$",
+      B: "$\\overrightarrow{AB} = \\overrightarrow{AC} - \\overrightarrow{CB}$",
+      C: "$\\overrightarrow{AB} = \\overrightarrow{AC} + \\overrightarrow{CB}$",
+      D: "$\\overrightarrow{AB} = \\overrightarrow{CA} + \\overrightarrow{BC}$"
     },
-    correctOption: "B", // AB = OB - OA
-    timeLimit: 40
+    correctOption: "C", // AB = AO + OB
+    timeLimit: 50
   },
 
   // Câu 4 – quy tắc hình bình hành
   {
     type: "choice",
-    text: "Câu 4. Cho hình bình hành ABCD. Khẳng định nào sau đây ĐÚNG (quy tắc hình bình hành)?",
+    text: "Câu 4. Cho hình bình hành ABCD. Khẳng định nào sau đây ĐÚNG?",
     options: {
       A: "$\\overrightarrow{AC} = \\overrightarrow{AB} - \\overrightarrow{AD}$",
       B: "$\\overrightarrow{AC} = \\overrightarrow{AB} + \\overrightarrow{AD}$",
@@ -52,15 +52,15 @@ export const QUESTIONS = [
   // Câu 5 – tìm D của hình bình hành
   {
     type: "choice",
-    text: "Câu 5. Cho hình bình hành ABCD với A(1;2;3), B(-2;4;0), C(0;1;-2). Tọa độ điểm D là:",
+    text: "Câu 5. Trong hệ trục Oxya, cho hình bình hành ABCD với A(1;2;3), B(-2;4;0), C(0;1;-2). Tọa độ điểm D là:",
     options: {
       A: "(3;-1;1)",        // đúng: D = A + C - B
       B: "(-3;5;-5)",       // gây nhiễu: lấy B + C - A
       C: "(1;1;-2)",        // gây nhiễu: quên dùng B, chỉ lấy trung bình A,C
-      D: "(-1;7;1)"         // gây nhiễu: cộng nhầm dấu
+      D: "(3;7;1)"         // gây nhiễu: cộng nhầm dấu
     },
     correctOption: "A",
-    timeLimit: 40
+    timeLimit: 50
   },
 
   // Câu 6 – độ dài, tích vô hướng, cùng phương
@@ -74,15 +74,15 @@ export const QUESTIONS = [
       D: "$\\vec{a}$ và $\\vec{b}$ cùng phương."
     },
     correctOption: "D", // a,b không cùng phương
-    timeLimit: 40
+    timeLimit: 50
   },
 
   // Câu 7 – trung điểm đoạn AB
   {
     type: "text",
-    text: "Câu 7. Cho đoạn thẳng AB với A(-2;0;3), B(2;-2;3). Tọa độ trung điểm của AB là (viết dưới dạng (x;y;z)):",
+    text: "Câu 7. Cho đoạn thẳng AB với A(-2;0;3), B(2;-2;3). Tìm tọa độ trung điểm của AB?(viết dưới dạng (x;y;z)):",
     correctAnswer: "(0;-1;3)", // (xM,yM,zM) = ((-2+2)/2, (0-2)/2, (3+3)/2)
-    timeLimit: 40
+    timeLimit: 50
   },
 
   // Câu 8 – trọng tâm tam giác, tìm C
@@ -96,7 +96,7 @@ export const QUESTIONS = [
       D: "(3;0;-2)"    // gây nhiễu: sai ở cả y và z
     },
     correctOption: "A",
-    timeLimit: 40
+    timeLimit: 60
   },
 
   // Câu 9 – đổi từ dạng i,j,k sang tọa độ
@@ -118,10 +118,10 @@ export const QUESTIONS = [
     type: "choice",
     text: "Câu 10. Trong hệ trục Oxyz, khẳng định nào sau đây SAI? Khi chiếu điểm M(1;2;3) lên:",
     options: {
-      A: "Trục Ox được A(1;0;0).",
-      B: "Trục Oy được B(0;2;0).",
-      C: "Mặt phẳng tọa độ (Oxy) được C(1;2;0).",
-      D: "Mặt phẳng tọa độ (Oyz) được D(1;0;3)."
+      A: "trục Ox được A(1;0;0).",
+      B: "trục Oy được B(0;2;0).",
+      C: "mặt phẳng tọa độ (Oxy) được C(1;2;0).",
+      D: "mặt phẳng tọa độ (Oyz) được D(1;0;3)."
     },
     correctOption: "D", // đúng phải là (0;2;3)
     timeLimit: 40
@@ -132,7 +132,7 @@ export const QUESTIONS = [
     type: "text",
     text: "Câu 11. Trong hệ trục Oxyz, cho điểm M(-1;2;-4). Tìm tọa độ điểm N đối xứng với M qua trục Ox (viết dưới dạng (x;y;z)):",
     correctAnswer: "(-1;-2;4)", // (x,-y,-z)
-    timeLimit: 40
+    timeLimit: 50
   },
 
   // Câu 12 – biểu thức tọa độ, tìm mệnh đề sai
@@ -146,7 +146,7 @@ export const QUESTIONS = [
       D: "$\\vec{a} \\cdot \\vec{b} = 1$."
     },
     correctOption: "C", // đúng phải là (2;2;6)
-    timeLimit: 40
+    timeLimit: 50
   },
 
   // Câu 13 – độ dài đoạn MN
@@ -157,7 +157,7 @@ export const QUESTIONS = [
       A: "$\\sqrt{38}$", // đúng: (3,-2,5)
       B: "$\\sqrt{29}$", // gây nhiễu: nhầm 3^2+2^2+2^2
       C: "$\\sqrt{35}$", // gây nhiễu: nhầm 3^2+2^2+4^2
-      D: "$\\sqrt{39}$"  // gây nhiễu: cộng nhầm 10 thành 11
+      D: "$38$"  // gây nhiễu: cộng nhầm 10 thành 11
     },
     correctOption: "A",
     timeLimit: 40
@@ -175,6 +175,6 @@ export const QUESTIONS = [
     },
     // Giữ theo đáp án trong đề gốc: B
     correctOption: "B",
-    timeLimit: 40
+    timeLimit: 50
   }
 ];
