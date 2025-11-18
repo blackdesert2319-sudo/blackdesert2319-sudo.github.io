@@ -330,9 +330,18 @@
   </style>
 
   <!-- MathJax để hiển thị kí hiệu vectơ, căn, phân số... -->
+    <!-- Cấu hình MathJax để nhận dạng công thức giữa dấu $...$ -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
+
 </head>
 <body>
 <div class="app-root">
