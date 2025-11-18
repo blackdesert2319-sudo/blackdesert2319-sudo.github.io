@@ -36,93 +36,122 @@
       padding: 12px;
       gap: 12px;
     }
-    .info {
-      font-size: 13px;
-      opacity: 0.85;
-    }
     .card {
-      background: #020617;
-      border-radius: 16px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      border-radius: 18px;
       padding: 14px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-      border: 1px solid #111827;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      border: 1px solid rgba(148,163,184,0.3);
     }
-    .question-status {
-      font-size: 15px;
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
       margin-bottom: 8px;
+      opacity: 0.9;
     }
-    .question-note {
-      font-size: 12px;
-      opacity: 0.8;
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      font-size: 11px;
     }
     .team-select {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 6px;
     }
     .team-btn {
       flex: 1;
       min-width: 45%;
-      border-radius: 14px;
-      padding: 10px;
+      border-radius: 16px;
+      padding: 10px 10px;
       border: none;
       color: #0b1120;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.35);
     }
     .team-green { background: linear-gradient(135deg,#22c55e,#4ade80); }
     .team-red { background: linear-gradient(135deg,#ef4444,#f97373); }
     .team-orange { background: linear-gradient(135deg,#f97316,#fb923c); }
     .team-purple { background: linear-gradient(135deg,#a855f7,#c084fc); }
     .team-label {
-      font-size: 12px;
-      opacity: 0.85;
+      font-size: 11px;
+      opacity: 0.9;
     }
     .team-name {
       font-size: 16px;
     }
     .current-team {
       font-size: 13px;
+      margin-top: 6px;
+    }
+    .tag-team {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
       margin-top: 4px;
+    }
+    .tag-green { background:#22c55e; color:#022c22;}
+    .tag-red { background:#ef4444; color:#450a0a;}
+    .tag-orange { background:#f97316; color:#451306;}
+    .tag-purple { background:#a855f7; color:#2e1065;}
+    .question-status {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .sub-note {
+      font-size: 11px;
+      opacity: 0.8;
     }
     .answer-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .answer-btn {
-      border-radius: 14px;
+      border-radius: 18px;
       border: none;
-      padding: 12px 8px;
-      font-size: 18px;
-      font-weight: 700;
+      padding: 14px 8px;
+      font-size: 20px;
+      font-weight: 800;
       cursor: pointer;
       color: #0b1120;
-      transition: transform 0.05s, box-shadow 0.05s, opacity 0.1s;
+      transition: transform 0.06s, box-shadow 0.06s, opacity 0.1s;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.45);
     }
     .answer-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.94);
       box-shadow: none;
     }
     .ans-A { background: #22c55e; }
     .ans-B { background: #ef4444; }
     .ans-C { background: #f97316; }
     .ans-D { background: #a855f7; }
+    .answer-btn.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      box-shadow: none;
+    }
     .text-answer {
-      margin-top: 10px;
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
     .text-answer input {
-      padding: 10px;
+      padding: 10px 16px;
       border-radius: 999px;
       border: 1px solid #374151;
       background: #020617;
@@ -135,27 +164,78 @@
       border: none;
       padding: 10px;
       font-size: 15px;
-      font-weight: 600;
-      background: #2563eb;
-      color: white;
+      font-weight: 700;
+      background: #22c55e;
+      color: #022c22;
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
-    .msg {
-      margin-top: 6px;
-      font-size: 14px;
-      min-height: 18px;
-    }
-    .msg.ok {
-      color: #4ade80;
-    }
-    .msg.err {
-      color: #f97373;
+    .text-answer button.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      box-shadow: none;
     }
     .footer {
       font-size: 11px;
       text-align: center;
       padding: 6px 8px;
-      opacity: 0.8;
+      opacity: 0.7;
+    }
+    .answer-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 16px;
+      text-align: center;
+    }
+    .answer-overlay.show {
+      display: flex;
+    }
+    .answer-box {
+      width: 100%;
+      max-width: 340px;
+      border-radius: 24px;
+      padding: 18px 16px;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.7);
+      background: radial-gradient(circle at top, #22c55e, #16a34a);
+      color: #022c22;
+      transform: scale(1);
+      animation: popIn 0.28s ease-out;
+    }
+    .answer-box.wrong {
+      background: radial-gradient(circle at top, #ef4444, #b91c1c);
+      color: #fef2f2;
+    }
+    .answer-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .answer-detail {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .answer-rank {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .answer-close {
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(15,23,42,0.18);
+      color: inherit;
+      cursor: pointer;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
     .warning-overlay {
       position: fixed;
@@ -202,51 +282,42 @@
 </head>
 <body>
 <header>
-  <h1>HS – Quiz 4 đội</h1>
+  <h1>Quiz 4 đội</h1>
   <div style="font-size:12px;">
-    Câu: <span id="qIndexLabel">–</span> |
-    Trạng thái: <span id="qStatus">Đang tải…</span>
+    Câu <span id="qIndexLabel">–</span> · <span id="qStatus">Đang tải…</span>
   </div>
 </header>
 
 <main>
   <section class="card">
-    <div class="info">
-      <strong>Lưu ý:</strong> Đề bài + hình chỉ hiển thị trên màn GV / máy chiếu.<br/>
-      Bạn chỉ chọn A/B/C/D hoặc nhập đáp án theo yêu cầu GV.
-    </div>
-
-    <div class="current-team" id="currentTeamInfo">
-      Chưa chọn đội.
+    <div class="status-top">
+      <div id="currentTeamInfo" class="current-team">Chọn đội để bắt đầu</div>
+      <div class="pill" id="questionTypeTag">Đang chờ GV</div>
     </div>
 
     <div class="team-select" id="teamSelect">
       <button class="team-btn team-green" data-team="green">
-        <div class="team-label">Đội</div>
+        <div class="team-label">Chọn</div>
         <div class="team-name">Xanh lá</div>
       </button>
       <button class="team-btn team-red" data-team="red">
-        <div class="team-label">Đội</div>
+        <div class="team-label">Chọn</div>
         <div class="team-name">Đỏ</div>
       </button>
       <button class="team-btn team-orange" data-team="orange">
-        <div class="team-label">Đội</div>
+        <div class="team-label">Chọn</div>
         <div class="team-name">Cam</div>
       </button>
       <button class="team-btn team-purple" data-team="purple">
-        <div class="team-label">Đội</div>
+        <div class="team-label">Chọn</div>
         <div class="team-name">Tím</div>
       </button>
     </div>
   </section>
 
   <section class="card">
-    <div class="question-status">
-      <strong>Trạng thái câu hỏi:</strong> <span id="questionStateText">Chưa bắt đầu.</span>
-    </div>
-    <div class="question-note" id="questionNote">
-      Khi GV bấm “Bắt đầu”, ở đây sẽ hiển thị loại câu hỏi và nút trả lời.
-    </div>
+    <div class="question-status" id="questionStateText">Chờ GV khởi động câu hỏi…</div>
+    <div class="sub-note" id="questionNote"></div>
 
     <div id="choiceArea" style="display:none;">
       <div class="answer-buttons">
@@ -258,26 +329,42 @@
     </div>
 
     <div id="textArea" class="text-answer" style="display:none;">
-      <input type="text" id="textAnswerInput" placeholder="Nhập đáp án theo yêu cầu GV…" />
+      <input type="text" id="textAnswerInput" placeholder="Nhập đáp án…" />
       <button id="btnSubmitText">Gửi đáp án</button>
     </div>
 
-    <div class="msg" id="message"></div>
+    <div class="sub-note" id="message"></div>
   </section>
 </main>
 
 <div class="footer">
-  Nếu bị out, chỉ cần F5 rồi chọn lại đúng đội. Điểm không bị mất.
+  Nếu bị out, chỉ cần F5 rồi chọn lại đúng đội.
 </div>
 
+<!-- Overlay báo đã trả lời -->
+<div class="answer-overlay" id="answerOverlay">
+  <div class="answer-box" id="answerBox">
+    <div class="answer-title" id="answerTitle">ĐÃ GỬI!</div>
+    <div class="answer-detail" id="answerDetail">Bạn đã trả lời câu hỏi.</div>
+    <div class="answer-rank" id="answerRank"></div>
+    <button class="answer-close" id="answerCloseBtn">Đã hiểu</button>
+  </div>
+</div>
+
+<!-- Anti cheat -->
 <div class="warning-overlay" id="antiCheatOverlay">
   <div class="warning-box">
     <h2>Đừng thoát khỏi bài thi 😅</h2>
-    <p>Phát hiện bạn vừa chuyển app / tab. Việc tra đáp án sẽ làm mất thời gian và giảm điểm.</p>
-    <p>Hãy quay lại làm bài trên màn hình này nhé.</p>
-    <button id="btnCloseOverlay">OK, hiểu rồi</button>
+    <p>Rời app để tra đáp án sẽ làm bạn chậm hơn đội khác.</p>
+    <p>Hãy tập trung vào màn hình này nhé.</p>
+    <button id="btnCloseOverlay">OK</button>
   </div>
 </div>
+
+<!-- Nhạc: bạn đặt file bgm.mp3, correct.mp3, wrong.mp3 cùng thư mục -->
+<audio id="bgm" src="bgm.mp3" loop></audio>
+<audio id="sfxCorrect" src="correct.mp3"></audio>
+<audio id="sfxWrong" src="wrong.mp3"></audio>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -287,7 +374,8 @@
     getDoc,
     onSnapshot,
     updateDoc,
-    increment
+    increment,
+    arrayUnion
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -310,6 +398,8 @@
   let latestGameData = null;
   let questionStartMs = null;
   let lastAnsweredQuestionIndex = Number(localStorage.getItem("lastAnsweredQuestionIndex") || "-1");
+  let answeredThisQuestion = false;
+  let lastSeenQuestionIndex = -1;
 
   const qIndexLabel = document.getElementById("qIndexLabel");
   const qStatus = document.getElementById("qStatus");
@@ -320,14 +410,29 @@
   const msgEl = document.getElementById("message");
   const teamSelect = document.getElementById("teamSelect");
   const currentTeamInfo = document.getElementById("currentTeamInfo");
+  const questionTypeTag = document.getElementById("questionTypeTag");
+
   const antiCheatOverlay = document.getElementById("antiCheatOverlay");
   const btnCloseOverlay = document.getElementById("btnCloseOverlay");
+
   const textAnswerInput = document.getElementById("textAnswerInput");
   const btnSubmitText = document.getElementById("btnSubmitText");
 
+  const answerOverlay = document.getElementById("answerOverlay");
+  const answerBox = document.getElementById("answerBox");
+  const answerTitle = document.getElementById("answerTitle");
+  const answerDetail = document.getElementById("answerDetail");
+  const answerRank = document.getElementById("answerRank");
+  const answerCloseBtn = document.getElementById("answerCloseBtn");
+
+  const bgm = document.getElementById("bgm");
+  const sfxCorrect = document.getElementById("sfxCorrect");
+  const sfxWrong = document.getElementById("sfxWrong");
+
+  // ==== TEAM ====
   function applyTeamUI() {
     if (!currentTeam) {
-      currentTeamInfo.textContent = "Chưa chọn đội.";
+      currentTeamInfo.textContent = "Chọn đội để bắt đầu";
       teamSelect.style.display = "flex";
     } else {
       const mapName = {
@@ -336,8 +441,22 @@
         orange: "Đội Cam",
         purple: "Đội Tím"
       };
-      currentTeamInfo.textContent = `Bạn đang chơi: ${mapName[currentTeam] || currentTeam}`;
+      const mapTagClass = {
+        green: "tag-team tag-green",
+        red: "tag-team tag-red",
+        orange: "tag-team tag-orange",
+        purple: "tag-team tag-purple"
+      };
+      currentTeamInfo.innerHTML = \`\${mapName[currentTeam] || currentTeam}\`;
+      const tag = document.createElement("span");
+      tag.className = mapTagClass[currentTeam];
+      tag.textContent = "ĐANG CHƠI";
+      currentTeamInfo.appendChild(document.createElement("br"));
+      currentTeamInfo.appendChild(tag);
       teamSelect.style.display = "none";
+
+      // bật nhạc nền khi đã có tương tác
+      bgm.play().catch(() => {});
     }
   }
 
@@ -360,12 +479,15 @@
     });
   });
 
+  // ==== GAME SNAPSHOT ====
   onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
-      qStatus.textContent = "Chưa khởi tạo (GV bấm 'Khởi tạo')";
+      qStatus.textContent = "Chưa khởi tạo";
       questionStateText.textContent = "Chờ GV khởi tạo game.";
+      questionNote.textContent = "";
       choiceArea.style.display = "none";
       textArea.style.display = "none";
+      msgEl.textContent = "";
       return;
     }
     const data = snap.data();
@@ -375,23 +497,33 @@
     const idx = data.currentQuestionIndex;
     const total = qs.length;
 
+    if (idx !== lastSeenQuestionIndex) {
+      // sang câu mới -> reset trạng thái
+      answeredThisQuestion = false;
+      lastSeenQuestionIndex = idx;
+      msgEl.textContent = "";
+      enableAnswerControls();
+      answerOverlay.classList.remove("show");
+    }
+
     if (idx === -1) {
       qIndexLabel.textContent = "–";
       qStatus.textContent = "Chưa bắt đầu";
-      questionStateText.textContent = "Chờ GV bấm 'Bắt đầu'.";
+      questionStateText.textContent = "Chờ GV bấm Bắt đầu.";
+      questionNote.textContent = "";
       choiceArea.style.display = "none";
       textArea.style.display = "none";
-      msgEl.textContent = "";
       return;
     }
 
-    qIndexLabel.textContent = `${idx + 1}/${total}`;
-    qStatus.textContent = data.acceptingAnswers ? "Đang nhận câu trả lời" : "Đã khóa";
+    qIndexLabel.textContent = \`\${idx + 1}/\${total}\`;
+    qStatus.textContent = data.acceptingAnswers ? "Đang trả lời" : "Đã khóa";
 
     const currentQuestion = qs[idx];
 
     if (data.isFinished) {
       questionStateText.textContent = "Game đã kết thúc. Xem kết quả trên màn GV.";
+      questionNote.textContent = "";
       choiceArea.style.display = "none";
       textArea.style.display = "none";
       return;
@@ -408,20 +540,21 @@
     }
 
     if (currentQuestion.type === "choice") {
-      questionStateText.textContent = "Câu trắc nghiệm: nhìn A/B/C/D trên bảng, bấm nút tương ứng.";
-      questionNote.textContent = "Mỗi câu chỉ trả lời 1 lần. Trả lời càng sớm càng nhiều điểm.";
+      questionStateText.textContent = "Câu trắc nghiệm – nhìn A/B/C/D trên bảng.";
+      questionNote.textContent = "Chạm A/B/C/D thật nhanh để giành nhiều điểm.";
+      questionTypeTag.textContent = "Trắc nghiệm";
       choiceArea.style.display = "block";
       textArea.style.display = "none";
     } else {
-      questionStateText.textContent = "Câu điền vào ô trống. Nhập chính xác theo yêu cầu GV.";
-      questionNote.textContent = "Ví dụ: can(8), (1;2;-5), số nguyên, v.v.";
+      questionStateText.textContent = "Câu điền đáp án – nhập theo yêu cầu GV.";
+      questionNote.textContent = "Ví dụ: can(8), (1;2;-5), số nguyên,…";
+      questionTypeTag.textContent = "Điền đáp án";
       choiceArea.style.display = "none";
       textArea.style.display = "flex";
     }
-
-    msgEl.textContent = "";
   });
 
+  // ==== ĐIỂM ====
   function calcPoints() {
     const now = Date.now();
     const baseTime = questionStartMs || now;
@@ -435,16 +568,78 @@
     return (s || "").trim();
   }
 
+  function disableAnswerControls() {
+    document.querySelectorAll(".answer-btn").forEach(btn => {
+      btn.classList.add("disabled");
+    });
+    textAnswerInput.disabled = true;
+    btnSubmitText.classList.add("disabled");
+    btnSubmitText.disabled = true;
+  }
+
+  function enableAnswerControls() {
+    document.querySelectorAll(".answer-btn").forEach(btn => {
+      btn.classList.remove("disabled");
+    });
+    textAnswerInput.disabled = false;
+    btnSubmitText.classList.remove("disabled");
+    btnSubmitText.disabled = false;
+  }
+
+  function showAnswerOverlay({ correct, pts, elapsedSec, rank }) {
+    answerTitle.textContent = correct ? "CHÍNH XÁC!" : "ĐÃ GỬI";
+    answerDetail.textContent = correct
+      ? \`Bạn nhận \${pts} điểm (chậm ~\${elapsedSec}s).\`
+      : "Bạn đã gửi đáp án cho câu hỏi này.";
+
+    if (correct && rank) {
+      answerRank.textContent = \`Nhanh thứ \${rank}\`;
+    } else {
+      answerRank.textContent = "";
+    }
+
+    if (correct) {
+      answerBox.classList.remove("wrong");
+    } else {
+      answerBox.classList.add("wrong");
+    }
+    answerOverlay.classList.add("show");
+  }
+
+  answerCloseBtn.addEventListener("click", () => {
+    answerOverlay.classList.remove("show");
+  });
+
+  // ==== GỬI ĐÁP ÁN ====
+  async function registerCorrectRank() {
+    if (!latestGameData) return null;
+    const idx = latestGameData.currentQuestionIndex;
+    const field = `answerOrder_${idx}`;
+    try {
+      // ghi đội nào trả lời đúng vào trường answerOrder_idx
+      await updateDoc(gameRef, {
+        [field]: arrayUnion(currentTeam)
+      });
+      const snap = await getDoc(gameRef);
+      const data = snap.data();
+      const arr = (data && data[field]) || [];
+      const pos = arr.indexOf(currentTeam);
+      if (pos !== -1) return pos + 1;
+      return null;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async function handleAnswerChoice(option) {
     if (!currentTeam) {
-      msgEl.textContent = "Hãy chọn đội trước.";
-      msgEl.className = "msg err";
+      msgEl.textContent = "Chọn đội trước khi trả lời.";
       return;
     }
     if (!latestGameData) return;
     if (!latestGameData.acceptingAnswers || latestGameData.isFinished) {
       msgEl.textContent = "GV đã khóa câu trả lời.";
-      msgEl.className = "msg err";
       return;
     }
 
@@ -453,47 +648,48 @@
     const q = qs[idx];
     if (!q || q.type !== "choice") return;
 
-    if (lastAnsweredQuestionIndex === idx) {
-      msgEl.textContent = "Bạn đã trả lời câu này rồi.";
-      msgEl.className = "msg err";
+    if (answeredThisQuestion || lastAnsweredQuestionIndex === idx) {
+      msgEl.textContent = "Bạn đã trả lời câu này.";
       return;
     }
 
     const isCorrect = option === q.correctOption;
-    if (!isCorrect) {
-      msgEl.textContent = "Sai rồi 😢";
-      msgEl.className = "msg err";
-      lastAnsweredQuestionIndex = idx;
-      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-      return;
-    }
-
     const { pts, elapsedSec } = calcPoints();
+
     try {
-      await updateDoc(scoresRef, {
-        [currentTeam]: increment(pts)
-      });
-      msgEl.textContent = `Đúng! Bạn được ${pts} điểm (trễ ~${elapsedSec}s).`;
-      msgEl.className = "msg ok";
-      lastAnsweredQuestionIndex = idx;
-      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+      if (isCorrect) {
+        await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
+        const rank = await registerCorrectRank();
+        answeredThisQuestion = true;
+        lastAnsweredQuestionIndex = idx;
+        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+        disableAnswerControls();
+        msgEl.textContent = "";
+        sfxCorrect.play().catch(() => {});
+        showAnswerOverlay({ correct: true, pts, elapsedSec, rank });
+      } else {
+        answeredThisQuestion = true;
+        lastAnsweredQuestionIndex = idx;
+        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+        disableAnswerControls();
+        msgEl.textContent = "";
+        sfxWrong.play().catch(() => {});
+        showAnswerOverlay({ correct: false });
+      }
     } catch (err) {
       console.error(err);
       msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
-      msgEl.className = "msg err";
     }
   }
 
   async function handleAnswerText() {
     if (!currentTeam) {
-      msgEl.textContent = "Hãy chọn đội trước.";
-      msgEl.className = "msg err";
+      msgEl.textContent = "Chọn đội trước khi trả lời.";
       return;
     }
     if (!latestGameData) return;
     if (!latestGameData.acceptingAnswers || latestGameData.isFinished) {
       msgEl.textContent = "GV đã khóa câu trả lời.";
-      msgEl.className = "msg err";
       return;
     }
 
@@ -502,54 +698,61 @@
     const q = qs[idx];
     if (!q || q.type !== "text") return;
 
-    if (lastAnsweredQuestionIndex === idx) {
-      msgEl.textContent = "Bạn đã trả lời câu này rồi.";
-      msgEl.className = "msg err";
+    if (answeredThisQuestion || lastAnsweredQuestionIndex === idx) {
+      msgEl.textContent = "Bạn đã trả lời câu này.";
       return;
     }
 
     const userAns = normalizeTextAnswer(textAnswerInput.value);
     if (!userAns) {
       msgEl.textContent = "Bạn chưa nhập đáp án.";
-      msgEl.className = "msg err";
       return;
     }
 
     const isCorrect = userAns === normalizeTextAnswer(q.correctAnswer);
-    if (!isCorrect) {
-      msgEl.textContent = "Sai rồi 😢 Hãy chú ý đúng cú pháp GV yêu cầu.";
-      msgEl.className = "msg err";
-      lastAnsweredQuestionIndex = idx;
-      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-      return;
-    }
-
     const { pts, elapsedSec } = calcPoints();
+
     try {
-      await updateDoc(scoresRef, {
-        [currentTeam]: increment(pts)
-      });
-      msgEl.textContent = `Đúng! Bạn được ${pts} điểm (trễ ~${elapsedSec}s).`;
-      msgEl.className = "msg ok";
-      lastAnsweredQuestionIndex = idx;
-      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-      textAnswerInput.value = "";
+      if (isCorrect) {
+        await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
+        const rank = await registerCorrectRank();
+        answeredThisQuestion = true;
+        lastAnsweredQuestionIndex = idx;
+        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+        disableAnswerControls();
+        textAnswerInput.value = "";
+        msgEl.textContent = "";
+        sfxCorrect.play().catch(() => {});
+        showAnswerOverlay({ correct: true, pts, elapsedSec, rank });
+      } else {
+        answeredThisQuestion = true;
+        lastAnsweredQuestionIndex = idx;
+        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+        disableAnswerControls();
+        msgEl.textContent = "";
+        sfxWrong.play().catch(() => {});
+        showAnswerOverlay({ correct: false });
+      }
     } catch (err) {
       console.error(err);
       msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
-      msgEl.className = "msg err";
     }
   }
 
   document.querySelectorAll(".answer-btn").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (btn.classList.contains("disabled")) return;
       const opt = btn.getAttribute("data-option");
       handleAnswerChoice(opt);
     });
   });
 
-  btnSubmitText.addEventListener("click", handleAnswerText);
+  btnSubmitText.addEventListener("click", () => {
+    if (btnSubmitText.disabled) return;
+    handleAnswerText();
+  });
 
+  // ==== ANTI CHEAT ====
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       antiCheatOverlay.classList.add("active");
