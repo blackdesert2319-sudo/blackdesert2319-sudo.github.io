@@ -12,10 +12,10 @@ export const QUESTIONS = [
     type: "choice",
     text: "Câu 2. Khẳng định nào sau đây SAI?",
     options: {
-      A: "Độ dài của $\\vec{i}$ bằng 1.",
-      B: "Độ dài của $\\vec{k}$ bằng 1.",
+      A: "$|\\vec{i}|$ bằng 1.",
+      B: "$|\\vec{k}|$ bằng 1.",
       C: "Điểm O có tọa độ (0;0;0).",
-      D: "Vector $3\\vec{i}+\\vec{j}+\\vec{k}$ có độ dài bằng 1."
+      D: "$|\\vec{i}+\\vec{j}+\\vec{k}|$=1."
     },
     correctOption: "D", // vì ||3i + j + k|| = sqrt(11) ≠ 1
     timeLimit: 40
