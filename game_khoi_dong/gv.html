@@ -343,6 +343,9 @@
 
   const questions = QUESTIONS;
 
+  const DEMO_COUNT = 2;
+
+
   function formatTimestamp(ts) {
     if (!ts) return "—";
     try {
@@ -420,7 +423,9 @@
     const question = qs[idx];
 
     counterEl.textContent = `Câu ${idx + 1}/${total}`;
-    qTypeEl.textContent = question.type === "choice" ? "Trắc nghiệm A/B/C/D" : "Điền vào ô trống";
+    let typeText = question.type === "choice" ? "Trắc nghiệm A/B/C/D" : "Điền vào ô trống";
+    if (idx < DEMO_COUNT) typeText += " – Câu chơi thử (không tính điểm)";
+    qTypeEl.textContent = typeText;
     qStartEl.textContent = formatTimestamp(gameData.questionStartedAt);
     qTextEl.textContent = question.text || "";
 

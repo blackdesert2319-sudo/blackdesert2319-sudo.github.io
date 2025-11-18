@@ -435,10 +435,13 @@
   const db = getFirestore(app);
 
   const gameRef = doc(db, "games", "default");
+  const DEMO_COUNT = 2;
+
   const scoresRef = doc(db, "games/default/scores", "teams");
 
   let currentTeam = null;
   let latestGameData = null;
+  let isDemoQuestion = false;
   let questionStartMs = null;
   let lastAnsweredQuestionIndex = Number(localStorage.getItem("lastAnsweredQuestionIndex") || "-1");
   let answeredThisQuestion = false;
@@ -550,6 +553,7 @@
     const qs = data.questions || [];
     const idx = data.currentQuestionIndex;
     const total = qs.length;
+    isDemoQuestion = (idx >= 0 && idx < DEMO_COUNT);
 
     if (idx !== lastSeenQuestionIndex) {
       answeredThisQuestion = false;
@@ -639,7 +643,11 @@
   }
 
   function showAnswerOverlay(correct, pts, elapsedSec) {
-    if (correct) {
+    if (isDemoQuestion) {
+      answerBox.classList.remove("wrong");
+      answerTitle.textContent = correct ? "CÂU CHƠI THỬ ✅" : "CÂU CHƠI THỬ";
+      answerDetail.textContent = "Câu này chỉ để làm quen, không tính điểm.";
+    } else if (correct) {
       answerBox.classList.remove("wrong");
       answerTitle.textContent = "CHÍNH XÁC!";
       answerDetail.textContent = `Bạn được ${pts} điểm (chậm ~${elapsedSec}s).`;
@@ -678,17 +686,20 @@
 
     const isCorrect = option === q.correctOption;
     const { pts, elapsedSec } = calcPoints();
+    const isDemo = idx < DEMO_COUNT;
 
     try {
       const payloadAns = {};
       payloadAns["answers." + currentTeam] = true;
 
-      if (isCorrect) {
+      if (isCorrect && !isDemo) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
-        await updateDoc(gameRef, payloadAns);
+      }
+      await updateDoc(gameRef, payloadAns);
+
+      if (isCorrect) {
         sfxCorrect.play().catch(() => {});
       } else {
-        await updateDoc(gameRef, payloadAns);
         sfxWrong.play().catch(() => {});
       }
       answeredThisQuestion = true;
@@ -732,17 +743,20 @@
 
     const isCorrect = userAns === normalizeTextAnswer(q.correctAnswer);
     const { pts, elapsedSec } = calcPoints();
+    const isDemo = idx < DEMO_COUNT;
 
     try {
       const payloadAns = {};
       payloadAns["answers." + currentTeam] = true;
 
-      if (isCorrect) {
+      if (isCorrect && !isDemo) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
-        await updateDoc(gameRef, payloadAns);
+      }
+      await updateDoc(gameRef, payloadAns);
+
+      if (isCorrect) {
         sfxCorrect.play().catch(() => {});
       } else {
-        await updateDoc(gameRef, payloadAns);
         sfxWrong.play().catch(() => {});
       }
       answeredThisQuestion = true;
