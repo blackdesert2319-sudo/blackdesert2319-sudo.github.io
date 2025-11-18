@@ -300,17 +300,6 @@
       gap: 6px;
     }
 
-    .warn-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid #facc15;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-    }
-
     footer {
       font-size: 11px;
       padding: 6px 10px;
@@ -327,10 +316,134 @@
         height: auto;
       }
     }
+
+    /* ==== OVERLAY TỔNG KẾT CUỐI GAME ==== */
+    .final-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.96), rgba(3,7,18,0.98));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out;
+    }
+
+    .final-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .final-box {
+      width: min(90vw, 800px);
+      max-height: 90vh;
+      background: rgba(15,23,42,0.98);
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      padding: 24px 26px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-box::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34,197,94,0.18), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(59,130,246,0.18), transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(147,51,234,0.15), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .final-title {
+      position: relative;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .final-sub {
+      position: relative;
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+
+    .final-podium {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .final-card {
+      position: relative;
+      width: 32%;
+      background: rgba(15,23,42,0.96);
+      border-radius: 18px;
+      padding: 10px 10px 12px;
+      border: 1px solid rgba(148,163,184,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      transform-origin: bottom;
+      animation: pop-up 0.5s both;
+    }
+
+    .final-card.first {
+      transform: translateY(-10px);
+    }
+
+    .final-rank-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .rank-1 { background: #facc15; color: #422006; }
+    .rank-2 { background: #e5e7eb; color: #020617; }
+    .rank-3 { background: #fed7aa; color: #451a03; }
+
+    .final-team-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .final-score {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+
+    .final-label {
+      font-size: 11px;
+      opacity: 0.85;
+    }
+
+    .final-close-btn {
+      position: relative;
+      margin-top: 8px;
+      padding-inline: 26px;
+    }
+
+    @keyframes pop-up {
+      from { transform: translateY(20px) scale(0.9); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
   </style>
 
-  <!-- MathJax để hiển thị kí hiệu vectơ, căn, phân số... -->
-    <!-- Cấu hình MathJax để nhận dạng công thức giữa dấu $...$ -->
+  <!-- Cấu hình MathJax để nhận dạng công thức giữa dấu $...$ -->
   <script>
     window.MathJax = {
       tex: {
@@ -341,7 +454,6 @@
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
-
 </head>
 <body>
 <div class="app-root">
@@ -450,6 +562,18 @@
   <footer>
     Học sinh vào file <strong>student.html</strong> trên điện thoại, chọn đội, bấm đáp án.
   </footer>
+
+  <!-- OVERLAY TỔNG KẾT CUỐI GAME -->
+  <div id="finalOverlay" class="final-overlay">
+    <div class="final-box">
+      <div class="final-title">KẾT THÚC TRÒ CHƠI!</div>
+      <div class="final-sub">Thứ hạng các đội</div>
+      <div id="finalPodium" class="final-podium"></div>
+      <button id="finalCloseBtn" class="primary final-close-btn">
+        Đóng (hoặc Khởi tạo game để chơi lại)
+      </button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -460,8 +584,7 @@
     setDoc,
     updateDoc,
     onSnapshot,
-    serverTimestamp,
-    increment
+    serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
   import { QUESTIONS } from "./questions.js";
@@ -484,7 +607,7 @@
   const scoresRef = doc(db, "games/default/scores", "teams");
 
   const questions = QUESTIONS;
-  const DEMO_COUNT = 2; // 2 câu đầu là câu chơi thử (HS đã được code không tính điểm)
+  const DEMO_COUNT = 2; // 2 câu đầu là chơi thử
 
   const statusText = document.getElementById("statusText");
   const questionTitleEl = document.getElementById("questionTitle");
@@ -498,11 +621,16 @@
   const btnAdvance = document.getElementById("btnAdvance");
   const btnLock = document.getElementById("btnLock");
 
+  const finalOverlay = document.getElementById("finalOverlay");
+  const finalPodium = document.getElementById("finalPodium");
+  const finalCloseBtn = document.getElementById("finalCloseBtn");
+
   const teamIds = ["green", "red", "orange", "purple"];
 
   let latestGameData = null;
   let latestScoresData = null;
   let timerInterval = null;
+  let hasShownFinal = false;
 
   function resetTimerDisplay() {
     timerValueEl.textContent = "--";
@@ -523,7 +651,7 @@
       const question = qs[idx];
       const limit = question && question.timeLimit ? question.timeLimit : 40;
 
-      let startMs;
+      let startMs = null;
       try {
         startMs = latestGameData.questionStartedAt?.toDate().getTime();
       } catch {
@@ -546,7 +674,6 @@
         timerValueEl.style.color = "#e5e7eb";
       }
 
-      // Hết giờ tự khóa
       if (remain === 0 && latestGameData.acceptingAnswers) {
         updateDoc(gameRef, { acceptingAnswers: false }).catch(() => {});
       }
@@ -573,10 +700,10 @@
     questionCounterEl.textContent = `Câu ${idx + 1}/${total}` +
       (idx < DEMO_COUNT ? " – Câu chơi thử (không tính điểm)" : "");
 
-    // text + LaTeX
+    // nội dung câu hỏi (có LaTeX)
     questionTextEl.innerHTML = question.text || "";
 
-    // hiển thị các lựa chọn
+    // các phương án
     optionsContainer.innerHTML = "";
     if (question.type === "choice" && question.options) {
       const letters = ["A", "B", "C", "D"];
@@ -601,7 +728,7 @@
       });
     }
 
-    // hiện ảnh nếu có (imageUrl)
+    // ảnh kèm (nếu có)
     imageContainer.innerHTML = "";
     if (question.imageUrl) {
       const img = document.createElement("img");
@@ -609,7 +736,6 @@
       imageContainer.appendChild(img);
     }
 
-    // gọi MathJax để render
     if (window.MathJax && window.MathJax.typesetPromise) {
       MathJax.typesetPromise([questionTextEl, optionsContainer]).catch((err) => {
         console.error("MathJax typeset lỗi:", err);
@@ -640,29 +766,73 @@
       const sc = typeof scores[id] === "number" ? scores[id] : 0;
       scoreEl.textContent = sc;
 
-      // trạng thái
       let stateText = "Chưa vào";
       if (joined[id]) stateText = "Đã vào phòng";
       if (answers[id]) stateText = "Đã trả lời câu hiện tại";
 
       stateEl.textContent = stateText;
 
-      // joined style
       if (joined[id]) card.classList.add("joined");
       else card.classList.remove("joined");
 
-      // glow nếu đã trả lời
       glow.style.display = answers[id] ? "block" : "none";
 
-      // thẻ vàng
       const w = warnCounts[id] || 0;
-      warnEl.innerHTML = "";
-      if (w > 0) {
-        const txt = document.createElement("span");
-        txt.textContent = `⚠ ${w} lần`;
-        warnEl.appendChild(txt);
-      }
+      warnEl.textContent = w > 0 ? `⚠ ${w} lần` : "";
     });
+  }
+
+  function showFinalSummary() {
+    if (hasShownFinal) return;
+    hasShownFinal = true;
+
+    const scores = latestScoresData || {};
+    const teams = [
+      { id: "green",  name: "Đội Xanh lá" },
+      { id: "red",    name: "Đội Đỏ" },
+      { id: "orange", name: "Đội Cam" },
+      { id: "purple", name: "Đội Tím" }
+    ];
+
+    const arr = teams.map(t => ({
+      ...t,
+      score: typeof scores[t.id] === "number" ? scores[t.id] : 0
+    }));
+
+    arr.sort((a, b) => b.score - a.score);
+
+    finalPodium.innerHTML = "";
+    const rankLabels = ["Hạng 1", "Hạng 2", "Hạng 3"];
+
+    arr.slice(0, 3).forEach((t, idx) => {
+      const card = document.createElement("div");
+      card.className = "final-card" + (idx === 0 ? " first" : "");
+
+      const badge = document.createElement("div");
+      badge.className = "final-rank-badge " +
+        (idx === 0 ? "rank-1" : idx === 1 ? "rank-2" : "rank-3");
+      badge.textContent = rankLabels[idx];
+
+      const name = document.createElement("div");
+      name.className = "final-team-name";
+      name.textContent = t.name;
+
+      const score = document.createElement("div");
+      score.className = "final-score";
+      score.textContent = t.score;
+
+      const label = document.createElement("div");
+      label.className = "final-label";
+      label.textContent = "điểm";
+
+      card.appendChild(badge);
+      card.appendChild(name);
+      card.appendChild(score);
+      card.appendChild(label);
+      finalPodium.appendChild(card);
+    });
+
+    finalOverlay.classList.add("show");
   }
 
   // Lắng nghe game doc
@@ -676,10 +846,16 @@
     latestGameData = snap.data();
     const g = latestGameData;
 
-    if (g.isFinished) statusText.textContent = "Đã kết thúc.";
-    else if (g.currentQuestionIndex === -1) statusText.textContent = "Chưa bắt đầu.";
-    else if (g.acceptingAnswers) statusText.textContent = "Đang cho trả lời.";
-    else statusText.textContent = "Đã khóa câu hiện tại.";
+    if (g.isFinished) {
+      statusText.textContent = "Đã kết thúc.";
+      showFinalSummary();
+    } else if (g.currentQuestionIndex === -1) {
+      statusText.textContent = "Chưa bắt đầu.";
+    } else if (g.acceptingAnswers) {
+      statusText.textContent = "Đang cho trả lời.";
+    } else {
+      statusText.textContent = "Đã khóa câu hiện tại.";
+    }
 
     renderQuestion(latestGameData);
     renderTeams();
@@ -695,18 +871,8 @@
 
   // Khởi tạo game
   btnInit.addEventListener("click", async () => {
-    const emptyAnswers = {
-      green: false,
-      red: false,
-      orange: false,
-      purple: false
-    };
-    const emptyWarns = {
-      green: 0,
-      red: 0,
-      orange: 0,
-      purple: 0
-    };
+    const emptyAnswers = { green:false, red:false, orange:false, purple:false };
+    const emptyWarns = { green:0, red:0, orange:0, purple:0 };
 
     await setDoc(gameRef, {
       questions,
@@ -721,17 +887,14 @@
     });
 
     await setDoc(scoresRef, {
-      green: 0,
-      red: 0,
-      orange: 0,
-      purple: 0,
-      greenJoined: false,
-      redJoined: false,
-      orangeJoined: false,
-      purpleJoined: false
+      green: 0, red: 0, orange: 0, purple: 0,
+      greenJoined: false, redJoined: false,
+      orangeJoined: false, purpleJoined: false
     });
 
     alert("Đã khởi tạo game. HS sẽ bị đuổi ra để chọn đội lại.");
+    hasShownFinal = false;
+    finalOverlay.classList.remove("show");
   });
 
   // Bắt đầu / Câu tiếp theo
@@ -739,17 +902,11 @@
     const gameData = latestGameData;
     if (!gameData || !Array.isArray(gameData.questions)) return;
 
-    const emptyAnswers = {
-      green: false,
-      red: false,
-      orange: false,
-      purple: false
-    };
+    const emptyAnswers = { green:false, red:false, orange:false, purple:false };
 
     const current = gameData.currentQuestionIndex;
     const total = gameData.questions.length;
 
-    // Chưa bắt đầu
     if (current === -1) {
       await updateDoc(gameRef, {
         currentQuestionIndex: 0,
@@ -762,7 +919,6 @@
       return;
     }
 
-    // Đang chơi -> chuyển câu
     if (current + 1 >= total) {
       await updateDoc(gameRef, {
         isFinished: true,
@@ -788,6 +944,10 @@
       "2) Bấm 'Bắt đầu / Câu tiếp theo' cho HS làm quen với Câu 1 và Câu 2.\n" +
       "3) Từ Câu 3 trở đi, hệ thống tự động cộng điểm cho đội trả lời đúng."
     );
+  });
+
+  finalCloseBtn.addEventListener("click", () => {
+    finalOverlay.classList.remove("show");
   });
 </script>
 </body>
