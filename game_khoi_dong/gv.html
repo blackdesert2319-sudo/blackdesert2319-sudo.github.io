@@ -47,6 +47,9 @@
       margin-top: 0;
       font-size: 22px;
       margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .question-meta {
       font-size: 14px;
@@ -132,6 +135,7 @@
       font-weight: 600;
       position: relative;
       overflow: hidden;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.15s, opacity 0.15s;
     }
     .team-name {
       font-size: 16px;
@@ -155,6 +159,18 @@
     .team-red { background: linear-gradient(135deg,#ef4444,#f97373); }
     .team-orange { background: linear-gradient(135deg,#f97316,#fb923c); }
     .team-purple { background: linear-gradient(135deg,#a855f7,#c084fc); }
+    .team-card.inactive {
+      filter: grayscale(0.85) brightness(0.6);
+      opacity: 0.6;
+    }
+    @keyframes pulse {
+      0% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(248,250,252,0.9); }
+      70% { transform: translateY(-2px); box-shadow: 0 0 0 8px rgba(248,250,252,0); }
+      100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(248,250,252,0); }
+    }
+    .team-card.answered {
+      animation: pulse 1s ease-out infinite;
+    }
     .footer {
       padding: 8px 16px;
       font-size: 12px;
@@ -168,6 +184,29 @@
       border-radius: 999px;
       border: 1px solid #374151;
       margin-left: 4px;
+    }
+    .timer-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .timer-label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .timer-value {
+      font-size: 28px;
+      font-weight: 700;
+      padding: 2px 14px;
+      border-radius: 999px;
+      background: #111827;
+      min-width: 64px;
+      text-align: center;
+    }
+    .timer-value.danger {
+      background: #b91c1c;
+      color: #fee2e2;
     }
   </style>
 </head>
@@ -183,7 +222,13 @@
 
 <main>
   <section class="question-panel">
-    <h2>Câu hỏi hiện tại</h2>
+    <h2>
+      <span>Câu hỏi hiện tại</span>
+      <span class="timer-box">
+        <span class="timer-label">Thời gian còn:</span>
+        <span class="timer-value" id="timerValue">--</span>
+      </span>
+    </h2>
     <div class="question-meta">
       Loại: <span id="questionType">—</span> |
       Bắt đầu lúc: <span id="questionStartTime">—</span>
@@ -206,32 +251,33 @@
       <div class="info">
         • HS chỉ thấy nút A/B/C/D hoặc ô nhập đáp án (không thấy đề).<br/>
         • Điểm: 300 điểm trong giây đầu, mỗi giây trễ -10 điểm, tối thiểu 10 điểm.<br/>
+        • Đồng hồ mặc định 40s/câu (có thể đặt timeLimit trong questions.js).<br/>
         • Khuyến nghị: chiếu màn hình này lên máy chiếu.
       </div>
     </div>
 
     <div class="score-panel" style="margin-top:16px;">
-      <h2>Điểm 4 đội</h2>
+      <h2>Điểm & trạng thái đội</h2>
       <div class="team-scores">
-        <div class="team-card team-green">
+        <div class="team-card team-green inactive" id="cardGreen">
           <div class="team-name">Đội Xanh lá</div>
           <div class="team-score" id="scoreGreen">0</div>
-          <div class="badge">GREEN</div>
+          <div class="badge" id="badgeGreen">GREEN</div>
         </div>
-        <div class="team-card team-red">
+        <div class="team-card team-red inactive" id="cardRed">
           <div class="team-name">Đội Đỏ</div>
           <div class="team-score" id="scoreRed">0</div>
-          <div class="badge">RED</div>
+          <div class="badge" id="badgeRed">RED</div>
         </div>
-        <div class="team-card team-orange">
+        <div class="team-card team-orange inactive" id="cardOrange">
           <div class="team-name">Đội Cam</div>
           <div class="team-score" id="scoreOrange">0</div>
-          <div class="badge">ORANGE</div>
+          <div class="badge" id="badgeOrange">ORANGE</div>
         </div>
-        <div class="team-card team-purple">
+        <div class="team-card team-purple inactive" id="cardPurple">
           <div class="team-name">Đội Tím</div>
           <div class="team-score" id="scorePurple">0</div>
-          <div class="badge">PURPLE</div>
+          <div class="badge" id="badgePurple">PURPLE</div>
         </div>
       </div>
     </div>
@@ -243,22 +289,18 @@
 </div>
 
 <script type="module">
-  // Import câu hỏi từ file riêng
   import { QUESTIONS } from "./questions.js";
 
-  // Import Firebase SDK từ CDN (v12.6.0)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import {
     getFirestore,
     doc,
-    getDoc,
     setDoc,
     updateDoc,
     onSnapshot,
     serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  // Cấu hình Firebase của bạn
   const firebaseConfig = {
     apiKey: "AIzaSyDVv1rc2BkQLBZdjM4OB1i7GRp1D02uORo",
     authDomain: "cau12c3.firebaseapp.com",
@@ -275,7 +317,6 @@
   const gameRef = doc(db, "games", "default");
   const scoresRef = doc(db, "games/default/scores", "teams");
 
-  // Lấy câu hỏi từ questions.js
   const questions = QUESTIONS;
 
   function formatTimestamp(ts) {
@@ -286,6 +327,50 @@
     } catch {
       return "—";
     }
+  }
+
+  const timerValueEl = document.getElementById("timerValue");
+  let timerInterval = null;
+  let questionStartMs = null;
+  let currentLimit = 40;
+
+  function startTimer(question) {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    const limit = question.timeLimit || 40;
+    currentLimit = limit;
+
+    function update() {
+      if (!questionStartMs) {
+        timerValueEl.textContent = "--";
+        return;
+      }
+      const now = Date.now();
+      const elapsedSec = Math.floor((now - questionStartMs) / 1000);
+      let remain = limit - elapsedSec;
+      if (remain < 0) remain = 0;
+      timerValueEl.textContent = String(remain);
+      if (remain <= 5) timerValueEl.classList.add("danger");
+      else timerValueEl.classList.remove("danger");
+      if (remain === 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    update();
+    timerInterval = setInterval(update, 300);
+  }
+
+  function resetTimerDisplay() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerValueEl.textContent = "--";
+    timerValueEl.classList.remove("danger");
   }
 
   function renderQuestion(gameData) {
@@ -303,6 +388,7 @@
       optionsContainer.innerHTML = "";
       imageContainer.innerHTML = "";
       counterEl.textContent = "";
+      resetTimerDisplay();
       return;
     }
 
@@ -335,7 +421,17 @@
       img.src = question.imageUrl;
       imageContainer.appendChild(img);
     }
+
+    startTimer(question);
   }
+
+  const cardGreen = document.getElementById("cardGreen");
+  const cardRed = document.getElementById("cardRed");
+  const cardOrange = document.getElementById("cardOrange");
+  const cardPurple = document.getElementById("cardPurple");
+
+  let latestGameData = null;
+  let latestScoresData = null;
 
   function renderScores(scoresData) {
     if (!scoresData) return;
@@ -345,11 +441,30 @@
     document.getElementById("scorePurple").textContent = scoresData.purple ?? 0;
   }
 
-  let latestGameData = null;
+  function updateTeamVisuals() {
+    const answers = (latestGameData && latestGameData.answers) || {};
+    const s = latestScoresData || {};
+    const mapping = [
+      ["green", cardGreen],
+      ["red", cardRed],
+      ["orange", cardOrange],
+      ["purple", cardPurple]
+    ];
+    mapping.forEach(([team, el]) => {
+      const joined = !!s[team + "Joined"];
+      const answered = !!answers[team];
+      if (joined) el.classList.remove("inactive");
+      else el.classList.add("inactive");
+
+      if (answered) el.classList.add("answered");
+      else el.classList.remove("answered");
+    });
+  }
 
   onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
       document.getElementById("gameStatus").textContent = "Chưa khởi tạo (bấm 'Khởi tạo game')";
+      resetTimerDisplay();
       return;
     }
     const data = snap.data();
@@ -368,12 +483,25 @@
 
     answerStatusEl.textContent = data.acceptingAnswers ? "Đang nhận câu trả lời" : "Đã khóa trả lời";
 
+    if (data.questionStartedAt) {
+      try {
+        questionStartMs = data.questionStartedAt.toDate().getTime();
+      } catch {
+        questionStartMs = Date.now();
+      }
+    } else {
+      questionStartMs = null;
+    }
+
     renderQuestion(data);
+    updateTeamVisuals();
   });
 
   onSnapshot(scoresRef, (snap) => {
     if (!snap.exists()) return;
-    renderScores(snap.data());
+    latestScoresData = snap.data();
+    renderScores(latestScoresData);
+    updateTeamVisuals();
   });
 
   const btnInit = document.getElementById("btnInit");
@@ -382,6 +510,8 @@
   const btnLock = document.getElementById("btnLock");
   const btnReset = document.getElementById("btnReset");
 
+  const emptyAnswers = { green: false, red: false, orange: false, purple: false };
+
   btnInit.addEventListener("click", async () => {
     await setDoc(gameRef, {
       questions,
@@ -389,13 +519,18 @@
       isStarted: false,
       isFinished: false,
       acceptingAnswers: false,
-      questionStartedAt: null
+      questionStartedAt: null,
+      answers: emptyAnswers
     });
     await setDoc(scoresRef, {
       green: 0,
       red: 0,
       orange: 0,
-      purple: 0
+      purple: 0,
+      greenJoined: false,
+      redJoined: false,
+      orangeJoined: false,
+      purpleJoined: false
     });
     alert("Đã khởi tạo game + reset điểm.");
   });
@@ -407,7 +542,8 @@
       isStarted: true,
       isFinished: false,
       acceptingAnswers: true,
-      questionStartedAt: serverTimestamp()
+      questionStartedAt: serverTimestamp(),
+      answers: emptyAnswers
     });
   });
 
@@ -427,7 +563,8 @@
       await updateDoc(gameRef, {
         currentQuestionIndex: current + 1,
         acceptingAnswers: true,
-        questionStartedAt: serverTimestamp()
+        questionStartedAt: serverTimestamp(),
+        answers: emptyAnswers
       });
     }
   });
@@ -446,13 +583,18 @@
       isStarted: false,
       isFinished: false,
       acceptingAnswers: false,
-      questionStartedAt: null
+      questionStartedAt: null,
+      answers: emptyAnswers
     });
     await setDoc(scoresRef, {
       green: 0,
       red: 0,
       orange: 0,
-      purple: 0
+      purple: 0,
+      greenJoined: false,
+      redJoined: false,
+      orangeJoined: false,
+      purpleJoined: false
     });
   });
 </script>

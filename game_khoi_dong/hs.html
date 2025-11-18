@@ -337,7 +337,6 @@
   Nếu bị out, chỉ cần F5 rồi chọn lại đúng đội.
 </div>
 
-<!-- Overlay báo đã trả lời -->
 <div class="answer-overlay" id="answerOverlay">
   <div class="answer-box" id="answerBox">
     <div class="answer-title" id="answerTitle">ĐÃ GỬI!</div>
@@ -346,7 +345,6 @@
   </div>
 </div>
 
-<!-- Anti cheat -->
 <div class="warning-overlay" id="antiCheatOverlay">
   <div class="warning-box">
     <h2>Đừng thoát khỏi bài thi 😅</h2>
@@ -356,7 +354,6 @@
   </div>
 </div>
 
-<!-- Nhạc: bạn đặt file bgm.mp3, correct.mp3, wrong.mp3 cùng thư mục -->
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="sfxCorrect" src="correct.mp3"></audio>
 <audio id="sfxWrong" src="wrong.mp3"></audio>
@@ -421,7 +418,6 @@
   const sfxCorrect = document.getElementById("sfxCorrect");
   const sfxWrong = document.getElementById("sfxWrong");
 
-  // ==== TEAM ====
   function applyTeamUI() {
     if (!currentTeam) {
       currentTeamInfo.textContent = "Chọn đội để bắt đầu";
@@ -467,10 +463,14 @@
       currentTeam = team;
       localStorage.setItem("teamId", team);
       applyTeamUI();
+
+      const joinField = team + "Joined";
+      const payload = {};
+      payload[joinField] = true;
+      updateDoc(scoresRef, payload).catch(() => {});
     });
   });
 
-  // ==== GAME SNAPSHOT ====
   onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
       qStatus.textContent = "Chưa khởi tạo";
@@ -544,7 +544,6 @@
     }
   });
 
-  // ==== ĐIỂM ====
   function calcPoints() {
     const now = Date.now();
     const baseTime = questionStartMs || now;
@@ -593,7 +592,6 @@
     answerOverlay.classList.remove("show");
   });
 
-  // ==== GỬI ĐÁP ÁN ====
   async function handleAnswerChoice(option) {
     if (!currentTeam) {
       msgEl.textContent = "Chọn đội trước khi trả lời.";
@@ -619,10 +617,15 @@
     const { pts, elapsedSec } = calcPoints();
 
     try {
+      const payloadAns = {};
+      payloadAns["answers." + currentTeam] = true;
+
       if (isCorrect) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
+        await updateDoc(gameRef, payloadAns);
         sfxCorrect.play().catch(() => {});
       } else {
+        await updateDoc(gameRef, payloadAns);
         sfxWrong.play().catch(() => {});
       }
       answeredThisQuestion = true;
@@ -668,10 +671,15 @@
     const { pts, elapsedSec } = calcPoints();
 
     try {
+      const payloadAns = {};
+      payloadAns["answers." + currentTeam] = true;
+
       if (isCorrect) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
+        await updateDoc(gameRef, payloadAns);
         sfxCorrect.play().catch(() => {});
       } else {
+        await updateDoc(gameRef, payloadAns);
         sfxWrong.play().catch(() => {});
       }
       answeredThisQuestion = true;
@@ -700,7 +708,6 @@
     handleAnswerText();
   });
 
-  // ==== ANTI CHEAT ====
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       antiCheatOverlay.classList.add("active");
