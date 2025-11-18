@@ -4,312 +4,446 @@
   <meta charset="UTF-8" />
   <title>GV – Quiz 4 đội (Firebase)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
       margin: 0;
       padding: 0;
-      background: #111827;
-      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    .app-root {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
     }
+
     header {
-      padding: 10px 16px;
-      background: #0f172a;
+      padding: 10px 18px;
+      border-bottom: 1px solid #111827;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #020617;
     }
+
     header h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 18px;
+      font-weight: 700;
     }
-    .status {
-      font-size: 14px;
-      opacity: 0.85;
+
+    header .status {
+      font-size: 13px;
+      opacity: 0.9;
     }
+
     main {
       flex: 1;
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: minmax(0, 2.3fr) minmax(280px, 0.9fr);
       gap: 16px;
-      padding: 16px;
+      padding: 14px 18px 10px 18px;
     }
-    .question-panel, .control-panel, .score-panel {
-      background: #020617;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+
+    .panel {
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 18px;
+      padding: 14px 16px;
+      border: 1px solid #111827;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     }
-    .question-panel h2 {
-      margin-top: 0;
-      font-size: 22px;
-      margin-bottom: 8px;
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .question-panel {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 96px);
+    }
+
+    .question-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .question-meta {
-      font-size: 14px;
-      opacity: 0.9;
       margin-bottom: 8px;
     }
-    .question-text {
-      font-size: 40px;
-      line-height: 1.25;
-      margin: 12px 0;
-      min-height: 120px;
+
+    #questionTitle {
+      font-size: 18px;
+      font-weight: 700;
     }
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .option {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #1f2933;
-      font-size: 28px;
-    }
-    .question-image {
-      margin-top: 10px;
-      max-height: 260px;
-    }
-    .question-image img {
-      max-width: 100%;
-      max-height: 260px;
-      border-radius: 10px;
-      border: 1px solid #374151;
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    button {
-      border: none;
+
+    .timer-box {
+      background: #020617;
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 4px 12px;
+      border: 1px solid #1d4ed8;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-label {
+      opacity: 0.8;
+    }
+
+    .timer-value {
+      font-size: 18px;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .question-body {
+      flex: 1;
+      background: #020617;
+      border-radius: 16px;
+      padding: 18px 20px;
+      border: 1px solid #111827;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #questionCounter {
       font-size: 14px;
-      cursor: pointer;
-      background: #4b5563;
-      color: white;
-      transition: transform 0.05s, box-shadow 0.05s, background 0.15s;
-    }
-    button.primary {
-      background: #2563eb;
-    }
-    button.danger {
-      background: #dc2626;
-    }
-    button:active {
-      transform: scale(0.96);
-      box-shadow: 0 0 0;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-    .info {
-      font-size: 13px;
       opacity: 0.85;
-      margin-top: 8px;
     }
-    .score-panel h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 20px;
+
+    #questionText {
+      font-size: 28px;
+      line-height: 1.45;
+      font-weight: 500;
     }
-    .team-scores {
+
+    #optionsContainer {
+      margin-top: 10px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
-    .team-card {
-      border-radius: 14px;
-      padding: 10px;
-      color: #0b1120;
-      font-weight: 600;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.15s, opacity 0.15s;
-    }
-    .team-name {
-      font-size: 16px;
-    }
-    .team-score {
-      font-size: 26px;
-      margin-top: 4px;
-    }
-    .badge {
-      position: absolute;
-      right: 8px;
-      top: 8px;
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.22);
-      color: #0b1120;
-      font-weight: 700;
-    }
-    .team-green { background: linear-gradient(135deg,#22c55e,#4ade80); }
-    .team-red { background: linear-gradient(135deg,#ef4444,#f97373); }
-    .team-orange { background: linear-gradient(135deg,#f97316,#fb923c); }
-    .team-purple { background: linear-gradient(135deg,#a855f7,#c084fc); }
-    .team-card.inactive {
-      filter: grayscale(0.85) brightness(0.6);
-      opacity: 0.6;
-    }
-    @keyframes pulse {
-      0% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(248,250,252,0.9); }
-      70% { transform: translateY(-2px); box-shadow: 0 0 0 8px rgba(248,250,252,0); }
-      100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(248,250,252,0); }
-    }
-    .team-card.answered {
-      animation: pulse 1s ease-out infinite;
-    }
-    .warn-strip {
-      margin-top: 6px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .warn-chip {
-      background: #facc15;
-      color: #451a03;
-      border-radius: 999px;
-      font-size: 11px;
-      padding: 2px 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .warn-chip span {
-      font-size: 12px;
-    }
-    .footer {
-      padding: 8px 16px;
-      font-size: 12px;
+
+    .option-item {
+      padding: 10px 12px;
       background: #020617;
-      text-align: right;
-      opacity: 0.75;
+      border-radius: 14px;
+      border: 1px solid #1f2937;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 20px;
     }
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #374151;
-      margin-left: 4px;
+
+    .option-label {
+      font-weight: 800;
+      font-size: 20px;
+      width: 26px;
     }
-    .timer-box {
+
+    .option-text {
+      flex: 1;
+    }
+
+    #questionImageContainer img {
+      max-width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+
+    .sidebar {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
+      gap: 16px;
     }
-    .timer-label {
-      font-size: 12px;
-      opacity: 0.8;
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
     }
-    .timer-value {
-      font-size: 32px;
-      font-weight: 700;
-      padding: 2px 14px;
+
+    button {
+      border: none;
       border-radius: 999px;
-      background: #111827;
-      min-width: 64px;
-      text-align: center;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.05s, box-shadow 0.05s, background 0.1s, opacity 0.1s;
     }
-    .timer-value.danger {
-      background: #b91c1c;
+
+    button:active {
+      transform: scale(0.96);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .primary {
+      background: #1d4ed8;
+      color: #e5e7eb;
+      box-shadow: 0 6px 14px rgba(37,99,235,0.45);
+    }
+
+    .primary:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    .danger {
+      background: #ef4444;
       color: #fee2e2;
+      box-shadow: 0 6px 14px rgba(239,68,68,0.45);
     }
-  
+
     .big-advance {
       font-size: 18px;
       padding: 10px 22px;
       flex: 1 1 100%;
     }
-</style>
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .team-card {
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: #020617;
+      border: 1px solid #111827;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card.joined {
+      border-color: rgba(96,165,250,0.9);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.6), 0 8px 18px rgba(59,130,246,0.5);
+    }
+
+    .team-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .team-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .team-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .tag-green { background: #22c55e; color: #052e16; }
+    .tag-red { background: #ef4444; color: #450a0a; }
+    .tag-orange { background: #f97316; color: #431407; }
+    .tag-purple { background: #a855f7; color: #2e1065; }
+
+    .team-body {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .team-score {
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .team-state {
+      font-size: 11px;
+      text-align: right;
+      opacity: 0.85;
+    }
+
+    .answered-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(22,163,74,0.12), transparent);
+      pointer-events: none;
+    }
+
+    .warn-badge {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #facc15;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .warn-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid #facc15;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+    }
+
+    footer {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-top: 1px solid #111827;
+      text-align: right;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .question-panel {
+        height: auto;
+      }
+    }
+  </style>
+
+  <!-- MathJax để hiển thị kí hiệu vectơ, căn, phân số... -->
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
-<header>
-  <h1>GV – Quiz 4 đội (Firebase)</h1>
-  <div class="status">
-    Trạng thái: <span id="gameStatus">Đang tải…</span>
-    <span class="tag" id="questionCounter"></span>
-    <span class="tag" id="answerStatus"></span>
-  </div>
-</header>
+<div class="app-root">
+  <header>
+    <h1>GV – Quiz 4 đội (Firebase)</h1>
+    <div class="status">
+      Trạng thái: <span id="statusText">Đang tải…</span>
+    </div>
+  </header>
 
-<main>
-  <section class="question-panel">
-    <h2>
-      <span id="questionTitle">Chưa bắt đầu</span>
-      <span class="timer-box">
-        <span class="timer-label">Thời gian còn:</span>
-        <span class="timer-value" id="timerValue">--</span>
-      </span>
-    </h2>
-    <div class="question-text" id="questionText">Chưa bắt đầu.</div>
-    <div class="options" id="optionsContainer"></div>
-    <div class="question-image" id="questionImageContainer"></div>
-  </section>
-
-  <section>
-    <div class="control-panel">
-      <h2>Điều khiển</h2>
-      <div class="controls">
-        <button id="btnInit" class="primary">Khởi tạo game (reset + đuổi HS)</button>
-        <button id="btnAdvance" class="primary big-advance">Bắt đầu / Câu tiếp theo</button>
-        <button id="btnLock" class="primary">Chơi thử (2 câu đầu không tính điểm)</button>
+  <main>
+    <!-- BÊN TRÁI: CÂU HỎI -->
+    <section class="panel question-panel">
+      <div class="question-header">
+        <div id="questionTitle">Chưa bắt đầu</div>
+        <div class="timer-box">
+          <span class="timer-label">Thời gian còn:</span>
+          <span class="timer-value" id="timerValue">--</span>
+        </div>
       </div>
 
-    </div>
-
-    <div class="score-panel" style="margin-top:16px;">
-      <h2>Điểm & trạng thái đội</h2>
-      <div class="team-scores">
-        <div class="team-card team-green inactive" id="cardGreen">
-          <div class="team-name">Đội Xanh lá</div>
-          <div class="team-score" id="scoreGreen">0</div>
-          <div class="badge" id="badgeGreen">GREEN</div>
-          <div class="warn-strip" id="warnGreen"></div>
-        </div>
-        <div class="team-card team-red inactive" id="cardRed">
-          <div class="team-name">Đội Đỏ</div>
-          <div class="team-score" id="scoreRed">0</div>
-          <div class="badge" id="badgeRed">RED</div>
-          <div class="warn-strip" id="warnRed"></div>
-        </div>
-        <div class="team-card team-orange inactive" id="cardOrange">
-          <div class="team-name">Đội Cam</div>
-          <div class="team-score" id="scoreOrange">0</div>
-          <div class="badge" id="badgeOrange">ORANGE</div>
-          <div class="warn-strip" id="warnOrange"></div>
-        </div>
-        <div class="team-card team-purple inactive" id="cardPurple">
-          <div class="team-name">Đội Tím</div>
-          <div class="team-score" id="scorePurple">0</div>
-          <div class="badge" id="badgePurple">PURPLE</div>
-          <div class="warn-strip" id="warnPurple"></div>
-        </div>
+      <div class="question-body">
+        <div id="questionCounter"></div>
+        <div id="questionText">Chưa bắt đầu.</div>
+        <div id="optionsContainer"></div>
+        <div id="questionImageContainer"></div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
 
-<div class="footer">
-  Học sinh vào file <strong>student.html</strong> trên điện thoại, chọn đội, bấm đáp án.
+    <!-- BÊN PHẢI: ĐIỀU KHIỂN + ĐIỂM -->
+    <section class="sidebar">
+      <section class="panel">
+        <h2>Điều khiển</h2>
+        <div class="controls">
+          <button id="btnInit" class="primary">
+            Khởi tạo game (reset + đuổi HS)
+          </button>
+          <button id="btnAdvance" class="primary big-advance">
+            Bắt đầu / Câu tiếp theo
+          </button>
+          <button id="btnLock" class="primary">
+            Chơi thử (2 câu đầu không tính điểm)
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Điểm & trạng thái đội</h2>
+        <div class="team-grid">
+          <div class="team-card" id="team-green">
+            <div class="answered-glow" style="display:none;"></div>
+            <div class="team-header">
+              <div class="team-name">Đội Xanh lá</div>
+              <div class="team-tag tag-green">GREEN</div>
+            </div>
+            <div class="team-body">
+              <div class="team-score" id="score-green">0</div>
+              <div class="team-state" id="state-green">Chưa vào</div>
+            </div>
+            <div class="warn-badge" id="warn-green"></div>
+          </div>
+
+          <div class="team-card" id="team-red">
+            <div class="answered-glow" style="display:none;"></div>
+            <div class="team-header">
+              <div class="team-name">Đội Đỏ</div>
+              <div class="team-tag tag-red">RED</div>
+            </div>
+            <div class="team-body">
+              <div class="team-score" id="score-red">0</div>
+              <div class="team-state" id="state-red">Chưa vào</div>
+            </div>
+            <div class="warn-badge" id="warn-red"></div>
+          </div>
+
+          <div class="team-card" id="team-orange">
+            <div class="answered-glow" style="display:none;"></div>
+            <div class="team-header">
+              <div class="team-name">Đội Cam</div>
+              <div class="team-tag tag-orange">ORANGE</div>
+            </div>
+            <div class="team-body">
+              <div class="team-score" id="score-orange">0</div>
+              <div class="team-state" id="state-orange">Chưa vào</div>
+            </div>
+            <div class="warn-badge" id="warn-orange"></div>
+          </div>
+
+          <div class="team-card" id="team-purple">
+            <div class="answered-glow" style="display:none;"></div>
+            <div class="team-header">
+              <div class="team-name">Đội Tím</div>
+              <div class="team-tag tag-purple">PURPLE</div>
+            </div>
+            <div class="team-body">
+              <div class="team-score" id="score-purple">0</div>
+              <div class="team-state" id="state-purple">Chưa vào</div>
+            </div>
+            <div class="warn-badge" id="warn-purple"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    Học sinh vào file <strong>student.html</strong> trên điện thoại, chọn đội, bấm đáp án.
+  </footer>
 </div>
 
 <script type="module">
-  import { QUESTIONS } from "./questions.js";
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import {
     getFirestore,
@@ -317,9 +451,13 @@
     setDoc,
     updateDoc,
     onSnapshot,
-    serverTimestamp
+    serverTimestamp,
+    increment
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
+  import { QUESTIONS } from "./questions.js";
+
+  // ==== CONFIG FIREBASE CỦA BẠN ====
   const firebaseConfig = {
     apiKey: "AIzaSyDVv1rc2BkQLBZdjM4OB1i7GRp1D02uORo",
     authDomain: "cau12c3.firebaseapp.com",
@@ -337,75 +475,82 @@
   const scoresRef = doc(db, "games/default/scores", "teams");
 
   const questions = QUESTIONS;
+  const DEMO_COUNT = 2; // 2 câu đầu là câu chơi thử (HS đã được code không tính điểm)
 
-  const DEMO_COUNT = 2;
-
-
-  function formatTimestamp(ts) {
-    if (!ts) return "—";
-    try {
-      const d = ts.toDate();
-      return d.toLocaleTimeString("vi-VN");
-    } catch {
-      return "—";
-    }
-  }
-
+  const statusText = document.getElementById("statusText");
+  const questionTitleEl = document.getElementById("questionTitle");
+  const questionTextEl = document.getElementById("questionText");
+  const questionCounterEl = document.getElementById("questionCounter");
+  const optionsContainer = document.getElementById("optionsContainer");
+  const imageContainer = document.getElementById("questionImageContainer");
   const timerValueEl = document.getElementById("timerValue");
+
+  const btnInit = document.getElementById("btnInit");
+  const btnAdvance = document.getElementById("btnAdvance");
+  const btnLock = document.getElementById("btnLock");
+
+  const teamIds = ["green", "red", "orange", "purple"];
+
+  let latestGameData = null;
+  let latestScoresData = null;
   let timerInterval = null;
-  let questionStartMs = null;
-
-  function startTimer(question) {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-    const limit = question.timeLimit || 40;
-
-    function update() {
-      if (!questionStartMs) {
-        timerValueEl.textContent = "--";
-        return;
-      }
-      const now = Date.now();
-      const elapsedSec = Math.floor((now - questionStartMs) / 1000);
-      let remain = limit - elapsedSec;
-      if (remain < 0) remain = 0;
-      timerValueEl.textContent = String(remain);
-      if (remain <= 5) timerValueEl.classList.add("danger");
-      else timerValueEl.classList.remove("danger");
-      if (remain === 0) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
-
-    update();
-    timerInterval = setInterval(update, 300);
-  }
 
   function resetTimerDisplay() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
     timerValueEl.textContent = "--";
-    timerValueEl.classList.remove("danger");
+    timerValueEl.style.color = "#e5e7eb";
+  }
+
+  function startTimerLoop() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (!latestGameData) return;
+      const idx = latestGameData.currentQuestionIndex;
+      if (idx === -1) {
+        resetTimerDisplay();
+        return;
+      }
+
+      const qs = latestGameData.questions || [];
+      const question = qs[idx];
+      const limit = question && question.timeLimit ? question.timeLimit : 40;
+
+      let startMs;
+      try {
+        startMs = latestGameData.questionStartedAt?.toDate().getTime();
+      } catch {
+        startMs = null;
+      }
+      if (!startMs) {
+        resetTimerDisplay();
+        return;
+      }
+
+      const now = Date.now();
+      let remain = limit - Math.floor((now - startMs) / 1000);
+      if (remain < 0) remain = 0;
+
+      timerValueEl.textContent = remain.toString().padStart(2, "0");
+
+      if (remain <= 5) {
+        timerValueEl.style.color = "#f97316";
+      } else {
+        timerValueEl.style.color = "#e5e7eb";
+      }
+
+      // Hết giờ tự khóa
+      if (remain === 0 && latestGameData.acceptingAnswers) {
+        updateDoc(gameRef, { acceptingAnswers: false }).catch(() => {});
+      }
+    }, 300);
   }
 
   function renderQuestion(gameData) {
-    const qTextEl = document.getElementById("questionText");
-    const optionsContainer = document.getElementById("optionsContainer");
-    const imageContainer = document.getElementById("questionImageContainer");
-    const counterEl = document.getElementById("questionCounter");
-    const titleEl = document.getElementById("questionTitle");
-
     if (!gameData || gameData.currentQuestionIndex === -1) {
-      qTextEl.textContent = "Chưa bắt đầu.";
+      questionTitleEl.textContent = "Chưa bắt đầu";
+      questionTextEl.textContent = "Chưa bắt đầu.";
+      questionCounterEl.textContent = "";
       optionsContainer.innerHTML = "";
       imageContainer.innerHTML = "";
-      counterEl.textContent = "";
-      if (titleEl) titleEl.textContent = "Chưa bắt đầu";
       resetTimerDisplay();
       return;
     }
@@ -415,23 +560,39 @@
     const total = qs.length;
     const question = qs[idx];
 
-    counterEl.textContent = `Câu ${idx + 1}/${total}`;
-    if (titleEl) titleEl.textContent = `Câu ${idx + 1}`;
-    qTextEl.textContent = question.text || "";
+    questionTitleEl.textContent = `Câu ${idx + 1}`;
+    questionCounterEl.textContent = `Câu ${idx + 1}/${total}` +
+      (idx < DEMO_COUNT ? " – Câu chơi thử (không tính điểm)" : "");
 
+    // text + LaTeX
+    questionTextEl.innerHTML = question.text || "";
+
+    // hiển thị các lựa chọn
     optionsContainer.innerHTML = "";
     if (question.type === "choice" && question.options) {
-      const labels = ["A","B","C","D"];
-      labels.forEach(label => {
-        if (question.options[label]) {
-          const div = document.createElement("div");
-          div.className = "option";
-          div.textContent = `${label}. ${question.options[label]}`;
-          optionsContainer.appendChild(div);
-        }
+      const letters = ["A", "B", "C", "D"];
+      letters.forEach((ch) => {
+        if (!(ch in question.options)) return;
+        const optText = question.options[ch];
+
+        const div = document.createElement("div");
+        div.className = "option-item";
+
+        const label = document.createElement("div");
+        label.className = "option-label";
+        label.textContent = ch;
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "option-text";
+        textDiv.innerHTML = optText;
+
+        div.appendChild(label);
+        div.appendChild(textDiv);
+        optionsContainer.appendChild(div);
       });
     }
 
+    // hiện ảnh nếu có (imageUrl)
     imageContainer.innerHTML = "";
     if (question.imageUrl) {
       const img = document.createElement("img");
@@ -439,118 +600,105 @@
       imageContainer.appendChild(img);
     }
 
-    startTimer(question);
+    // gọi MathJax để render
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      MathJax.typesetPromise([questionTextEl, optionsContainer]).catch((err) => {
+        console.error("MathJax typeset lỗi:", err);
+      });
+    }
   }
 
-  const cardGreen = document.getElementById("cardGreen");
-  const cardRed = document.getElementById("cardRed");
-  const cardOrange = document.getElementById("cardOrange");
-  const cardPurple = document.getElementById("cardPurple");
+  function renderTeams() {
+    const scores = latestScoresData || {};
+    const game = latestGameData || {};
 
-  let latestGameData = null;
-  let latestScoresData = null;
+    const answers = game.answers || {};
+    const warnCounts = game.warnCounts || {};
+    const joined = {
+      green: scores.greenJoined,
+      red: scores.redJoined,
+      orange: scores.orangeJoined,
+      purple: scores.purpleJoined
+    };
 
-  function renderScores(scoresData) {
-    if (!scoresData) return;
-    document.getElementById("scoreGreen").textContent = scoresData.green ?? 0;
-    document.getElementById("scoreRed").textContent = scoresData.red ?? 0;
-    document.getElementById("scoreOrange").textContent = scoresData.orange ?? 0;
-    document.getElementById("scorePurple").textContent = scoresData.purple ?? 0;
-  }
+    teamIds.forEach((id) => {
+      const card = document.getElementById(`team-${id}`);
+      const scoreEl = document.getElementById(`score-${id}`);
+      const stateEl = document.getElementById(`state-${id}`);
+      const warnEl = document.getElementById(`warn-${id}`);
+      const glow = card.querySelector(".answered-glow");
 
-  function renderWarnings(gameData) {
-    const warns = (gameData && gameData.warnCounts) || {};
-    const map = [
-      ["green", document.getElementById("warnGreen")],
-      ["red", document.getElementById("warnRed")],
-      ["orange", document.getElementById("warnOrange")],
-      ["purple", document.getElementById("warnPurple")]
-    ];
-    map.forEach(([team, el]) => {
-      const count = warns[team] || 0;
-      el.innerHTML = "";
-      for (let i = 0; i < count; i++) {
-        const chip = document.createElement("span");
-        chip.className = "warn-chip";
-        chip.innerHTML = "<span>⚠</span> ra ngoài";
-        el.appendChild(chip);
+      const sc = typeof scores[id] === "number" ? scores[id] : 0;
+      scoreEl.textContent = sc;
+
+      // trạng thái
+      let stateText = "Chưa vào";
+      if (joined[id]) stateText = "Đã vào phòng";
+      if (answers[id]) stateText = "Đã trả lời câu hiện tại";
+
+      stateEl.textContent = stateText;
+
+      // joined style
+      if (joined[id]) card.classList.add("joined");
+      else card.classList.remove("joined");
+
+      // glow nếu đã trả lời
+      glow.style.display = answers[id] ? "block" : "none";
+
+      // thẻ vàng
+      const w = warnCounts[id] || 0;
+      warnEl.innerHTML = "";
+      if (w > 0) {
+        const txt = document.createElement("span");
+        txt.textContent = `⚠ ${w} lần`;
+        warnEl.appendChild(txt);
       }
     });
   }
 
-  function updateTeamVisuals() {
-    const answers = (latestGameData && latestGameData.answers) || {};
-    const s = latestScoresData || {};
-    const mapping = [
-      ["green", cardGreen],
-      ["red", cardRed],
-      ["orange", cardOrange],
-      ["purple", cardPurple]
-    ];
-    mapping.forEach(([team, el]) => {
-      const joined = !!s[team + "Joined"];
-      const answered = !!answers[team];
-      if (joined) el.classList.remove("inactive");
-      else el.classList.add("inactive");
-
-      if (answered) el.classList.add("answered");
-      else el.classList.remove("answered");
-    });
-  }
-
+  // Lắng nghe game doc
   onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
-      document.getElementById("gameStatus").textContent = "Chưa khởi tạo (bấm 'Khởi tạo game')";
-      resetTimerDisplay();
+      statusText.textContent = "Chưa khởi tạo.";
+      latestGameData = null;
+      renderQuestion(null);
       return;
     }
-    const data = snap.data();
-    latestGameData = data;
+    latestGameData = snap.data();
+    const g = latestGameData;
 
-    const statusEl = document.getElementById("gameStatus");
-    const answerStatusEl = document.getElementById("answerStatus");
+    if (g.isFinished) statusText.textContent = "Đã kết thúc.";
+    else if (g.currentQuestionIndex === -1) statusText.textContent = "Chưa bắt đầu.";
+    else if (g.acceptingAnswers) statusText.textContent = "Đang cho trả lời.";
+    else statusText.textContent = "Đã khóa câu hiện tại.";
 
-    if (data.isFinished) {
-      statusEl.textContent = "Đã kết thúc";
-    } else if (data.currentQuestionIndex === -1) {
-      statusEl.textContent = "Chưa bắt đầu";
-    } else {
-      statusEl.textContent = "Đang chơi";
-    }
-
-    answerStatusEl.textContent = data.acceptingAnswers ? "Đang nhận câu trả lời" : "Đã khóa trả lời";
-
-    if (data.questionStartedAt) {
-      try {
-        questionStartMs = data.questionStartedAt.toDate().getTime();
-      } catch {
-        questionStartMs = Date.now();
-      }
-    } else {
-      questionStartMs = null;
-    }
-
-    renderQuestion(data);
-    renderWarnings(data);
-    updateTeamVisuals();
+    renderQuestion(latestGameData);
+    renderTeams();
+    startTimerLoop();
   });
 
+  // Lắng nghe điểm
   onSnapshot(scoresRef, (snap) => {
     if (!snap.exists()) return;
     latestScoresData = snap.data();
-    renderScores(latestScoresData);
-    updateTeamVisuals();
+    renderTeams();
   });
 
-  const btnInit = document.getElementById("btnInit");
-  const btnAdvance = document.getElementById("btnAdvance");
-  const btnLock = document.getElementById("btnLock");
-
-  const emptyAnswers = { green: false, red: false, orange: false, purple: false };
-  const emptyWarns = { green: 0, red: 0, orange: 0, purple: 0 };
-
+  // Khởi tạo game
   btnInit.addEventListener("click", async () => {
-    const forceKickValue = Date.now();
+    const emptyAnswers = {
+      green: false,
+      red: false,
+      orange: false,
+      purple: false
+    };
+    const emptyWarns = {
+      green: 0,
+      red: 0,
+      orange: 0,
+      purple: 0
+    };
+
     await setDoc(gameRef, {
       questions,
       currentQuestionIndex: -1,
@@ -560,8 +708,9 @@
       questionStartedAt: null,
       answers: emptyAnswers,
       warnCounts: emptyWarns,
-      forceKick: forceKickValue
+      forceKick: Date.now()
     });
+
     await setDoc(scoresRef, {
       green: 0,
       red: 0,
@@ -572,17 +721,26 @@
       orangeJoined: false,
       purpleJoined: false
     });
-    alert("Đã khởi tạo game + reset điểm + đuổi HS.");
+
+    alert("Đã khởi tạo game. HS sẽ bị đuổi ra để chọn đội lại.");
   });
 
+  // Bắt đầu / Câu tiếp theo
   btnAdvance.addEventListener("click", async () => {
     const gameData = latestGameData;
     if (!gameData || !Array.isArray(gameData.questions)) return;
 
+    const emptyAnswers = {
+      green: false,
+      red: false,
+      orange: false,
+      purple: false
+    };
+
     const current = gameData.currentQuestionIndex;
     const total = gameData.questions.length;
 
-    // Nếu chưa bắt đầu -> bắt đầu từ câu 1 (index 0)
+    // Chưa bắt đầu
     if (current === -1) {
       await updateDoc(gameRef, {
         currentQuestionIndex: 0,
@@ -595,7 +753,7 @@
       return;
     }
 
-    // Đang chơi -> chuyển câu tiếp
+    // Đang chơi -> chuyển câu
     if (current + 1 >= total) {
       await updateDoc(gameRef, {
         isFinished: true,
@@ -612,8 +770,15 @@
     }
   });
 
+  // Nút "Chơi thử" – chỉ giải thích, không can thiệp logic
   btnLock.addEventListener("click", () => {
-    alert("Hai câu đầu (Câu 1 và Câu 2) đã được cài sẵn là câu CHƠI THỬ, không tính điểm.\n\nChỉ cần bấm 'Bắt đầu / Câu tiếp theo' để cho HS làm quen 2 câu đầu; từ Câu 3 trở đi hệ thống sẽ tự động tính điểm.");
+    alert(
+      "Hai câu đầu (Câu 1 và Câu 2) đã được cài sẵn là CÂU CHƠI THỬ, không tính điểm (phần code ở màn HS).\n\n" +
+      "Cách dùng:\n" +
+      "1) Bấm 'Khởi tạo game' để reset.\n" +
+      "2) Bấm 'Bắt đầu / Câu tiếp theo' cho HS làm quen với Câu 1 và Câu 2.\n" +
+      "3) Từ Câu 3 trở đi, hệ thống tự động cộng điểm cho đội trả lời đúng."
+    );
   });
 </script>
 </body>
