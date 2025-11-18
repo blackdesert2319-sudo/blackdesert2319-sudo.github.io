@@ -280,8 +280,7 @@
 </div>
 
 <script type="module">
-  // ====== 1. Import Firebase ======
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import {
     getFirestore,
     doc,
@@ -289,16 +288,16 @@
     onSnapshot,
     updateDoc,
     increment
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  // ====== 2. CẤU HÌNH FIREBASE (giống teacher.html) ======
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDVv1rc2BkQLBZdjM4OB1i7GRp1D02uORo",
+    authDomain: "cau12c3.firebaseapp.com",
+    projectId: "cau12c3",
+    storageBucket: "cau12c3.firebasestorage.app",
+    messagingSenderId: "899332858074",
+    appId: "1:899332858074:web:e3f1eef00c9566f861c5e3",
+    measurementId: "G-15VDE147Q1"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -307,13 +306,11 @@
   const gameRef = doc(db, "games", "default");
   const scoresRef = doc(db, "games/default/scores", "teams");
 
-  // ====== 3. BIẾN TOÀN CỤC ======
   let currentTeam = null;
   let latestGameData = null;
-  let questionStartMs = null; // thời gian bắt đầu câu (ms)
+  let questionStartMs = null;
   let lastAnsweredQuestionIndex = Number(localStorage.getItem("lastAnsweredQuestionIndex") || "-1");
 
-  // ====== 4. DOM ======
   const qIndexLabel = document.getElementById("qIndexLabel");
   const qStatus = document.getElementById("qStatus");
   const questionStateText = document.getElementById("questionStateText");
@@ -328,7 +325,6 @@
   const textAnswerInput = document.getElementById("textAnswerInput");
   const btnSubmitText = document.getElementById("btnSubmitText");
 
-  // ====== 5. TEAM SELECTION ======
   function applyTeamUI() {
     if (!currentTeam) {
       currentTeamInfo.textContent = "Chưa chọn đội.";
@@ -364,7 +360,6 @@
     });
   });
 
-  // ====== 6. LẮNG NGHE GAME ======
   onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
       qStatus.textContent = "Chưa khởi tạo (GV bấm 'Khởi tạo')";
@@ -402,7 +397,6 @@
       return;
     }
 
-    // Lưu thời gian bắt đầu câu để tính điểm
     if (data.questionStartedAt) {
       try {
         questionStartMs = data.questionStartedAt.toDate().getTime();
@@ -428,7 +422,6 @@
     msgEl.textContent = "";
   });
 
-  // ====== 7. TÍNH ĐIỂM ======
   function calcPoints() {
     const now = Date.now();
     const baseTime = questionStartMs || now;
@@ -548,7 +541,6 @@
     }
   }
 
-  // Gán sự kiện cho nút A/B/C/D
   document.querySelectorAll(".answer-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const opt = btn.getAttribute("data-option");
@@ -558,12 +550,8 @@
 
   btnSubmitText.addEventListener("click", handleAnswerText);
 
-  // ====== 8. CHỐNG GIAN LẬN CƠ BẢN: phát hiện chuyển app/tab ======
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-      // rời tab
-    } else if (document.visibilityState === "visible") {
-      // quay lại
+    if (document.visibilityState === "visible") {
       antiCheatOverlay.classList.add("active");
     }
   });

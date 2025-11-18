@@ -243,8 +243,11 @@
 </div>
 
 <script type="module">
-  // ====== 1. Import Firebase SDK từ CDN ======
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  // Import câu hỏi từ file riêng
+  import { QUESTIONS } from "./questions.js";
+
+  // Import Firebase SDK từ CDN (v12.6.0)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import {
     getFirestore,
     doc,
@@ -253,130 +256,28 @@
     updateDoc,
     onSnapshot,
     serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  // ====== 2. CẤU HÌNH FIREBASE CỦA BẠN ======
-  // 👉 Vào Firebase Console → Project settings → Your apps (Web) → copy đoạn config dán vào đây:
+  // Cấu hình Firebase của bạn
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDVv1rc2BkQLBZdjM4OB1i7GRp1D02uORo",
+    authDomain: "cau12c3.firebaseapp.com",
+    projectId: "cau12c3",
+    storageBucket: "cau12c3.firebasestorage.app",
+    messagingSenderId: "899332858074",
+    appId: "1:899332858074:web:e3f1eef00c9566f861c5e3",
+    measurementId: "G-15VDE147Q1"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // ====== 3. THAM CHIẾU FIRESTORE ======
   const gameRef = doc(db, "games", "default");
   const scoresRef = doc(db, "games/default/scores", "teams");
 
-  // ====== 4. BỘ CÂU HỎI MẪU (SỬA TRONG JS NÀY) ======
-  // Bạn sửa / thêm / bớt câu hỏi ở đây. Có 2 loại:
-  // type: "choice"  (trắc nghiệm A/B/C/D)
-  // type: "text"    (điền vào ô trống, so sánh chuỗi)
-  const questions = [
-    {
-      type: "choice",
-      text: "Giá trị của 2 + 3 · 4 là:",
-      options: {
-        A: "20",
-        B: "14",
-        C: "24",
-        D: "18"
-      },
-      correctOption: "B",
-      imageUrl: ""
-    },
-    {
-      type: "text",
-      text: "Căn bậc hai của 8 được nhập là:",
-      correctAnswer: "can(8)",
-      imageUrl: ""
-    },
-    {
-      type: "text",
-      text: "Tọa độ của vectơ \\(\\vec{a}\\) là (1;2;-5). Nhập đúng dạng: (1;2;-5)",
-      correctAnswer: "(1;2;-5)",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Phân số nào bằng 1/2?",
-      options: {
-        A: "2/4",
-        B: "3/5",
-        C: "4/8",
-        D: "2/3"
-      },
-      correctOption: "A",
-      imageUrl: ""
-    },
-    // Thêm tiếp tới đủ ~12 câu:
-    {
-      type: "choice",
-      text: "Giá trị của (−1)^2 là:",
-      options: { A: "-1", B: "1", C: "0", D: "2" },
-      correctOption: "B",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Trong không gian Oxyz, điểm A(1;2;3) có tung độ là:",
-      options: { A: "1", B: "2", C: "3", D: "5" },
-      correctOption: "B",
-      imageUrl: ""
-    },
-    {
-      type: "text",
-      text: "Nhập kết quả: 5^2 = ? (nhập số nguyên)",
-      correctAnswer: "25",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Độ dài vectơ \\(\\vec{a}=(3;4)\\) là:",
-      options: { A: "5", B: "7", C: "25", D: "12" },
-      correctOption: "A",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Số nghiệm của phương trình x^2 = 0 là:",
-      options: { A: "0", B: "1", C: "2", D: "vô số" },
-      correctOption: "B",
-      imageUrl: ""
-    },
-    {
-      type: "text",
-      text: "Nhập số nguyên: 10 - 7 = ?",
-      correctAnswer: "3",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Giá trị gần đúng của can(9) là:",
-      options: { A: "2", B: "3", C: "4", D: "5" },
-      correctOption: "B",
-      imageUrl: ""
-    },
-    {
-      type: "choice",
-      text: "Nếu AB là một vectơ thì ký hiệu đúng là:",
-      options: {
-        A: "AB",
-        B: "BA",
-        C: "→AB",
-        D: "|AB|"
-      },
-      correctOption: "C",
-      imageUrl: ""
-    }
-  ];
+  // Lấy câu hỏi từ questions.js
+  const questions = QUESTIONS;
 
-  // ====== 5. HÀM TIỆN ÍCH ======
   function formatTimestamp(ts) {
     if (!ts) return "—";
     try {
@@ -413,10 +314,8 @@
     counterEl.textContent = `Câu ${idx + 1}/${total}`;
     qTypeEl.textContent = question.type === "choice" ? "Trắc nghiệm A/B/C/D" : "Điền vào ô trống";
     qStartEl.textContent = formatTimestamp(gameData.questionStartedAt);
-
     qTextEl.textContent = question.text || "";
 
-    // Options
     optionsContainer.innerHTML = "";
     if (question.type === "choice" && question.options) {
       const labels = ["A","B","C","D"];
@@ -430,7 +329,6 @@
       });
     }
 
-    // Image
     imageContainer.innerHTML = "";
     if (question.imageUrl) {
       const img = document.createElement("img");
@@ -447,7 +345,6 @@
     document.getElementById("scorePurple").textContent = scoresData.purple ?? 0;
   }
 
-  // ====== 6. LẮNG NGHE REALTIME ======
   let latestGameData = null;
 
   onSnapshot(gameRef, (snap) => {
@@ -479,7 +376,6 @@
     renderScores(snap.data());
   });
 
-  // ====== 7. NÚT ĐIỀU KHIỂN ======
   const btnInit = document.getElementById("btnInit");
   const btnStart = document.getElementById("btnStart");
   const btnNext = document.getElementById("btnNext");
@@ -522,7 +418,6 @@
     const total = gameData.questions.length;
 
     if (current + 1 >= total) {
-      // Hết câu
       await updateDoc(gameRef, {
         isFinished: true,
         acceptingAnswers: false
