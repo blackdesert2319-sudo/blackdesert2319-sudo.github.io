@@ -2,604 +2,563 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>GV – Quiz Toán 12 (Vectơ & tọa độ Oxyz)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GV – Quiz 4 đội (Firebase)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * { box-sizing: border-box; }
     body {
+      font-family: system-ui, sans-serif;
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #000 60%);
-      color: #e5e7eb;
+      padding: 0;
+      background: #111827;
+      color: #f9fafb;
       display: flex;
-      justify-content: center;
-      align-items: stretch;
+      flex-direction: column;
       min-height: 100vh;
     }
-    .app {
-      width: 100%;
-      max-width: 1100px;
-      margin: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: linear-gradient(135deg, #020617, #020617, #0f172a);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
     header {
-      padding: 12px 16px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 10px 16px;
+      background: #0f172a;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      align-items: center;
     }
-    .title {
-      font-size: 18px;
-      font-weight: 600;
+    header h1 {
+      margin: 0;
+      font-size: 20px;
     }
-    .subtitle {
-      font-size: 13px;
-      color: #9ca3af;
-    }
-    .pill {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: #cbd5f5;
+    .status {
+      font-size: 14px;
+      opacity: 0.85;
     }
     main {
+      flex: 1;
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 10px;
-      padding: 10px;
-      flex: 1;
+      gap: 16px;
+      padding: 16px;
     }
-    .question-panel {
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-                  rgba(15, 23, 42, 0.96);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-height: 0;
+    .question-panel, .control-panel, .score-panel {
+      background: #020617;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      color: #9ca3af;
+    .question-panel h2 {
+      margin-top: 0;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .question-meta {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
     }
     .question-text {
-      font-size: 20px;
-      line-height: 1.5;
-      margin-top: 6px;
-      min-height: 120px;
+      font-size: 22px;
+      margin: 12px 0;
+      min-height: 80px;
     }
     .options {
-      margin-top: 10px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      margin-top: 8px;
     }
     .option {
       padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.98);
+      border-radius: 8px;
+      background: #1f2933;
       font-size: 15px;
     }
-    .info-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: #9ca3af;
-      margin-top: 4px;
+    .question-image {
+      margin-top: 10px;
+      max-height: 220px;
     }
-    .info-pill {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
+    .question-image img {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 10px;
+      border: 1px solid #374151;
     }
     .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 8px;
+      margin-bottom: 12px;
     }
     button {
       border: none;
-      outline: none;
       border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 13px;
+      padding: 8px 14px;
+      font-size: 14px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #111827;
-      color: #e5e7eb;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      transition: 0.15s;
+      background: #4b5563;
+      color: white;
+      transition: transform 0.05s, box-shadow 0.05s, background 0.15s;
     }
-    button:hover:not(:disabled) {
-      background: #020617;
-      transform: translateY(-1px);
-      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.8);
+    button.primary {
+      background: #2563eb;
+    }
+    button.danger {
+      background: #dc2626;
+    }
+    button:active {
+      transform: scale(0.96);
+      box-shadow: 0 0 0;
     }
     button:disabled {
-      opacity: 0.4;
+      opacity: 0.5;
       cursor: default;
-      box-shadow: none;
-      transform: none;
     }
-    .btn-primary {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: rgba(74, 222, 128, 0.9);
-      color: #022c22;
+    .info {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 8px;
     }
-    .timer {
-      font-size: 16px;
-      font-weight: 600;
-      color: #f97316;
+    .score-panel h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 20px;
     }
-    .scoreboard {
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.96);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      font-size: 14px;
-      min-height: 0;
-    }
-    .score-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .score-row {
+    .team-scores {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px;
-      align-items: center;
-      padding: 6px 8px;
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.94);
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
-    .bar {
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(31, 41, 55, 0.8);
+    .team-card {
+      border-radius: 14px;
+      padding: 10px;
+      color: #0b1120;
+      font-weight: 600;
+      position: relative;
       overflow: hidden;
+    }
+    .team-name {
+      font-size: 16px;
+    }
+    .team-score {
+      font-size: 26px;
       margin-top: 4px;
     }
-    .bar-inner {
-      height: 100%;
+    .badge {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      font-size: 11px;
+      padding: 3px 7px;
       border-radius: 999px;
+      background: rgba(15,23,42,0.22);
+      color: #0b1120;
+      font-weight: 700;
     }
-    .team-name { font-weight: 500; }
-    .team-score { font-weight: 700; font-size: 16px; }
-    .log {
+    .team-green { background: linear-gradient(135deg,#22c55e,#4ade80); }
+    .team-red { background: linear-gradient(135deg,#ef4444,#f97373); }
+    .team-orange { background: linear-gradient(135deg,#f97316,#fb923c); }
+    .team-purple { background: linear-gradient(135deg,#a855f7,#c084fc); }
+    .footer {
+      padding: 8px 16px;
       font-size: 12px;
-      color: #9ca3af;
-      max-height: 140px;
-      overflow-y: auto;
-      margin-top: 6px;
-      border-top: 1px dashed rgba(148,163,184,0.4);
-      padding-top: 4px;
+      background: #020617;
+      text-align: right;
+      opacity: 0.75;
     }
-    @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
-      .question-text { font-size: 18px; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      margin-left: 4px;
     }
   </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div>
-      <div class="title">GV – Quiz Toán 12: Vectơ & tọa độ Oxyz</div>
-      <div class="subtitle">Firebase Realtime – 4 đội, điểm theo thời gian</div>
+<header>
+  <h1>GV – Quiz 4 đội (Firebase)</h1>
+  <div class="status">
+    Trạng thái: <span id="gameStatus">Đang tải…</span>
+    <span class="tag" id="questionCounter"></span>
+    <span class="tag" id="answerStatus"></span>
+  </div>
+</header>
+
+<main>
+  <section class="question-panel">
+    <h2>Câu hỏi hiện tại</h2>
+    <div class="question-meta">
+      Loại: <span id="questionType">—</span> |
+      Bắt đầu lúc: <span id="questionStartTime">—</span>
     </div>
-    <div>
-      <span class="pill" id="connectionStatus">Đang kết nối Firebase…</span>
-    </div>
-  </header>
+    <div class="question-text" id="questionText">Chưa bắt đầu.</div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="question-image" id="questionImageContainer"></div>
+  </section>
 
-  <main>
-    <section class="question-panel">
-      <div class="question-header">
-        <div>Câu: <strong id="qIndexLabel">0 / 12</strong></div>
-        <div>Thời gian: <span class="timer" id="timerLabel">0.0 s</span></div>
-      </div>
-
-      <div class="question-text" id="questionText">
-        Bấm <strong>“Bắt đầu / Câu 1”</strong> để bắt đầu.
-      </div>
-
-      <div class="options" id="optionsBox" style="display:none;"></div>
-
-      <div class="info-row">
-        <span class="info-pill">Loại câu: <span id="qTypeLabel">---</span></span>
-        <span class="info-pill">Điểm tối đa: 300 · trừ 10 điểm mỗi giây</span>
-      </div>
-
+  <section>
+    <div class="control-panel">
+      <h2>Điều khiển</h2>
       <div class="controls">
-        <button id="startBtn" class="btn-primary">Bắt đầu / Câu 1</button>
-        <button id="nextBtn">Câu tiếp theo</button>
-        <button id="resetBtn">Đặt lại trò chơi</button>
+        <button id="btnInit" class="primary">1. Khởi tạo game</button>
+        <button id="btnStart" class="primary">2. Bắt đầu (Câu 1)</button>
+        <button id="btnNext">Câu tiếp theo</button>
+        <button id="btnLock" class="danger">Khóa trả lời</button>
+        <button id="btnReset" class="danger">Reset điểm + game</button>
       </div>
-
-      <div class="info-row">
-        <span id="lastInfoLabel">Chưa có câu nào.</span>
+      <div class="info">
+        • HS chỉ thấy nút A/B/C/D hoặc ô nhập đáp án (không thấy đề).<br/>
+        • Điểm: 300 điểm trong giây đầu, mỗi giây trễ -10 điểm, tối thiểu 10 điểm.<br/>
+        • Khuyến nghị: chiếu màn hình này lên máy chiếu.
       </div>
+    </div>
 
-      <div class="log" id="logBox"></div>
-    </section>
-
-    <aside class="scoreboard">
-      <div class="score-header">
-        <div style="font-weight:600;">Bảng điểm 4 đội</div>
-        <div style="font-size:12px;color:#9ca3af;">Realtime từ Firebase</div>
+    <div class="score-panel" style="margin-top:16px;">
+      <h2>Điểm 4 đội</h2>
+      <div class="team-scores">
+        <div class="team-card team-green">
+          <div class="team-name">Đội Xanh lá</div>
+          <div class="team-score" id="scoreGreen">0</div>
+          <div class="badge">GREEN</div>
+        </div>
+        <div class="team-card team-red">
+          <div class="team-name">Đội Đỏ</div>
+          <div class="team-score" id="scoreRed">0</div>
+          <div class="badge">RED</div>
+        </div>
+        <div class="team-card team-orange">
+          <div class="team-name">Đội Cam</div>
+          <div class="team-score" id="scoreOrange">0</div>
+          <div class="badge">ORANGE</div>
+        </div>
+        <div class="team-card team-purple">
+          <div class="team-name">Đội Tím</div>
+          <div class="team-score" id="scorePurple">0</div>
+          <div class="badge">PURPLE</div>
+        </div>
       </div>
-      <div id="scoresBox"></div>
-    </aside>
-  </main>
+    </div>
+  </section>
+</main>
+
+<div class="footer">
+  Học sinh vào file <strong>student.html</strong> trên điện thoại, chọn đội, bấm đáp án.
 </div>
 
 <script type="module">
-  // ===== Firebase modular v12.6.0 =====
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  // ====== 1. Import Firebase SDK từ CDN ======
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getDatabase,
-    ref,
-    onValue,
-    set,
-    get,
-    update
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // === CONFIG của thầy (giữ nguyên, chỉ bổ sung dùng thêm DB) ===
+  // ====== 2. CẤU HÌNH FIREBASE CỦA BẠN ======
+  // 👉 Vào Firebase Console → Project settings → Your apps (Web) → copy đoạn config dán vào đây:
   const firebaseConfig = {
-    apiKey: "AIzaSyCeKHAaY58XKouzucFq9NJuKSD5oZI0Yyw",
-    authDomain: "khoidog12c3.firebaseapp.com",
-    projectId: "khoidog12c3",
-    storageBucket: "khoidog12c3.firebasestorage.app",
-    messagingSenderId: "177773503964",
-    appId: "1:177773503964:web:3986f366bba3d3e6909b19",
-    measurementId: "G-WFHZ5RXYL4"
-  // 👉 THÊM DÒNG NÀY:
-  databaseURL: "https://khoidog12c3-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
   const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  const db = getFirestore(app);
 
-  // ====== DATA CÂU HỎI ======
+  // ====== 3. THAM CHIẾU FIRESTORE ======
+  const gameRef = doc(db, "games", "default");
+  const scoresRef = doc(db, "games/default/scores", "teams");
+
+  // ====== 4. BỘ CÂU HỎI MẪU (SỬA TRONG JS NÀY) ======
+  // Bạn sửa / thêm / bớt câu hỏi ở đây. Có 2 loại:
+  // type: "choice"  (trắc nghiệm A/B/C/D)
+  // type: "text"    (điền vào ô trống, so sánh chuỗi)
   const questions = [
     {
-      type: "mcq",
-      text: "Câu 1. Trong không gian Oxyz, cho A(1;2;3), B(4;0;-1). Tọa độ vectơ AB là:",
-      options: [
-        "(3; -2; -4)",
-        "(-3; 2; 4)",
-        "(3; 2; 4)",
-        "(4; 2; 3)"
-      ],
-      correctOptionIndex: 0
+      type: "choice",
+      text: "Giá trị của 2 + 3 · 4 là:",
+      options: {
+        A: "20",
+        B: "14",
+        C: "24",
+        D: "18"
+      },
+      correctOption: "B",
+      imageUrl: ""
     },
     {
-      type: "fill",
-      text: "Câu 2. Trong không gian Oxyz, cho A(2; -1; 3), B(-1; 4; 0). Tọa độ vectơ BA là:",
-      answerPatterns: ["(3;-5;3)", "3;-5;3", "(3; -5; 3)", "3; -5; 3"]
+      type: "text",
+      text: "Căn bậc hai của 8 được nhập là:",
+      correctAnswer: "can(8)",
+      imageUrl: ""
     },
     {
-      type: "mcq",
-      text: "Câu 3. Vectơ nào sau đây cùng hướng với vectơ u = (2; -1; 4)?",
-      options: [
-        "(1; -0,5; 2)",
-        "(-2; 1; -4)",
-        "(-1; 0,5; -2)",
-        "(-4; 2; -8)"
-      ],
-      correctOptionIndex: 0
+      type: "text",
+      text: "Tọa độ của vectơ \\(\\vec{a}\\) là (1;2;-5). Nhập đúng dạng: (1;2;-5)",
+      correctAnswer: "(1;2;-5)",
+      imageUrl: ""
     },
     {
-      type: "fill",
-      text: "Câu 4. Cho vectơ u = (1; 2; -3). Tọa độ vectơ 2u là:",
-      answerPatterns: ["(2;4;-6)", "2;4;-6", "(2; 4; -6)", "2; 4; -6"]
+      type: "choice",
+      text: "Phân số nào bằng 1/2?",
+      options: {
+        A: "2/4",
+        B: "3/5",
+        C: "4/8",
+        D: "2/3"
+      },
+      correctOption: "A",
+      imageUrl: ""
+    },
+    // Thêm tiếp tới đủ ~12 câu:
+    {
+      type: "choice",
+      text: "Giá trị của (−1)^2 là:",
+      options: { A: "-1", B: "1", C: "0", D: "2" },
+      correctOption: "B",
+      imageUrl: ""
     },
     {
-      type: "mcq",
-      text: "Câu 5. Trong không gian Oxyz, cho A(1;0;2), C(0;2;1). Tọa độ vectơ AC là:",
-      options: [
-        "(-1; 2; -1)",
-        "(-1; -2; -1)",
-        "(1; 2; 1)",
-        "(0; 2; 1)"
-      ],
-      correctOptionIndex: 0
+      type: "choice",
+      text: "Trong không gian Oxyz, điểm A(1;2;3) có tung độ là:",
+      options: { A: "1", B: "2", C: "3", D: "5" },
+      correctOption: "B",
+      imageUrl: ""
     },
     {
-      type: "fill",
-      text: "Câu 6. Cho a = (2; -1; 3), b = (-1; 4; 0). Tọa độ vectơ a + b là:",
-      answerPatterns: ["(1;3;3)", "1;3;3", "(1; 3; 3)", "1; 3; 3"]
+      type: "text",
+      text: "Nhập kết quả: 5^2 = ? (nhập số nguyên)",
+      correctAnswer: "25",
+      imageUrl: ""
     },
     {
-      type: "mcq",
-      text: "Câu 7. Cho vectơ u = (x; y; z). Điều kiện cần và đủ để u là vectơ không là:",
-      options: [
-        "x = y = z",
-        "x + y + z = 0",
-        "x = y = z = 0",
-        "Không đồng thời x, y, z đều bằng 0"
-      ],
-      correctOptionIndex: 3
+      type: "choice",
+      text: "Độ dài vectơ \\(\\vec{a}=(3;4)\\) là:",
+      options: { A: "5", B: "7", C: "25", D: "12" },
+      correctOption: "A",
+      imageUrl: ""
     },
     {
-      type: "fill",
-      text: "Câu 8. Cho u = (1; -2; 3), v = (2; 1; -1). Tọa độ vectơ u - v là:",
-      answerPatterns: ["(-1;-3;4)", "-1;-3;4", "(-1; -3; 4)", "-1; -3; 4"]
+      type: "choice",
+      text: "Số nghiệm của phương trình x^2 = 0 là:",
+      options: { A: "0", B: "1", C: "2", D: "vô số" },
+      correctOption: "B",
+      imageUrl: ""
     },
     {
-      type: "mcq",
-      text: "Câu 9. Cho A(0;1;2), B(2;3;4), C(1;2;3). Khẳng định nào đúng?",
-      options: [
-        "AB = (2; 2; 2)",
-        "AC = (1; 1; 1)",
-        "BC = (-1; -1; -1)",
-        "Cả B) và C) đều đúng"
-      ],
-      correctOptionIndex: 3
+      type: "text",
+      text: "Nhập số nguyên: 10 - 7 = ?",
+      correctAnswer: "3",
+      imageUrl: ""
     },
     {
-      type: "fill",
-      text: "Câu 10. Cho A(1;2;3), B(3;0;5). Tọa độ trung điểm M của đoạn AB là:",
-      answerPatterns: ["(2;1;4)", "2;1;4", "(2; 1; 4)", "2; 1; 4"]
+      type: "choice",
+      text: "Giá trị gần đúng của can(9) là:",
+      options: { A: "2", B: "3", C: "4", D: "5" },
+      correctOption: "B",
+      imageUrl: ""
     },
     {
-      type: "mcq",
-      text: "Câu 11. Cho u = (1;2;0), v = (0;1;3). Tọa độ vectơ 2u + v là:",
-      options: [
-        "(1; 4; 3)",
-        "(2; 3; 3)",
-        "(2; 5; 3)",
-        "(0; 4; 3)"
-      ],
-      correctOptionIndex: 2
-    },
-    {
-      type: "fill",
-      text: "Câu 12. Cho u = (2; -1; 4). Tọa độ vectơ đối của u (tức là -u) là:",
-      answerPatterns: ["(-2;1;-4)", "-2;1;-4", "(-2; 1; -4)", "-2; 1; -4"]
+      type: "choice",
+      text: "Nếu AB là một vectơ thì ký hiệu đúng là:",
+      options: {
+        A: "AB",
+        B: "BA",
+        C: "→AB",
+        D: "|AB|"
+      },
+      correctOption: "C",
+      imageUrl: ""
     }
   ];
 
-  const stateRef = ref(db, "quiz/state");
-  const teamsRef = ref(db, "quiz/teams");
-
-  const maxScore = 300;
-  const penaltyPerSecond = 10;
-
-  // DOM
-  const connectionStatus = document.getElementById("connectionStatus");
-  const qIndexLabel = document.getElementById("qIndexLabel");
-  const qTextEl = document.getElementById("questionText");
-  const optionsBox = document.getElementById("optionsBox");
-  const qTypeLabel = document.getElementById("qTypeLabel");
-  const timerLabel = document.getElementById("timerLabel");
-  const lastInfoLabel = document.getElementById("lastInfoLabel");
-  const logBox = document.getElementById("logBox");
-  const scoresBox = document.getElementById("scoresBox");
-  const startBtn = document.getElementById("startBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const resetBtn = document.getElementById("resetBtn");
-
-  let currentIndex = -1;
-  let questionStartTime = null;
-  let timerInterval = null;
-
-  function appendLog(msg) {
-    const now = new Date();
-    const t = `[${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}] `;
-    const div = document.createElement("div");
-    div.textContent = t + msg;
-    logBox.appendChild(div);
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-
-  function startTimer(tsFromDB) {
-    stopTimer();
-    if (!tsFromDB) {
-      questionStartTime = Date.now();
-    } else {
-      questionStartTime = tsFromDB;
+  // ====== 5. HÀM TIỆN ÍCH ======
+  function formatTimestamp(ts) {
+    if (!ts) return "—";
+    try {
+      const d = ts.toDate();
+      return d.toLocaleTimeString("vi-VN");
+    } catch {
+      return "—";
     }
-    timerInterval = setInterval(() => {
-      const elapsed = (Date.now() - questionStartTime) / 1000;
-      timerLabel.textContent = elapsed.toFixed(1) + " s";
-    }, 100);
   }
 
-  function stopTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  function renderQuestion(gameData) {
+    const qTextEl = document.getElementById("questionText");
+    const qTypeEl = document.getElementById("questionType");
+    const qStartEl = document.getElementById("questionStartTime");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const imageContainer = document.getElementById("questionImageContainer");
+    const counterEl = document.getElementById("questionCounter");
 
-  function renderQuestion(idx) {
-    if (idx < 0 || idx >= questions.length) {
-      qIndexLabel.textContent = "0 / " + questions.length;
-      qTextEl.innerHTML = 'Bấm <strong>“Bắt đầu / Câu 1”</strong> để bắt đầu.';
-      qTypeLabel.textContent = "---";
-      optionsBox.style.display = "none";
-      optionsBox.innerHTML = "";
+    if (!gameData || gameData.currentQuestionIndex === -1) {
+      qTextEl.textContent = "Chưa bắt đầu.";
+      qTypeEl.textContent = "—";
+      qStartEl.textContent = "—";
+      optionsContainer.innerHTML = "";
+      imageContainer.innerHTML = "";
+      counterEl.textContent = "";
       return;
     }
-    const q = questions[idx];
-    qIndexLabel.textContent = (idx + 1) + " / " + questions.length;
-    qTextEl.textContent = q.text;
-    qTypeLabel.textContent = q.type === "mcq" ? "Trắc nghiệm" : "Điền đáp án (HS nhập trên điện thoại)";
-    optionsBox.innerHTML = "";
-    if (q.type === "mcq") {
-      optionsBox.style.display = "grid";
-      (q.options || []).forEach((opt, i) => {
-        const div = document.createElement("div");
-        div.className = "option";
-        div.innerHTML = `<strong>${String.fromCharCode(65 + i)}.</strong> ${opt}`;
-        optionsBox.appendChild(div);
+
+    const idx = gameData.currentQuestionIndex;
+    const qs = gameData.questions || [];
+    const total = qs.length;
+    const question = qs[idx];
+
+    counterEl.textContent = `Câu ${idx + 1}/${total}`;
+    qTypeEl.textContent = question.type === "choice" ? "Trắc nghiệm A/B/C/D" : "Điền vào ô trống";
+    qStartEl.textContent = formatTimestamp(gameData.questionStartedAt);
+
+    qTextEl.textContent = question.text || "";
+
+    // Options
+    optionsContainer.innerHTML = "";
+    if (question.type === "choice" && question.options) {
+      const labels = ["A","B","C","D"];
+      labels.forEach(label => {
+        if (question.options[label]) {
+          const div = document.createElement("div");
+          div.className = "option";
+          div.textContent = `${label}. ${question.options[label]}`;
+          optionsContainer.appendChild(div);
+        }
       });
-    } else {
-      optionsBox.style.display = "block";
-      const helper = document.createElement("div");
-      helper.className = "option";
-      helper.innerHTML = "<em>Câu điền vào ô trống – học sinh nhập đáp án trên điện thoại, hệ thống tự chấm.</em>";
-      optionsBox.appendChild(helper);
+    }
+
+    // Image
+    imageContainer.innerHTML = "";
+    if (question.imageUrl) {
+      const img = document.createElement("img");
+      img.src = question.imageUrl;
+      imageContainer.appendChild(img);
     }
   }
 
-  function renderScores(teamsData) {
-    scoresBox.innerHTML = "";
-    if (!teamsData) return;
-    const arr = Object.entries(teamsData).map(([id, t]) => ({
-      id,
-      name: t.name || id,
-      score: t.score || 0
-    }));
-    if (arr.length === 0) return;
-    const max = arr.reduce((m, t) => Math.max(m, t.score), 0) || 1;
-    const colors = {
-      green: "#22c55e",
-      red: "#ef4444",
-      orange: "#f97316",
-      purple: "#a855f7"
-    };
-    arr.forEach(t => {
-      const row = document.createElement("div");
-      row.className = "score-row";
-      const left = document.createElement("div");
-      const dot = document.createElement("span");
-      dot.style.display = "inline-block";
-      dot.style.width = "10px";
-      dot.style.height = "10px";
-      dot.style.borderRadius = "999px";
-      dot.style.marginRight = "6px";
-      dot.style.background = colors[t.id] || "#38bdf8";
-      const name = document.createElement("span");
-      name.className = "team-name";
-      name.textContent = t.name;
-      left.appendChild(dot);
-      left.appendChild(name);
-      const scoreSpan = document.createElement("span");
-      scoreSpan.className = "team-score";
-      scoreSpan.textContent = t.score;
-      row.appendChild(left);
-      row.appendChild(scoreSpan);
-
-      const bar = document.createElement("div");
-      bar.className = "bar";
-      const inner = document.createElement("div");
-      inner.className = "bar-inner";
-      inner.style.width = (t.score * 100 / max) + "%";
-      inner.style.background = colors[t.id] || "#38bdf8";
-      bar.appendChild(inner);
-
-      scoresBox.appendChild(row);
-      scoresBox.appendChild(bar);
-    });
+  function renderScores(scoresData) {
+    if (!scoresData) return;
+    document.getElementById("scoreGreen").textContent = scoresData.green ?? 0;
+    document.getElementById("scoreRed").textContent = scoresData.red ?? 0;
+    document.getElementById("scoreOrange").textContent = scoresData.orange ?? 0;
+    document.getElementById("scorePurple").textContent = scoresData.purple ?? 0;
   }
 
-  // === Theo dõi state & teams từ Firebase ===
-  onValue(stateRef, (snap) => {
-    const value = snap.val() || {};
-    const idx = value.currentQuestionIndex ?? -1;
-    const ts = value.questionStartTime ?? null;
-    currentIndex = idx;
-    renderQuestion(idx);
-    if (idx >= 0 && ts) {
-      startTimer(ts);
-      lastInfoLabel.textContent = "Đang ở câu " + (idx + 1) + ".";
-    } else {
-      stopTimer();
-      timerLabel.textContent = "0.0 s";
-      lastInfoLabel.textContent = "Chưa bắt đầu.";
-    }
-  });
+  // ====== 6. LẮNG NGHE REALTIME ======
+  let latestGameData = null;
 
-  onValue(teamsRef, (snap) => {
-    renderScores(snap.val());
-  });
-
-  // Khởi tạo teams nếu chưa có
-  get(teamsRef).then(snap => {
+  onSnapshot(gameRef, (snap) => {
     if (!snap.exists()) {
-      set(teamsRef, {
-        green:  { name: "Đội Xanh",  score: 0 },
-        red:    { name: "Đội Đỏ",   score: 0 },
-        orange: { name: "Đội Cam",  score: 0 },
-        purple: { name: "Đội Tím",  score: 0 }
+      document.getElementById("gameStatus").textContent = "Chưa khởi tạo (bấm 'Khởi tạo game')";
+      return;
+    }
+    const data = snap.data();
+    latestGameData = data;
+
+    const statusEl = document.getElementById("gameStatus");
+    const answerStatusEl = document.getElementById("answerStatus");
+
+    if (data.isFinished) {
+      statusEl.textContent = "Đã kết thúc";
+    } else if (data.currentQuestionIndex === -1) {
+      statusEl.textContent = "Chưa bắt đầu";
+    } else {
+      statusEl.textContent = "Đang chơi";
+    }
+
+    answerStatusEl.textContent = data.acceptingAnswers ? "Đang nhận câu trả lời" : "Đã khóa trả lời";
+
+    renderQuestion(data);
+  });
+
+  onSnapshot(scoresRef, (snap) => {
+    if (!snap.exists()) return;
+    renderScores(snap.data());
+  });
+
+  // ====== 7. NÚT ĐIỀU KHIỂN ======
+  const btnInit = document.getElementById("btnInit");
+  const btnStart = document.getElementById("btnStart");
+  const btnNext = document.getElementById("btnNext");
+  const btnLock = document.getElementById("btnLock");
+  const btnReset = document.getElementById("btnReset");
+
+  btnInit.addEventListener("click", async () => {
+    await setDoc(gameRef, {
+      questions,
+      currentQuestionIndex: -1,
+      isStarted: false,
+      isFinished: false,
+      acceptingAnswers: false,
+      questionStartedAt: null
+    });
+    await setDoc(scoresRef, {
+      green: 0,
+      red: 0,
+      orange: 0,
+      purple: 0
+    });
+    alert("Đã khởi tạo game + reset điểm.");
+  });
+
+  btnStart.addEventListener("click", async () => {
+    const firstIndex = 0;
+    await updateDoc(gameRef, {
+      currentQuestionIndex: firstIndex,
+      isStarted: true,
+      isFinished: false,
+      acceptingAnswers: true,
+      questionStartedAt: serverTimestamp()
+    });
+  });
+
+  btnNext.addEventListener("click", async () => {
+    const gameData = latestGameData;
+    if (!gameData || !Array.isArray(gameData.questions)) return;
+    const current = gameData.currentQuestionIndex;
+    const total = gameData.questions.length;
+
+    if (current + 1 >= total) {
+      // Hết câu
+      await updateDoc(gameRef, {
+        isFinished: true,
+        acceptingAnswers: false
+      });
+      alert("Đã hết câu hỏi.");
+    } else {
+      await updateDoc(gameRef, {
+        currentQuestionIndex: current + 1,
+        acceptingAnswers: true,
+        questionStartedAt: serverTimestamp()
       });
     }
   });
 
-  // Connection status đơn giản
-  const infoRef = ref(db, ".info/connected");
-  onValue(infoRef, (snap) => {
-    if (snap.val() === true) {
-      connectionStatus.textContent = "Đã kết nối Firebase";
-      connectionStatus.style.borderColor = "rgba(74,222,128,0.9)";
-    } else {
-      connectionStatus.textContent = "Mất kết nối Firebase…";
-      connectionStatus.style.borderColor = "rgba(239,68,68,0.9)";
-    }
-  });
-
-  // === Nút điều khiển GV ===
-  startBtn.addEventListener("click", () => {
-    set(ref(db, "quiz/state"), {
-      currentQuestionIndex: 0,
-      questionStartTime: Date.now()
+  btnLock.addEventListener("click", async () => {
+    await updateDoc(gameRef, {
+      acceptingAnswers: false
     });
-    set(ref(db, "quiz/teamAnswers"), null); // xóa đáp án cũ
-    appendLog("Bắt đầu trò chơi – vào câu 1.");
   });
 
-  nextBtn.addEventListener("click", () => {
-    const idx = currentIndex < 0 ? 0 : currentIndex + 1;
-    if (idx >= questions.length) {
-      appendLog("Hết câu hỏi, không còn câu tiếp theo.");
-      lastInfoLabel.textContent = "Đã hết 12 câu.";
-      return;
-    }
-    set(ref(db, "quiz/state"), {
-      currentQuestionIndex: idx,
-      questionStartTime: Date.now()
-    });
-    appendLog("Chuyển sang câu " + (idx + 1) + ".");
-  });
-
-  resetBtn.addEventListener("click", () => {
-    if (!confirm("Đặt lại toàn bộ trò chơi (điểm + trạng thái)?")) return;
-    set(ref(db, "quiz/state"), {
+  btnReset.addEventListener("click", async () => {
+    if (!confirm("Reset game + điểm về 0?")) return;
+    await setDoc(gameRef, {
+      questions,
       currentQuestionIndex: -1,
-      questionStartTime: null
+      isStarted: false,
+      isFinished: false,
+      acceptingAnswers: false,
+      questionStartedAt: null
     });
-    set(teamsRef, {
-      green:  { name: "Đội Xanh",  score: 0 },
-      red:    { name: "Đội Đỏ",   score: 0 },
-      orange: { name: "Đội Cam",  score: 0 },
-      purple: { name: "Đội Tím",  score: 0 }
+    await setDoc(scoresRef, {
+      green: 0,
+      red: 0,
+      orange: 0,
+      purple: 0
     });
-    set(ref(db, "quiz/teamAnswers"), null);
-    appendLog("Đặt lại toàn bộ trò chơi.");
   });
 </script>
 </body>

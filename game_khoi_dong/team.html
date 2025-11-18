@@ -2,573 +2,575 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Team – Quiz Toán 12 (Vectơ & tọa độ Oxyz)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HS – Quiz 4 đội (Firebase)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * { box-sizing: border-box; }
     body {
+      font-family: system-ui, sans-serif;
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #000 60%);
+      padding: 0;
+      background: #020617;
       color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
       min-height: 100vh;
-    }
-    .app {
-      width: 100%;
-      max-width: 480px;
-      margin: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: linear-gradient(135deg, #020617, #020617, #0f172a);
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
     header {
       padding: 10px 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
+      background: #020617;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #111827;
     }
-    .title { font-size:16px; font-weight:600; }
-    .subtitle { font-size:12px; color:#9ca3af; }
-    .pill {
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.5);
+    header h1 {
+      margin: 0;
+      font-size: 16px;
     }
     main {
-      padding:10px;
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      gap: 12px;
+    }
+    .info {
+      font-size: 13px;
+      opacity: 0.85;
     }
     .card {
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,0.4);
-      background:rgba(15,23,42,0.95);
-      padding:12px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      border: 1px solid #111827;
     }
-    .team-select-grid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
+    .question-status {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+    .question-note {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .team-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
     }
     .team-btn {
-      border-radius:12px;
-      padding:10px;
-      border:none;
-      color:#0b1120;
-      font-weight:600;
-      cursor:pointer;
-      font-size:14px;
+      flex: 1;
+      min-width: 45%;
+      border-radius: 14px;
+      padding: 10px;
+      border: none;
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
     }
-    .team-green{ background:#22c55e; }
-    .team-red{ background:#ef4444; }
-    .team-orange{ background:#f97316; }
-    .team-purple{ background:#a855f7; }
-
-    .label { font-size:12px; color:#9ca3af; margin-bottom:4px; }
-    .input {
-      width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid rgba(148,163,184,0.6);
-      background:#020617;
-      color:#e5e7eb;
-      font-size:14px;
-      outline:none;
+    .team-green { background: linear-gradient(135deg,#22c55e,#4ade80); }
+    .team-red { background: linear-gradient(135deg,#ef4444,#f97373); }
+    .team-orange { background: linear-gradient(135deg,#f97316,#fb923c); }
+    .team-purple { background: linear-gradient(135deg,#a855f7,#c084fc); }
+    .team-label {
+      font-size: 12px;
+      opacity: 0.85;
     }
-    .input:focus {
-      border-color:rgba(56,189,248,0.9);
-      box-shadow:0 0 0 1px rgba(56,189,248,0.7);
+    .team-name {
+      font-size: 16px;
     }
-    .btn-primary {
-      margin-top:10px;
-      width:100%;
-      border-radius:999px;
-      border:none;
-      padding:9px 12px;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      border:1px solid rgba(74,222,128,0.9);
-      color:#022c22;
+    .current-team {
+      font-size: 13px;
+      margin-top: 4px;
     }
-    .btn-primary:disabled {
-      opacity:0.4;
-      cursor:default;
+    .answer-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
     }
-
-    .question-info {
-      font-size:12px;
-      color:#9ca3af;
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:6px;
+    .answer-btn {
+      border-radius: 14px;
+      border: none;
+      padding: 12px 8px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #0b1120;
+      transition: transform 0.05s, box-shadow 0.05s, opacity 0.1s;
     }
-    .question-main {
-      font-size:16px;
-      line-height:1.5;
-      min-height:40px;
+    .answer-btn:active {
+      transform: scale(0.96);
+      box-shadow: none;
     }
-    .options {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:6px;
-      margin-top:10px;
+    .ans-A { background: #22c55e; }
+    .ans-B { background: #ef4444; }
+    .ans-C { background: #f97316; }
+    .ans-D { background: #a855f7; }
+    .text-answer {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .option-btn {
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,0.5);
-      background:#020617;
-      color:#e5e7eb;
-      padding:8px 10px;
-      font-size:14px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:6px;
+    .text-answer input {
+      padding: 10px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 16px;
+      outline: none;
     }
-    .option-btn.selected {
-      border-color:rgba(56,189,248,0.9);
-      box-shadow:0 0 0 1px rgba(56,189,248,0.8);
+    .text-answer button {
+      border-radius: 999px;
+      border: none;
+      padding: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
     }
-    .option-label {
-      width:22px;
-      height:22px;
-      border-radius:8px;
-      border:1px solid rgba(148,163,184,0.7);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
+    .msg {
+      margin-top: 6px;
+      font-size: 14px;
+      min-height: 18px;
     }
-    .status-row {
-      font-size:12px;
-      color:#9ca3af;
-      margin-top:6px;
+    .msg.ok {
+      color: #4ade80;
     }
-    .feedback {
-      margin-top:6px;
-      font-size:13px;
+    .msg.err {
+      color: #f97373;
     }
-    .score-label {
-      font-size:13px;
-      font-weight:500;
+    .footer {
+      font-size: 11px;
+      text-align: center;
+      padding: 6px 8px;
+      opacity: 0.8;
     }
-    .btn-submit {
-      margin-top:8px;
-      width:100%;
-      border-radius:999px;
-      border:none;
-      padding:9px 12px;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      border:1px solid rgba(74,222,128,0.9);
-      color:#022c22;
+    .warning-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      z-index: 9999;
     }
-    .btn-submit:disabled { opacity:0.4; cursor:default; }
+    .warning-overlay.active {
+      display: flex;
+    }
+    .warning-box {
+      max-width: 320px;
+      background: #111827;
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid #f97316;
+    }
+    .warning-box h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #f97316;
+    }
+    .warning-box p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+    .warning-box button {
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      background: #f97316;
+      color: #111827;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div>
-      <div class="title">Team – Vectơ & tọa độ Oxyz</div>
-      <div class="subtitle" id="teamNameLabel">Chưa chọn đội</div>
-    </div>
-    <div>
-      <span class="pill" id="connectStatus">Đang kết nối...</span>
-    </div>
-  </header>
+<header>
+  <h1>HS – Quiz 4 đội</h1>
+  <div style="font-size:12px;">
+    Câu: <span id="qIndexLabel">–</span> |
+    Trạng thái: <span id="qStatus">Đang tải…</span>
+  </div>
+</header>
 
-  <main>
-    <section class="card" id="teamSelectCard">
-      <div class="label">1. Chọn màu đội</div>
-      <div class="team-select-grid">
-        <button class="team-btn team-green" data-team="green">Đội Xanh</button>
-        <button class="team-btn team-red" data-team="red">Đội Đỏ</button>
-        <button class="team-btn team-orange" data-team="orange">Đội Cam</button>
-        <button class="team-btn team-purple" data-team="purple">Đội Tím</button>
-      </div>
-      <div style="margin-top:10px;">
-        <div class="label">2. Nhập tên đội (lớp/nhóm)</div>
-        <input id="nicknameInput" class="input" placeholder="Ví dụ: 12A1 - Nhóm 1">
-      </div>
-      <button id="joinBtn" class="btn-primary">Vào chơi</button>
-    </section>
+<main>
+  <section class="card">
+    <div class="info">
+      <strong>Lưu ý:</strong> Đề bài + hình chỉ hiển thị trên màn GV / máy chiếu.<br/>
+      Bạn chỉ chọn A/B/C/D hoặc nhập đáp án theo yêu cầu GV.
+    </div>
 
-    <section class="card" id="gameCard" style="display:none;">
-      <div class="question-info">
-        <div>Câu: <strong id="qIndexLabel">- / 12</strong></div>
-        <div>Điểm: <span class="score-label" id="scoreLabel">0</span></div>
+    <div class="current-team" id="currentTeamInfo">
+      Chưa chọn đội.
+    </div>
+
+    <div class="team-select" id="teamSelect">
+      <button class="team-btn team-green" data-team="green">
+        <div class="team-label">Đội</div>
+        <div class="team-name">Xanh lá</div>
+      </button>
+      <button class="team-btn team-red" data-team="red">
+        <div class="team-label">Đội</div>
+        <div class="team-name">Đỏ</div>
+      </button>
+      <button class="team-btn team-orange" data-team="orange">
+        <div class="team-label">Đội</div>
+        <div class="team-name">Cam</div>
+      </button>
+      <button class="team-btn team-purple" data-team="purple">
+        <div class="team-label">Đội</div>
+        <div class="team-name">Tím</div>
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="question-status">
+      <strong>Trạng thái câu hỏi:</strong> <span id="questionStateText">Chưa bắt đầu.</span>
+    </div>
+    <div class="question-note" id="questionNote">
+      Khi GV bấm “Bắt đầu”, ở đây sẽ hiển thị loại câu hỏi và nút trả lời.
+    </div>
+
+    <div id="choiceArea" style="display:none;">
+      <div class="answer-buttons">
+        <button class="answer-btn ans-A" data-option="A">A</button>
+        <button class="answer-btn ans-B" data-option="B">B</button>
+        <button class="answer-btn ans-C" data-option="C">C</button>
+        <button class="answer-btn ans-D" data-option="D">D</button>
       </div>
-      <div class="question-main" id="qText">Đang chờ giáo viên bắt đầu câu hỏi...</div>
-      <div id="mcqBox" class="options" style="display:none;"></div>
-      <div id="fillBox" style="display:none;margin-top:8px;">
-        <input id="fillInput" class="input" placeholder="Nhập đáp án, ví dụ: (2;-3;5)">
-      </div>
-      <button id="submitBtn" class="btn-submit" disabled>Gửi đáp án</button>
-      <div class="status-row" id="statusRow">Chưa có câu hỏi.</div>
-      <div class="feedback" id="feedbackBox"></div>
-    </section>
-  </main>
+    </div>
+
+    <div id="textArea" class="text-answer" style="display:none;">
+      <input type="text" id="textAnswerInput" placeholder="Nhập đáp án theo yêu cầu GV…" />
+      <button id="btnSubmitText">Gửi đáp án</button>
+    </div>
+
+    <div class="msg" id="message"></div>
+  </section>
+</main>
+
+<div class="footer">
+  Nếu bị out, chỉ cần F5 rồi chọn lại đúng đội. Điểm không bị mất.
+</div>
+
+<div class="warning-overlay" id="antiCheatOverlay">
+  <div class="warning-box">
+    <h2>Đừng thoát khỏi bài thi 😅</h2>
+    <p>Phát hiện bạn vừa chuyển app / tab. Việc tra đáp án sẽ làm mất thời gian và giảm điểm.</p>
+    <p>Hãy quay lại làm bài trên màn hình này nhé.</p>
+    <button id="btnCloseOverlay">OK, hiểu rồi</button>
+  </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  // ====== 1. Import Firebase ======
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getDatabase,
-    ref,
-    onValue,
-    set,
-    get,
-    runTransaction
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    getFirestore,
+    doc,
+    getDoc,
+    onSnapshot,
+    updateDoc,
+    increment
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  // ====== 2. CẤU HÌNH FIREBASE (giống teacher.html) ======
   const firebaseConfig = {
-    apiKey: "AIzaSyCeKHAaY58XKouzucFq9NJuKSD5oZI0Yyw",
-    authDomain: "khoidog12c3.firebaseapp.com",
-    projectId: "khoidog12c3",
-    storageBucket: "khoidog12c3.firebasestorage.app",
-    messagingSenderId: "177773503964",
-    appId: "1:177773503964:web:3986f366bba3d3e6909b19",
-    measurementId: "G-WFHZ5RXYL4"
-  // 👉 THÊM DÒNG NÀY:
-  databaseURL: "https://khoidog12c3-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
   const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  const db = getFirestore(app);
 
-  const questions = [
-    {
-      type: "mcq",
-      text: "Câu 1. Trong không gian Oxyz, cho A(1;2;3), B(4;0;-1). Tọa độ vectơ AB là:",
-      options: [
-        "(3; -2; -4)",
-        "(-3; 2; 4)",
-        "(3; 2; 4)",
-        "(4; 2; 3)"
-      ],
-      correctOptionIndex: 0
-    },
-    {
-      type: "fill",
-      text: "Câu 2. Trong không gian Oxyz, cho A(2; -1; 3), B(-1; 4; 0). Tọa độ vectơ BA là:",
-      answerPatterns: ["(3;-5;3)", "3;-5;3", "(3; -5; 3)", "3; -5; 3"]
-    },
-    {
-      type: "mcq",
-      text: "Câu 3. Vectơ nào sau đây cùng hướng với vectơ u = (2; -1; 4)?",
-      options: [
-        "(1; -0,5; 2)",
-        "(-2; 1; -4)",
-        "(-1; 0,5; -2)",
-        "(-4; 2; -8)"
-      ],
-      correctOptionIndex: 0
-    },
-    {
-      type: "fill",
-      text: "Câu 4. Cho vectơ u = (1; 2; -3). Tọa độ vectơ 2u là:",
-      answerPatterns: ["(2;4;-6)", "2;4;-6", "(2; 4; -6)", "2; 4; -6"]
-    },
-    {
-      type: "mcq",
-      text: "Câu 5. Trong không gian Oxyz, cho A(1;0;2), C(0;2;1). Tọa độ vectơ AC là:",
-      options: [
-        "(-1; 2; -1)",
-        "(-1; -2; -1)",
-        "(1; 2; 1)",
-        "(0; 2; 1)"
-      ],
-      correctOptionIndex: 0
-    },
-    {
-      type: "fill",
-      text: "Câu 6. Cho a = (2; -1; 3), b = (-1; 4; 0). Tọa độ vectơ a + b là:",
-      answerPatterns: ["(1;3;3)", "1;3;3", "(1; 3; 3)", "1; 3; 3"]
-    },
-    {
-      type: "mcq",
-      text: "Câu 7. Cho vectơ u = (x; y; z). Điều kiện cần và đủ để u là vectơ không là:",
-      options: [
-        "x = y = z",
-        "x + y + z = 0",
-        "x = y = z = 0",
-        "Không đồng thời x, y, z đều bằng 0"
-      ],
-      correctOptionIndex: 3
-    },
-    {
-      type: "fill",
-      text: "Câu 8. Cho u = (1; -2; 3), v = (2; 1; -1). Tọa độ vectơ u - v là:",
-      answerPatterns: ["(-1;-3;4)", "-1;-3;4", "(-1; -3; 4)", "-1; -3; 4"]
-    },
-    {
-      type: "mcq",
-      text: "Câu 9. Cho A(0;1;2), B(2;3;4), C(1;2;3). Khẳng định nào đúng?",
-      options: [
-        "AB = (2; 2; 2)",
-        "AC = (1; 1; 1)",
-        "BC = (-1; -1; -1)",
-        "Cả B) và C) đều đúng"
-      ],
-      correctOptionIndex: 3
-    },
-    {
-      type: "fill",
-      text: "Câu 10. Cho A(1;2;3), B(3;0;5). Tọa độ trung điểm M của đoạn AB là:",
-      answerPatterns: ["(2;1;4)", "2;1;4", "(2; 1; 4)", "2; 1; 4"]
-    },
-    {
-      type: "mcq",
-      text: "Câu 11. Cho u = (1;2;0), v = (0;1;3). Tọa độ vectơ 2u + v là:",
-      options: [
-        "(1; 4; 3)",
-        "(2; 3; 3)",
-        "(2; 5; 3)",
-        "(0; 4; 3)"
-      ],
-      correctOptionIndex: 2
-    },
-    {
-      type: "fill",
-      text: "Câu 12. Cho u = (2; -1; 4). Tọa độ vectơ đối của u (tức là -u) là:",
-      answerPatterns: ["(-2;1;-4)", "-2;1;-4", "(-2; 1; -4)", "-2; 1; -4"]
-    }
-  ];
+  const gameRef = doc(db, "games", "default");
+  const scoresRef = doc(db, "games/default/scores", "teams");
 
-  const connectStatus = document.getElementById("connectStatus");
-  const teamNameLabel = document.getElementById("teamNameLabel");
-  const teamSelectCard = document.getElementById("teamSelectCard");
-  const gameCard = document.getElementById("gameCard");
-  const nicknameInput = document.getElementById("nicknameInput");
-  const joinBtn = document.getElementById("joinBtn");
+  // ====== 3. BIẾN TOÀN CỤC ======
+  let currentTeam = null;
+  let latestGameData = null;
+  let questionStartMs = null; // thời gian bắt đầu câu (ms)
+  let lastAnsweredQuestionIndex = Number(localStorage.getItem("lastAnsweredQuestionIndex") || "-1");
 
+  // ====== 4. DOM ======
   const qIndexLabel = document.getElementById("qIndexLabel");
-  const qText = document.getElementById("qText");
-  const mcqBox = document.getElementById("mcqBox");
-  const fillBox = document.getElementById("fillBox");
-  const fillInput = document.getElementById("fillInput");
-  const submitBtn = document.getElementById("submitBtn");
-  const statusRow = document.getElementById("statusRow");
-  const feedbackBox = document.getElementById("feedbackBox");
-  const scoreLabel = document.getElementById("scoreLabel");
+  const qStatus = document.getElementById("qStatus");
+  const questionStateText = document.getElementById("questionStateText");
+  const questionNote = document.getElementById("questionNote");
+  const choiceArea = document.getElementById("choiceArea");
+  const textArea = document.getElementById("textArea");
+  const msgEl = document.getElementById("message");
+  const teamSelect = document.getElementById("teamSelect");
+  const currentTeamInfo = document.getElementById("currentTeamInfo");
+  const antiCheatOverlay = document.getElementById("antiCheatOverlay");
+  const btnCloseOverlay = document.getElementById("btnCloseOverlay");
+  const textAnswerInput = document.getElementById("textAnswerInput");
+  const btnSubmitText = document.getElementById("btnSubmitText");
 
-  let chosenTeam = null;
-  let currentQuestionIndex = -1;
-  let currentQuestionType = null;
-  let selectedOptionIndex = null;
-  let questionStartTime = null;
-
-  const params = new URLSearchParams(window.location.search);
-  const urlTeam = params.get("team");
-  if (urlTeam) chosenTeam = urlTeam;
-
-  function normalizeAnswer(str) {
-    if (!str) return "";
-    return str.trim().toLowerCase()
-      .replace(/,/g, ";")
-      .replace(/\s+/g, "");
+  // ====== 5. TEAM SELECTION ======
+  function applyTeamUI() {
+    if (!currentTeam) {
+      currentTeamInfo.textContent = "Chưa chọn đội.";
+      teamSelect.style.display = "flex";
+    } else {
+      const mapName = {
+        green: "Đội Xanh lá",
+        red: "Đội Đỏ",
+        orange: "Đội Cam",
+        purple: "Đội Tím"
+      };
+      currentTeamInfo.textContent = `Bạn đang chơi: ${mapName[currentTeam] || currentTeam}`;
+      teamSelect.style.display = "none";
+    }
   }
 
-  function highlightTeamButton(teamId) {
-    document.querySelectorAll(".team-btn").forEach(btn => {
-      if (btn.dataset.team === teamId) {
-        btn.style.outline = "2px solid #22c55e";
-      } else {
-        btn.style.outline = "none";
-      }
-    });
+  function loadTeamFromStorage() {
+    const saved = localStorage.getItem("teamId");
+    if (saved) {
+      currentTeam = saved;
+      applyTeamUI();
+    }
   }
-  if (chosenTeam) highlightTeamButton(chosenTeam);
 
-  document.querySelectorAll(".team-btn").forEach(btn => {
+  loadTeamFromStorage();
+
+  teamSelect.querySelectorAll(".team-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      chosenTeam = btn.dataset.team;
-      highlightTeamButton(chosenTeam);
+      const team = btn.getAttribute("data-team");
+      currentTeam = team;
+      localStorage.setItem("teamId", team);
+      applyTeamUI();
     });
   });
 
-  joinBtn.addEventListener("click", () => {
-    if (!chosenTeam) {
-      alert("Hãy chọn màu đội.");
+  // ====== 6. LẮNG NGHE GAME ======
+  onSnapshot(gameRef, (snap) => {
+    if (!snap.exists()) {
+      qStatus.textContent = "Chưa khởi tạo (GV bấm 'Khởi tạo')";
+      questionStateText.textContent = "Chờ GV khởi tạo game.";
+      choiceArea.style.display = "none";
+      textArea.style.display = "none";
       return;
     }
-    const nick = nicknameInput.value.trim();
-    const name = nick || (
-      chosenTeam === "green" ? "Đội Xanh" :
-      chosenTeam === "red" ? "Đội Đỏ" :
-      chosenTeam === "orange" ? "Đội Cam" :
-      "Đội Tím"
-    );
-    set(ref(db, "quiz/teams/" + chosenTeam + "/name"), name);
-    teamNameLabel.textContent = `${name} (${chosenTeam})`;
-    teamSelectCard.style.display = "none";
-    gameCard.style.display = "block";
-    subscribeTeamScore();
+    const data = snap.data();
+    latestGameData = data;
+
+    const qs = data.questions || [];
+    const idx = data.currentQuestionIndex;
+    const total = qs.length;
+
+    if (idx === -1) {
+      qIndexLabel.textContent = "–";
+      qStatus.textContent = "Chưa bắt đầu";
+      questionStateText.textContent = "Chờ GV bấm 'Bắt đầu'.";
+      choiceArea.style.display = "none";
+      textArea.style.display = "none";
+      msgEl.textContent = "";
+      return;
+    }
+
+    qIndexLabel.textContent = `${idx + 1}/${total}`;
+    qStatus.textContent = data.acceptingAnswers ? "Đang nhận câu trả lời" : "Đã khóa";
+
+    const currentQuestion = qs[idx];
+
+    if (data.isFinished) {
+      questionStateText.textContent = "Game đã kết thúc. Xem kết quả trên màn GV.";
+      choiceArea.style.display = "none";
+      textArea.style.display = "none";
+      return;
+    }
+
+    // Lưu thời gian bắt đầu câu để tính điểm
+    if (data.questionStartedAt) {
+      try {
+        questionStartMs = data.questionStartedAt.toDate().getTime();
+      } catch {
+        questionStartMs = Date.now();
+      }
+    } else {
+      questionStartMs = Date.now();
+    }
+
+    if (currentQuestion.type === "choice") {
+      questionStateText.textContent = "Câu trắc nghiệm: nhìn A/B/C/D trên bảng, bấm nút tương ứng.";
+      questionNote.textContent = "Mỗi câu chỉ trả lời 1 lần. Trả lời càng sớm càng nhiều điểm.";
+      choiceArea.style.display = "block";
+      textArea.style.display = "none";
+    } else {
+      questionStateText.textContent = "Câu điền vào ô trống. Nhập chính xác theo yêu cầu GV.";
+      questionNote.textContent = "Ví dụ: can(8), (1;2;-5), số nguyên, v.v.";
+      choiceArea.style.display = "none";
+      textArea.style.display = "flex";
+    }
+
+    msgEl.textContent = "";
   });
 
-  const infoRef = ref(db, ".info/connected");
-  onValue(infoRef, (snap) => {
-    if (snap.val() === true) {
-      connectStatus.textContent = "Đã kết nối Firebase";
-      connectStatus.style.borderColor = "rgba(74,222,128,0.9)";
-    } else {
-      connectStatus.textContent = "Mất kết nối…";
-      connectStatus.style.borderColor = "rgba(239,68,68,0.9)";
-    }
-  });
-
-  const stateRef = ref(db, "quiz/state");
-  onValue(stateRef, (snap) => {
-    const v = snap.val() || {};
-    currentQuestionIndex = v.currentQuestionIndex ?? -1;
-    questionStartTime = v.questionStartTime ?? null;
-    renderQuestion(currentQuestionIndex);
-  });
-
-  function subscribeTeamScore() {
-    if (!chosenTeam) return;
-    const scoreRef = ref(db, "quiz/teams/" + chosenTeam + "/score");
-    onValue(scoreRef, (snap) => {
-      scoreLabel.textContent = snap.val() || 0;
-    });
+  // ====== 7. TÍNH ĐIỂM ======
+  function calcPoints() {
+    const now = Date.now();
+    const baseTime = questionStartMs || now;
+    const elapsedSec = Math.floor((now - baseTime) / 1000);
+    let pts = 300 - 10 * elapsedSec;
+    if (pts < 10) pts = 10;
+    return { pts, elapsedSec };
   }
 
-  function renderQuestion(idx) {
-    feedbackBox.textContent = "";
-    selectedOptionIndex = null;
-    submitBtn.disabled = true;
-
-    if (idx < 0 || idx >= questions.length) {
-      qIndexLabel.textContent = "- / " + questions.length;
-      qText.textContent = "Đang chờ giáo viên bắt đầu câu hỏi.";
-      mcqBox.style.display = "none";
-      fillBox.style.display = "none";
-      statusRow.textContent = "Chưa có câu hỏi.";
-      return;
-    }
-    const q = questions[idx];
-    currentQuestionType = q.type;
-    qIndexLabel.textContent = (idx + 1) + " / " + questions.length;
-    qText.textContent = q.text;
-    statusRow.textContent = "Câu mới – làm nhanh và chính xác!";
-    submitBtn.disabled = false;
-
-    mcqBox.innerHTML = "";
-    fillBox.style.display = "none";
-    if (q.type === "mcq") {
-      mcqBox.style.display = "grid";
-      (q.options || []).forEach((opt, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "option-btn";
-        btn.dataset.index = i;
-        btn.innerHTML = `<div class="option-label">${String.fromCharCode(65 + i)}</div><div>${opt}</div>`;
-        btn.addEventListener("click", () => {
-          selectedOptionIndex = i;
-          document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
-          btn.classList.add("selected");
-        });
-        mcqBox.appendChild(btn);
-      });
-    } else {
-      mcqBox.style.display = "none";
-      fillBox.style.display = "block";
-      fillInput.value = "";
-    }
+  function normalizeTextAnswer(s) {
+    return (s || "").trim();
   }
 
-  function computeScore() {
-    if (!questionStartTime) return { gained: 0, elapsed: "0.0" };
-    const elapsed = (Date.now() - questionStartTime) / 1000;
-    const s = Math.floor(elapsed);
-    const gained = Math.max(0, 300 - 10 * s);
-    return { gained, elapsed: elapsed.toFixed(1) };
-  }
-
-  submitBtn.addEventListener("click", async () => {
-    if (!chosenTeam) {
-      alert("Bạn chưa chọn đội.");
+  async function handleAnswerChoice(option) {
+    if (!currentTeam) {
+      msgEl.textContent = "Hãy chọn đội trước.";
+      msgEl.className = "msg err";
       return;
     }
-    if (currentQuestionIndex < 0) {
-      alert("Chưa có câu hỏi.");
+    if (!latestGameData) return;
+    if (!latestGameData.acceptingAnswers || latestGameData.isFinished) {
+      msgEl.textContent = "GV đã khóa câu trả lời.";
+      msgEl.className = "msg err";
       return;
     }
 
-    const q = questions[currentQuestionIndex];
-    const ansRef = ref(db, `quiz/teamAnswers/${chosenTeam}/${currentQuestionIndex}`);
+    const idx = latestGameData.currentQuestionIndex;
+    const qs = latestGameData.questions || [];
+    const q = qs[idx];
+    if (!q || q.type !== "choice") return;
 
-    const existed = await get(ansRef);
-    if (existed.exists()) {
-      statusRow.textContent = "Bạn đã trả lời câu này rồi.";
-      submitBtn.disabled = true;
+    if (lastAnsweredQuestionIndex === idx) {
+      msgEl.textContent = "Bạn đã trả lời câu này rồi.";
+      msgEl.className = "msg err";
       return;
     }
 
-    let isCorrect = false;
-
-    if (q.type === "mcq") {
-      if (selectedOptionIndex === null) {
-        alert("Hãy chọn một đáp án A/B/C/D trước.");
-        return;
-      }
-      isCorrect = selectedOptionIndex === q.correctOptionIndex;
-    } else {
-      const ans = fillInput.value;
-      if (!ans.trim()) {
-        alert("Hãy nhập đáp án.");
-        return;
-      }
-      const norm = normalizeAnswer(ans);
-      for (const pattern of (q.answerPatterns || [])) {
-        if (norm === normalizeAnswer(pattern)) {
-          isCorrect = true;
-          break;
-        }
-      }
-    }
-
-    const { gained, elapsed } = computeScore();
-
+    const isCorrect = option === q.correctOption;
     if (!isCorrect) {
-      feedbackBox.textContent = "Sai hoặc không khớp dạng đáp án. Câu này không được điểm.";
-      statusRow.textContent = "Đã gửi, câu này không được điểm.";
-      submitBtn.disabled = true;
-      await set(ansRef, { correct: false, gained: 0, at: Date.now() });
+      msgEl.textContent = "Sai rồi 😢";
+      msgEl.className = "msg err";
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
       return;
     }
 
-    const scoreRef = ref(db, "quiz/teams/" + chosenTeam + "/score");
-    await runTransaction(scoreRef, (prev) => {
-      const base = prev || 0;
-      return base + gained;
+    const { pts, elapsedSec } = calcPoints();
+    try {
+      await updateDoc(scoresRef, {
+        [currentTeam]: increment(pts)
+      });
+      msgEl.textContent = `Đúng! Bạn được ${pts} điểm (trễ ~${elapsedSec}s).`;
+      msgEl.className = "msg ok";
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+    } catch (err) {
+      console.error(err);
+      msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
+      msgEl.className = "msg err";
+    }
+  }
+
+  async function handleAnswerText() {
+    if (!currentTeam) {
+      msgEl.textContent = "Hãy chọn đội trước.";
+      msgEl.className = "msg err";
+      return;
+    }
+    if (!latestGameData) return;
+    if (!latestGameData.acceptingAnswers || latestGameData.isFinished) {
+      msgEl.textContent = "GV đã khóa câu trả lời.";
+      msgEl.className = "msg err";
+      return;
+    }
+
+    const idx = latestGameData.currentQuestionIndex;
+    const qs = latestGameData.questions || [];
+    const q = qs[idx];
+    if (!q || q.type !== "text") return;
+
+    if (lastAnsweredQuestionIndex === idx) {
+      msgEl.textContent = "Bạn đã trả lời câu này rồi.";
+      msgEl.className = "msg err";
+      return;
+    }
+
+    const userAns = normalizeTextAnswer(textAnswerInput.value);
+    if (!userAns) {
+      msgEl.textContent = "Bạn chưa nhập đáp án.";
+      msgEl.className = "msg err";
+      return;
+    }
+
+    const isCorrect = userAns === normalizeTextAnswer(q.correctAnswer);
+    if (!isCorrect) {
+      msgEl.textContent = "Sai rồi 😢 Hãy chú ý đúng cú pháp GV yêu cầu.";
+      msgEl.className = "msg err";
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+      return;
+    }
+
+    const { pts, elapsedSec } = calcPoints();
+    try {
+      await updateDoc(scoresRef, {
+        [currentTeam]: increment(pts)
+      });
+      msgEl.textContent = `Đúng! Bạn được ${pts} điểm (trễ ~${elapsedSec}s).`;
+      msgEl.className = "msg ok";
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+      textAnswerInput.value = "";
+    } catch (err) {
+      console.error(err);
+      msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
+      msgEl.className = "msg err";
+    }
+  }
+
+  // Gán sự kiện cho nút A/B/C/D
+  document.querySelectorAll(".answer-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const opt = btn.getAttribute("data-option");
+      handleAnswerChoice(opt);
     });
-
-    await set(ansRef, { correct: true, gained, at: Date.now() });
-
-    feedbackBox.textContent = `Đúng! Bạn được ${gained} điểm (thời gian: ${elapsed}s).`;
-    statusRow.textContent = "Đã gửi đáp án. Chờ GV sang câu mới.";
-    submitBtn.disabled = true;
   });
 
-  // Nếu đã có ?team=... trên URL, tự subscribe sẵn điểm
-  if (chosenTeam) subscribeTeamScore();
+  btnSubmitText.addEventListener("click", handleAnswerText);
+
+  // ====== 8. CHỐNG GIAN LẬN CƠ BẢN: phát hiện chuyển app/tab ======
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      // rời tab
+    } else if (document.visibilityState === "visible") {
+      // quay lại
+      antiCheatOverlay.classList.add("active");
+    }
+  });
+
+  btnCloseOverlay.addEventListener("click", () => {
+    antiCheatOverlay.classList.remove("active");
+  });
 </script>
 </body>
 </html>
