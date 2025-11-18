@@ -32,7 +32,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       padding: 12px;
       gap: 12px;
     }
@@ -123,8 +123,9 @@
     .answer-btn {
       border-radius: 18px;
       border: none;
-      padding: 14px 8px;
-      font-size: 20px;
+      padding: 18px 8px;
+      min-height: 80px;
+      font-size: 28px;
       font-weight: 800;
       cursor: pointer;
       color: #0b1120;
@@ -145,25 +146,25 @@
       box-shadow: none;
     }
     .text-answer {
-      margin-top: 12px;
+      margin-top: 16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .text-answer input {
-      padding: 10px 16px;
+      padding: 14px 18px;
       border-radius: 999px;
       border: 1px solid #374151;
       background: #020617;
       color: #e5e7eb;
-      font-size: 16px;
+      font-size: 22px;
       outline: none;
     }
     .text-answer button {
       border-radius: 999px;
       border: none;
-      padding: 10px;
-      font-size: 15px;
+      padding: 14px;
+      font-size: 20px;
       font-weight: 700;
       background: #22c55e;
       color: #022c22;
@@ -174,6 +175,28 @@
       opacity: 0.35;
       pointer-events: none;
       box-shadow: none;
+    }
+    .math-keypad {
+      margin-top: 4px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .math-keypad button {
+      border-radius: 12px;
+      border: none;
+      padding: 10px 0;
+      font-size: 18px;
+      font-weight: 600;
+      background: #1f2937;
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+    .math-keypad button:active {
+      transform: scale(0.95);
+    }
+    .math-keypad .wide {
+      grid-column: span 2;
     }
     .footer {
       font-size: 11px;
@@ -326,6 +349,30 @@
 
     <div id="textArea" class="text-answer" style="display:none;">
       <input type="text" id="textAnswerInput" placeholder="Nhập đáp án…" />
+      <div class="math-keypad">
+        <button class="key-btn" data-value="7">7</button>
+        <button class="key-btn" data-value="8">8</button>
+        <button class="key-btn" data-value="9">9</button>
+        <button class="key-btn" data-value="/">/</button>
+
+        <button class="key-btn" data-value="4">4</button>
+        <button class="key-btn" data-value="5">5</button>
+        <button class="key-btn" data-value="6">6</button>
+        <button class="key-btn" data-value="-">-</button>
+
+        <button class="key-btn" data-value="1">1</button>
+        <button class="key-btn" data-value="2">2</button>
+        <button class="key-btn" data-value="3">3</button>
+        <button class="key-btn" data-value="0">0</button>
+
+        <button class="key-btn" data-value="can">can</button>
+        <button class="key-btn" data-value="(">(</button>
+        <button class="key-btn" data-value=")">)</button>
+        <button class="key-btn" data-value=";">;</button>
+
+        <button class="key-btn wide" data-action="backspace">⌫</button>
+        <button class="key-btn wide" data-action="clear">Xóa hết</button>
+      </div>
       <button id="btnSubmitText">Gửi đáp án</button>
     </div>
 
@@ -390,6 +437,7 @@
   let lastAnsweredQuestionIndex = Number(localStorage.getItem("lastAnsweredQuestionIndex") || "-1");
   let answeredThisQuestion = false;
   let lastSeenQuestionIndex = -1;
+  let lastForceKick = Number(localStorage.getItem("lastForceKick") || "0");
 
   const qIndexLabel = document.getElementById("qIndexLabel");
   const qStatus = document.getElementById("qStatus");
@@ -482,6 +530,16 @@
       return;
     }
     const data = snap.data();
+
+    // force kick logic
+    const fk = Number(data.forceKick || 0);
+    if (fk && fk !== lastForceKick) {
+      localStorage.setItem("lastForceKick", String(fk));
+      localStorage.removeItem("teamId");
+      location.reload();
+      return;
+    }
+
     latestGameData = data;
 
     const qs = data.questions || [];
@@ -706,6 +764,28 @@
   btnSubmitText.addEventListener("click", () => {
     if (btnSubmitText.disabled) return;
     handleAnswerText();
+  });
+
+  // math keypad
+  document.querySelectorAll(".key-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.getAttribute("data-action");
+      if (action === "backspace") {
+        textAnswerInput.value = textAnswerInput.value.slice(0, -1);
+        textAnswerInput.focus();
+        return;
+      }
+      if (action === "clear") {
+        textAnswerInput.value = "";
+        textAnswerInput.focus();
+        return;
+      }
+      const val = btn.getAttribute("data-value");
+      if (val) {
+        textAnswerInput.value += val;
+        textAnswerInput.focus();
+      }
+    });
   });
 
   document.addEventListener("visibilitychange", () => {

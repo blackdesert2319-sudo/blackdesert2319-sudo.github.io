@@ -57,7 +57,7 @@
       margin-bottom: 8px;
     }
     .question-text {
-      font-size: 40px; /* tăng ~200% cho dễ nhìn xa */
+      font-size: 40px;
       line-height: 1.25;
       margin: 12px 0;
       min-height: 120px;
@@ -72,7 +72,7 @@
       padding: 10px 12px;
       border-radius: 10px;
       background: #1f2933;
-      font-size: 28px; /* lớn cho HS nhìn */
+      font-size: 28px;
     }
     .question-image {
       margin-top: 10px;
@@ -262,14 +262,13 @@
     <div class="control-panel">
       <h2>Điều khiển</h2>
       <div class="controls">
-        <button id="btnInit" class="primary">1. Khởi tạo game</button>
-        <button id="btnStart" class="primary">2. Bắt đầu (Câu 1)</button>
+        <button id="btnInit" class="primary">Khởi tạo game (reset + đuổi HS)</button>
+        <button id="btnStart" class="primary">Bắt đầu (Câu 1)</button>
         <button id="btnNext">Câu tiếp theo</button>
         <button id="btnLock" class="danger">Khóa trả lời</button>
-        <button id="btnReset" class="danger">Reset điểm + game</button>
       </div>
       <div class="info">
-        • HS chỉ thấy nút A/B/C/D hoặc ô nhập đáp án (không thấy đề).<br/>
+        • Khởi tạo game = reset điểm, reset trạng thái, <strong>tự động đuổi HS ra chọn đội lại</strong>.<br/>
         • Điểm: 300 điểm trong giây đầu, mỗi giây trễ -10 điểm, tối thiểu 10 điểm.<br/>
         • Đồng hồ mặc định 40s/câu (có thể đặt timeLimit trong questions.js).<br/>
         • Thẻ vàng ⚠ xuất hiện khi đội đó thoát màn hình (1 lần = 1 thẻ).<br/>
@@ -417,7 +416,7 @@
 
     const idx = gameData.currentQuestionIndex;
     const qs = gameData.questions || [];
-    const total = qs.length;
+       const total = qs.length;
     const question = qs[idx];
 
     counterEl.textContent = `Câu ${idx + 1}/${total}`;
@@ -552,12 +551,12 @@
   const btnStart = document.getElementById("btnStart");
   const btnNext = document.getElementById("btnNext");
   const btnLock = document.getElementById("btnLock");
-  const btnReset = document.getElementById("btnReset");
 
   const emptyAnswers = { green: false, red: false, orange: false, purple: false };
   const emptyWarns = { green: 0, red: 0, orange: 0, purple: 0 };
 
   btnInit.addEventListener("click", async () => {
+    const forceKickValue = Date.now();
     await setDoc(gameRef, {
       questions,
       currentQuestionIndex: -1,
@@ -566,7 +565,8 @@
       acceptingAnswers: false,
       questionStartedAt: null,
       answers: emptyAnswers,
-      warnCounts: emptyWarns
+      warnCounts: emptyWarns,
+      forceKick: forceKickValue
     });
     await setDoc(scoresRef, {
       green: 0,
@@ -578,7 +578,7 @@
       orangeJoined: false,
       purpleJoined: false
     });
-    alert("Đã khởi tạo game + reset điểm.");
+    alert("Đã khởi tạo game + reset điểm + đuổi HS.");
   });
 
   btnStart.addEventListener("click", async () => {
@@ -618,30 +618,6 @@
   btnLock.addEventListener("click", async () => {
     await updateDoc(gameRef, {
       acceptingAnswers: false
-    });
-  });
-
-  btnReset.addEventListener("click", async () => {
-    if (!confirm("Reset game + điểm về 0?")) return;
-    await setDoc(gameRef, {
-      questions,
-      currentQuestionIndex: -1,
-      isStarted: false,
-      isFinished: false,
-      acceptingAnswers: false,
-      questionStartedAt: null,
-      answers: emptyAnswers,
-      warnCounts: emptyWarns
-    });
-    await setDoc(scoresRef, {
-      green: 0,
-      red: 0,
-      orange: 0,
-      purple: 0,
-      greenJoined: false,
-      redJoined: false,
-      orangeJoined: false,
-      purpleJoined: false
     });
   });
 </script>
