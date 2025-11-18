@@ -40,7 +40,7 @@ export const QUESTIONS = [
   },
   {
     type: "choice",
-    text: "Trong hình bình hành ABCD, biết $\\vec{AB} = (3; -1; 2)$ và $\\vec{AD} = (-1; 4; 0)$. Tọa độ $\\vec{AC}$ là:",
+    text: "Trong hình bình hành ABCD, biết $\\overrightarrow{AB} = (3; -1; 2)$ và $\\overrightarrow{AD} = (-1; 4; 0)$. Tọa độ $\\overrightarrow{AC}$ là:",
     options: {
       A: "$(2; 3; 2)$",
       B: "$(-2; 3; 2)$",
