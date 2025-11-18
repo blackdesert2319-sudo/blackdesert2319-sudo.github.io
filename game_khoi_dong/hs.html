@@ -140,7 +140,7 @@
     .ans-C { background: #f97316; }
     .ans-D { background: #a855f7; }
     .answer-btn.disabled {
-      opacity: 0.4;
+      opacity: 0.35;
       pointer-events: none;
       box-shadow: none;
     }
@@ -171,7 +171,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
     .text-answer button.disabled {
-      opacity: 0.4;
+      opacity: 0.35;
       pointer-events: none;
       box-shadow: none;
     }
@@ -217,10 +217,6 @@
     .answer-detail {
       font-size: 14px;
       margin-bottom: 10px;
-    }
-    .answer-rank {
-      font-size: 13px;
-      font-weight: 600;
     }
     .answer-close {
       margin-top: 10px;
@@ -346,7 +342,6 @@
   <div class="answer-box" id="answerBox">
     <div class="answer-title" id="answerTitle">ĐÃ GỬI!</div>
     <div class="answer-detail" id="answerDetail">Bạn đã trả lời câu hỏi.</div>
-    <div class="answer-rank" id="answerRank"></div>
     <button class="answer-close" id="answerCloseBtn">Đã hiểu</button>
   </div>
 </div>
@@ -371,11 +366,9 @@
   import {
     getFirestore,
     doc,
-    getDoc,
     onSnapshot,
     updateDoc,
-    increment,
-    arrayUnion
+    increment
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -422,7 +415,6 @@
   const answerBox = document.getElementById("answerBox");
   const answerTitle = document.getElementById("answerTitle");
   const answerDetail = document.getElementById("answerDetail");
-  const answerRank = document.getElementById("answerRank");
   const answerCloseBtn = document.getElementById("answerCloseBtn");
 
   const bgm = document.getElementById("bgm");
@@ -447,7 +439,7 @@
         orange: "tag-team tag-orange",
         purple: "tag-team tag-purple"
       };
-      currentTeamInfo.innerHTML = \`\${mapName[currentTeam] || currentTeam}\`;
+      currentTeamInfo.innerHTML = mapName[currentTeam] || currentTeam;
       const tag = document.createElement("span");
       tag.className = mapTagClass[currentTeam];
       tag.textContent = "ĐANG CHƠI";
@@ -455,7 +447,6 @@
       currentTeamInfo.appendChild(tag);
       teamSelect.style.display = "none";
 
-      // bật nhạc nền khi đã có tương tác
       bgm.play().catch(() => {});
     }
   }
@@ -498,7 +489,6 @@
     const total = qs.length;
 
     if (idx !== lastSeenQuestionIndex) {
-      // sang câu mới -> reset trạng thái
       answeredThisQuestion = false;
       lastSeenQuestionIndex = idx;
       msgEl.textContent = "";
@@ -516,7 +506,7 @@
       return;
     }
 
-    qIndexLabel.textContent = \`\${idx + 1}/\${total}\`;
+    qIndexLabel.textContent = `${idx + 1}/${total}`;
     qStatus.textContent = data.acceptingAnswers ? "Đang trả lời" : "Đã khóa";
 
     const currentQuestion = qs[idx];
@@ -586,22 +576,15 @@
     btnSubmitText.disabled = false;
   }
 
-  function showAnswerOverlay({ correct, pts, elapsedSec, rank }) {
-    answerTitle.textContent = correct ? "CHÍNH XÁC!" : "ĐÃ GỬI";
-    answerDetail.textContent = correct
-      ? \`Bạn nhận \${pts} điểm (chậm ~\${elapsedSec}s).\`
-      : "Bạn đã gửi đáp án cho câu hỏi này.";
-
-    if (correct && rank) {
-      answerRank.textContent = \`Nhanh thứ \${rank}\`;
-    } else {
-      answerRank.textContent = "";
-    }
-
+  function showAnswerOverlay(correct, pts, elapsedSec) {
     if (correct) {
       answerBox.classList.remove("wrong");
+      answerTitle.textContent = "CHÍNH XÁC!";
+      answerDetail.textContent = `Bạn được ${pts} điểm (chậm ~${elapsedSec}s).`;
     } else {
       answerBox.classList.add("wrong");
+      answerTitle.textContent = "ĐÃ GỬI";
+      answerDetail.textContent = "Bạn đã gửi đáp án cho câu hỏi này.";
     }
     answerOverlay.classList.add("show");
   }
@@ -611,27 +594,6 @@
   });
 
   // ==== GỬI ĐÁP ÁN ====
-  async function registerCorrectRank() {
-    if (!latestGameData) return null;
-    const idx = latestGameData.currentQuestionIndex;
-    const field = `answerOrder_${idx}`;
-    try {
-      // ghi đội nào trả lời đúng vào trường answerOrder_idx
-      await updateDoc(gameRef, {
-        [field]: arrayUnion(currentTeam)
-      });
-      const snap = await getDoc(gameRef);
-      const data = snap.data();
-      const arr = (data && data[field]) || [];
-      const pos = arr.indexOf(currentTeam);
-      if (pos !== -1) return pos + 1;
-      return null;
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  }
-
   async function handleAnswerChoice(option) {
     if (!currentTeam) {
       msgEl.textContent = "Chọn đội trước khi trả lời.";
@@ -659,23 +621,16 @@
     try {
       if (isCorrect) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
-        const rank = await registerCorrectRank();
-        answeredThisQuestion = true;
-        lastAnsweredQuestionIndex = idx;
-        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-        disableAnswerControls();
-        msgEl.textContent = "";
         sfxCorrect.play().catch(() => {});
-        showAnswerOverlay({ correct: true, pts, elapsedSec, rank });
       } else {
-        answeredThisQuestion = true;
-        lastAnsweredQuestionIndex = idx;
-        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-        disableAnswerControls();
-        msgEl.textContent = "";
         sfxWrong.play().catch(() => {});
-        showAnswerOverlay({ correct: false });
       }
+      answeredThisQuestion = true;
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+      disableAnswerControls();
+      msgEl.textContent = "";
+      showAnswerOverlay(isCorrect, pts, elapsedSec);
     } catch (err) {
       console.error(err);
       msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
@@ -715,24 +670,17 @@
     try {
       if (isCorrect) {
         await updateDoc(scoresRef, { [currentTeam]: increment(pts) });
-        const rank = await registerCorrectRank();
-        answeredThisQuestion = true;
-        lastAnsweredQuestionIndex = idx;
-        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-        disableAnswerControls();
-        textAnswerInput.value = "";
-        msgEl.textContent = "";
         sfxCorrect.play().catch(() => {});
-        showAnswerOverlay({ correct: true, pts, elapsedSec, rank });
       } else {
-        answeredThisQuestion = true;
-        lastAnsweredQuestionIndex = idx;
-        localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
-        disableAnswerControls();
-        msgEl.textContent = "";
         sfxWrong.play().catch(() => {});
-        showAnswerOverlay({ correct: false });
       }
+      answeredThisQuestion = true;
+      lastAnsweredQuestionIndex = idx;
+      localStorage.setItem("lastAnsweredQuestionIndex", String(idx));
+      disableAnswerControls();
+      textAnswerInput.value = "";
+      msgEl.textContent = "";
+      showAnswerOverlay(isCorrect, pts, elapsedSec);
     } catch (err) {
       console.error(err);
       msgEl.textContent = "Lỗi khi cập nhật điểm, báo GV giúp nhé.";
