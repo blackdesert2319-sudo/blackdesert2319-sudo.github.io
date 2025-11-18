@@ -228,7 +228,13 @@
       background: #b91c1c;
       color: #fee2e2;
     }
-  </style>
+  
+    .big-advance {
+      font-size: 18px;
+      padding: 10px 22px;
+      flex: 1 1 100%;
+    }
+</style>
 </head>
 <body>
 <header>
@@ -260,7 +266,7 @@
       <div class="controls">
         <button id="btnInit" class="primary">Khởi tạo game (reset + đuổi HS)</button>
         <button id="btnAdvance" class="primary big-advance">Bắt đầu / Câu tiếp theo</button>
-        <button id="btnLock" class="danger">Khóa trả lời</button>
+        <button id="btnLock" class="primary">Chơi thử (2 câu đầu không tính điểm)</button>
       </div>
 
     </div>
@@ -606,17 +612,9 @@
     }
   });
 
-  btnLock.addEventListener("click", async () => {
-    await updateDoc(gameRef, {
-      acceptingAnswers: false
-    });
+  btnLock.addEventListener("click", () => {
+    alert("Hai câu đầu (Câu 1 và Câu 2) đã được cài sẵn là câu CHƠI THỬ, không tính điểm.\n\nChỉ cần bấm 'Bắt đầu / Câu tiếp theo' để cho HS làm quen 2 câu đầu; từ Câu 3 trở đi hệ thống sẽ tự động tính điểm.");
   });
 </script>
 </body>
 </html>
-
-    .big-advance {
-      font-size: 18px;
-      padding: 10px 22px;
-      flex: 1 1 100%;
-    }
