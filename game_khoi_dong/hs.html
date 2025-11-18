@@ -709,7 +709,14 @@
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
+    if (!currentTeam) return;
+
+    if (document.visibilityState === "hidden") {
+      const field = "warnCounts." + currentTeam;
+      const payload = {};
+      payload[field] = increment(1);
+      updateDoc(gameRef, payload).catch(() => {});
+    } else if (document.visibilityState === "visible") {
       antiCheatOverlay.classList.add("active");
     }
   });

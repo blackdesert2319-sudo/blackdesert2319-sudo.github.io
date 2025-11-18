@@ -57,9 +57,10 @@
       margin-bottom: 8px;
     }
     .question-text {
-      font-size: 22px;
+      font-size: 40px; /* tăng ~200% cho dễ nhìn xa */
+      line-height: 1.25;
       margin: 12px 0;
-      min-height: 80px;
+      min-height: 120px;
     }
     .options {
       display: grid;
@@ -68,18 +69,18 @@
       margin-top: 8px;
     }
     .option {
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
       background: #1f2933;
-      font-size: 15px;
+      font-size: 28px; /* lớn cho HS nhìn */
     }
     .question-image {
       margin-top: 10px;
-      max-height: 220px;
+      max-height: 260px;
     }
     .question-image img {
       max-width: 100%;
-      max-height: 220px;
+      max-height: 260px;
       border-radius: 10px;
       border: 1px solid #374151;
     }
@@ -171,6 +172,25 @@
     .team-card.answered {
       animation: pulse 1s ease-out infinite;
     }
+    .warn-strip {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .warn-chip {
+      background: #facc15;
+      color: #451a03;
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 2px 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .warn-chip span {
+      font-size: 12px;
+    }
     .footer {
       padding: 8px 16px;
       font-size: 12px;
@@ -196,7 +216,7 @@
       opacity: 0.8;
     }
     .timer-value {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
       padding: 2px 14px;
       border-radius: 999px;
@@ -252,6 +272,7 @@
         • HS chỉ thấy nút A/B/C/D hoặc ô nhập đáp án (không thấy đề).<br/>
         • Điểm: 300 điểm trong giây đầu, mỗi giây trễ -10 điểm, tối thiểu 10 điểm.<br/>
         • Đồng hồ mặc định 40s/câu (có thể đặt timeLimit trong questions.js).<br/>
+        • Thẻ vàng ⚠ xuất hiện khi đội đó thoát màn hình (1 lần = 1 thẻ).<br/>
         • Khuyến nghị: chiếu màn hình này lên máy chiếu.
       </div>
     </div>
@@ -263,21 +284,25 @@
           <div class="team-name">Đội Xanh lá</div>
           <div class="team-score" id="scoreGreen">0</div>
           <div class="badge" id="badgeGreen">GREEN</div>
+          <div class="warn-strip" id="warnGreen"></div>
         </div>
         <div class="team-card team-red inactive" id="cardRed">
           <div class="team-name">Đội Đỏ</div>
           <div class="team-score" id="scoreRed">0</div>
           <div class="badge" id="badgeRed">RED</div>
+          <div class="warn-strip" id="warnRed"></div>
         </div>
         <div class="team-card team-orange inactive" id="cardOrange">
           <div class="team-name">Đội Cam</div>
           <div class="team-score" id="scoreOrange">0</div>
           <div class="badge" id="badgeOrange">ORANGE</div>
+          <div class="warn-strip" id="warnOrange"></div>
         </div>
         <div class="team-card team-purple inactive" id="cardPurple">
           <div class="team-name">Đội Tím</div>
           <div class="team-score" id="scorePurple">0</div>
           <div class="badge" id="badgePurple">PURPLE</div>
+          <div class="warn-strip" id="warnPurple"></div>
         </div>
       </div>
     </div>
@@ -332,7 +357,6 @@
   const timerValueEl = document.getElementById("timerValue");
   let timerInterval = null;
   let questionStartMs = null;
-  let currentLimit = 40;
 
   function startTimer(question) {
     if (timerInterval) {
@@ -340,7 +364,6 @@
       timerInterval = null;
     }
     const limit = question.timeLimit || 40;
-    currentLimit = limit;
 
     function update() {
       if (!questionStartMs) {
@@ -441,6 +464,26 @@
     document.getElementById("scorePurple").textContent = scoresData.purple ?? 0;
   }
 
+  function renderWarnings(gameData) {
+    const warns = (gameData && gameData.warnCounts) || {};
+    const map = [
+      ["green", document.getElementById("warnGreen")],
+      ["red", document.getElementById("warnRed")],
+      ["orange", document.getElementById("warnOrange")],
+      ["purple", document.getElementById("warnPurple")]
+    ];
+    map.forEach(([team, el]) => {
+      const count = warns[team] || 0;
+      el.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const chip = document.createElement("span");
+        chip.className = "warn-chip";
+        chip.innerHTML = "<span>⚠</span> ra ngoài";
+        el.appendChild(chip);
+      }
+    });
+  }
+
   function updateTeamVisuals() {
     const answers = (latestGameData && latestGameData.answers) || {};
     const s = latestScoresData || {};
@@ -494,6 +537,7 @@
     }
 
     renderQuestion(data);
+    renderWarnings(data);
     updateTeamVisuals();
   });
 
@@ -511,6 +555,7 @@
   const btnReset = document.getElementById("btnReset");
 
   const emptyAnswers = { green: false, red: false, orange: false, purple: false };
+  const emptyWarns = { green: 0, red: 0, orange: 0, purple: 0 };
 
   btnInit.addEventListener("click", async () => {
     await setDoc(gameRef, {
@@ -520,7 +565,8 @@
       isFinished: false,
       acceptingAnswers: false,
       questionStartedAt: null,
-      answers: emptyAnswers
+      answers: emptyAnswers,
+      warnCounts: emptyWarns
     });
     await setDoc(scoresRef, {
       green: 0,
@@ -584,7 +630,8 @@
       isFinished: false,
       acceptingAnswers: false,
       questionStartedAt: null,
-      answers: emptyAnswers
+      answers: emptyAnswers,
+      warnCounts: emptyWarns
     });
     await setDoc(scoresRef, {
       green: 0,
