@@ -243,16 +243,12 @@
 <main>
   <section class="question-panel">
     <h2>
-      <span>Câu hỏi hiện tại</span>
+      <span id="questionTitle">Chưa bắt đầu</span>
       <span class="timer-box">
         <span class="timer-label">Thời gian còn:</span>
         <span class="timer-value" id="timerValue">--</span>
       </span>
     </h2>
-    <div class="question-meta">
-      Loại: <span id="questionType">—</span> |
-      Bắt đầu lúc: <span id="questionStartTime">—</span>
-    </div>
     <div class="question-text" id="questionText">Chưa bắt đầu.</div>
     <div class="options" id="optionsContainer"></div>
     <div class="question-image" id="questionImageContainer"></div>
@@ -263,17 +259,10 @@
       <h2>Điều khiển</h2>
       <div class="controls">
         <button id="btnInit" class="primary">Khởi tạo game (reset + đuổi HS)</button>
-        <button id="btnStart" class="primary">Bắt đầu (Câu 1)</button>
-        <button id="btnNext">Câu tiếp theo</button>
+        <button id="btnAdvance" class="primary big-advance">Bắt đầu / Câu tiếp theo</button>
         <button id="btnLock" class="danger">Khóa trả lời</button>
       </div>
-      <div class="info">
-        • Khởi tạo game = reset điểm, reset trạng thái, <strong>tự động đuổi HS ra chọn đội lại</strong>.<br/>
-        • Điểm: 300 điểm trong giây đầu, mỗi giây trễ -10 điểm, tối thiểu 10 điểm.<br/>
-        • Đồng hồ mặc định 40s/câu (có thể đặt timeLimit trong questions.js).<br/>
-        • Thẻ vàng ⚠ xuất hiện khi đội đó thoát màn hình (1 lần = 1 thẻ).<br/>
-        • Khuyến nghị: chiếu màn hình này lên máy chiếu.
-      </div>
+
     </div>
 
     <div class="score-panel" style="margin-top:16px;">
@@ -400,33 +389,28 @@
 
   function renderQuestion(gameData) {
     const qTextEl = document.getElementById("questionText");
-    const qTypeEl = document.getElementById("questionType");
-    const qStartEl = document.getElementById("questionStartTime");
     const optionsContainer = document.getElementById("optionsContainer");
     const imageContainer = document.getElementById("questionImageContainer");
     const counterEl = document.getElementById("questionCounter");
+    const titleEl = document.getElementById("questionTitle");
 
     if (!gameData || gameData.currentQuestionIndex === -1) {
       qTextEl.textContent = "Chưa bắt đầu.";
-      qTypeEl.textContent = "—";
-      qStartEl.textContent = "—";
       optionsContainer.innerHTML = "";
       imageContainer.innerHTML = "";
       counterEl.textContent = "";
+      if (titleEl) titleEl.textContent = "Chưa bắt đầu";
       resetTimerDisplay();
       return;
     }
 
     const idx = gameData.currentQuestionIndex;
     const qs = gameData.questions || [];
-       const total = qs.length;
+    const total = qs.length;
     const question = qs[idx];
 
     counterEl.textContent = `Câu ${idx + 1}/${total}`;
-    let typeText = question.type === "choice" ? "Trắc nghiệm A/B/C/D" : "Điền vào ô trống";
-    if (idx < DEMO_COUNT) typeText += " – Câu chơi thử (không tính điểm)";
-    qTypeEl.textContent = typeText;
-    qStartEl.textContent = formatTimestamp(gameData.questionStartedAt);
+    if (titleEl) titleEl.textContent = `Câu ${idx + 1}`;
     qTextEl.textContent = question.text || "";
 
     optionsContainer.innerHTML = "";
@@ -553,8 +537,7 @@
   });
 
   const btnInit = document.getElementById("btnInit");
-  const btnStart = document.getElementById("btnStart");
-  const btnNext = document.getElementById("btnNext");
+  const btnAdvance = document.getElementById("btnAdvance");
   const btnLock = document.getElementById("btnLock");
 
   const emptyAnswers = { green: false, red: false, orange: false, purple: false };
@@ -586,24 +569,27 @@
     alert("Đã khởi tạo game + reset điểm + đuổi HS.");
   });
 
-  btnStart.addEventListener("click", async () => {
-    const firstIndex = 0;
-    await updateDoc(gameRef, {
-      currentQuestionIndex: firstIndex,
-      isStarted: true,
-      isFinished: false,
-      acceptingAnswers: true,
-      questionStartedAt: serverTimestamp(),
-      answers: emptyAnswers
-    });
-  });
-
-  btnNext.addEventListener("click", async () => {
+  btnAdvance.addEventListener("click", async () => {
     const gameData = latestGameData;
     if (!gameData || !Array.isArray(gameData.questions)) return;
+
     const current = gameData.currentQuestionIndex;
     const total = gameData.questions.length;
 
+    // Nếu chưa bắt đầu -> bắt đầu từ câu 1 (index 0)
+    if (current === -1) {
+      await updateDoc(gameRef, {
+        currentQuestionIndex: 0,
+        isStarted: true,
+        isFinished: false,
+        acceptingAnswers: true,
+        questionStartedAt: serverTimestamp(),
+        answers: emptyAnswers
+      });
+      return;
+    }
+
+    // Đang chơi -> chuyển câu tiếp
     if (current + 1 >= total) {
       await updateDoc(gameRef, {
         isFinished: true,
@@ -628,3 +614,9 @@
 </script>
 </body>
 </html>
+
+    .big-advance {
+      font-size: 18px;
+      padding: 10px 22px;
+      flex: 1 1 100%;
+    }
