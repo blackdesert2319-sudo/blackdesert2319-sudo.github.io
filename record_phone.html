@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thu âm tiếng dân tộc (điện thoại)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+    h2 { margin-top: 0; }
+    label { display:block; margin-top:12px; font-weight:600; }
+    select, button {
+      width: 100%; padding: 10px; font-size: 16px;
+      margin-top: 6px; border-radius: 8px; border: 1px solid #ccc;
+    }
+    button { border:none; background:#2563eb; color:#fff; }
+    button:disabled { opacity:0.6; }
+    #stopBtn { background:#ef4444; }
+    #status { margin-top:10px; font-size:14px; }
+  </style>
+</head>
+<body>
+  <h2>Thu âm tiếng dân tộc</h2>
+
+  <label for="label">Chọn câu tiếng Việt:</label>
+  <select id="label">
+    <option>ăn cơm</option>
+    <option>uống nước</option>
+    <option>đi vệ sinh</option>
+    <option>em bị đau bụng</option>
+  </select>
+
+  <button id="recordBtn">🎙 Bắt đầu thu</button>
+  <button id="stopBtn" disabled>⏹ Dừng & tải file</button>
+
+  <p id="status">Chưa thu.</p>
+
+  <script>
+    let mediaRecorder;
+    let chunks = [];
+
+    const recordBtn = document.getElementById("recordBtn");
+    const stopBtn   = document.getElementById("stopBtn");
+    const statusEl  = document.getElementById("status");
+    const labelSel  = document.getElementById("label");
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        chunks = [];
+
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) chunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          const label = labelSel.value.replace(/\s+/g, "_");
+          const ts = Date.now();
+          const filename = `${label}_${ts}.webm`;
+
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          statusEl.textContent = "Đã thu xong, file đã tải xuống: " + filename;
+          stream.getTracks().forEach(t => t.stop());
+        };
+
+        mediaRecorder.start();
+        statusEl.textContent = "Đang thu... hãy nói vào mic.";
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Không dùng được micro. Hãy kiểm tra quyền mic / HTTPS.";
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    }
+
+    recordBtn.onclick = startRecording;
+    stopBtn.onclick   = stopRecording;
+  </script>
+</body>
+</html>
