@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fast Quiz - Bắn Tia Chớp</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial Black', sans-serif;
+      background: #0a0e27;
+      color: #fff;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightning-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0.1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .lightning-bolt {
+      position: absolute;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #00ffff, transparent);
+      animation: lightning-strike 3s ease-in-out infinite;
+    }
+
+    .bolt-1 { left: 10%; animation-delay: 0s; }
+    .bolt-2 { left: 30%; animation-delay: 0.7s; }
+    .bolt-3 { left: 50%; animation-delay: 1.4s; }
+    .bolt-4 { left: 70%; animation-delay: 2.1s; }
+    .bolt-5 { left: 90%; animation-delay: 2.8s; }
+
+    @keyframes lightning-strike {
+      0%, 90%, 100% { opacity: 0; transform: translateY(-100%); }
+      92%, 94%, 96% { opacity: 1; transform: translateY(0); }
+      93%, 95% { opacity: 0; }
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .glitch-title {
+      font-size: 4em;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 8px;
+      margin: 40px 0;
+      position: relative;
+      animation: glitch 1s ease-in-out infinite;
+      text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 40px #00ffff,
+        0 0 80px #00ffff;
+    }
+
+    @keyframes glitch {
+      0%, 100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff; }
+      25% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 40px #ff00ff; }
+      50% { text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 40px #ffff00; }
+      75% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 40px #00ff00; }
+    }
+
+    .subtitle {
+      font-size: 1.5em;
+      color: #00ffff;
+      margin-bottom: 40px;
+      animation: flicker 2s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .neon-button {
+      background: transparent;
+      border: 3px solid #00ffff;
+      color: #00ffff;
+      padding: 20px 50px;
+      font-size: 1.5em;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+
+    .neon-button:hover {
+      background: #00ffff;
+      color: #0a0e27;
+      box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+    }
+
+    .neon-button:active {
+      transform: scale(0.95);
+    }
+
+    .rules-box {
+      background: rgba(0, 255, 255, 0.1);
+      border: 2px solid #00ffff;
+      border-radius: 20px;
+      padding: 40px;
+      margin: 20px auto;
+      max-width: 800px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    }
+
+    .rules-box h2 {
+      font-size: 2.5em;
+      color: #ffff00;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #ffff00;
+    }
+
+    .rules-box p {
+      font-size: 1.3em;
+      line-height: 2;
+      margin: 15px 0;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      max-width: 1000px;
+      margin: 40px auto;
+    }
+
+    .team-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 3px solid;
+      border-radius: 15px;
+      padding: 30px;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .team-card.red { border-color: #ff0066; }
+    .team-card.blue { border-color: #00ffff; }
+    .team-card.yellow { border-color: #ffff00; }
+    .team-card.purple { border-color: #ff00ff; }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px currentColor; }
+      50% { box-shadow: 0 0 30px currentColor; }
+    }
+
+    .team-card h3 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .team-card.red h3 { color: #ff0066; }
+    .team-card.blue h3 { color: #00ffff; }
+    .team-card.yellow h3 { color: #ffff00; }
+    .team-card.purple h3 { color: #ff00ff; }
+
+    .score-input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid currentColor;
+      color: #fff;
+      padding: 15px;
+      font-size: 2em;
+      text-align: center;
+      width: 100%;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      background: rgba(0, 255, 255, 0.1);
+      border: 3px solid #00ffff;
+      border-radius: 20px;
+      padding: 50px;
+      margin: 20px auto;
+      max-width: 900px;
+      animation: pulse-border 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: #00ffff; box-shadow: 0 0 20px #00ffff; }
+      33% { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+      66% { border-color: #ffff00; box-shadow: 0 0 20px #ffff00; }
+    }
+
+    .question-number {
+      font-size: 1.5em;
+      color: #ffff00;
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.8em;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      animation: flash-reveal 0.5s ease;
+    }
+
+    @keyframes flash-reveal {
+      0%, 20%, 40%, 60% { opacity: 0; }
+      10%, 30%, 50%, 70%, 100% { opacity: 1; }
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #666;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 1.2em;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option:hover {
+      border-color: #00ffff;
+      background: rgba(0, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    .option.correct {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.2);
+      animation: correct-flash 0.5s ease;
+    }
+
+    @keyframes correct-flash {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0.5; }
+    }
+
+    .timer {
+      font-size: 4em;
+      font-weight: 900;
+      color: #ff0066;
+      margin: 30px 0;
+      text-shadow: 0 0 20px #ff0066;
+      animation: timer-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes timer-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .answer-revealed {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      background: rgba(0, 255, 0, 0.2);
+      border: 3px solid #00ff00;
+      border-radius: 15px;
+      font-size: 1.5em;
+      animation: flash-reveal 0.5s ease;
+    }
+
+    .answer-revealed.show {
+      display: block;
+    }
+
+    .victory-burst {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffff00, transparent);
+      animation: burst 2s ease-out infinite;
+    }
+
+    @keyframes burst {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+    }
+
+    .nav-buttons {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 255, 255, 0.3);
+      border-top-color: #00ffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    .loading-spinner.show {
+      display: block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .glitch-title { font-size: 2.5em; letter-spacing: 3px; }
+      .subtitle { font-size: 1.2em; }
+      .scoreboard { grid-template-columns: 1fr; gap: 20px; }
+      .options { grid-template-columns: 1fr; }
+      .question-text { font-size: 1.3em; }
+      .neon-button { padding: 15px 30px; font-size: 1.2em; }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="lightning-bg">
+   <div class="lightning-bolt bolt-1"></div>
+   <div class="lightning-bolt bolt-2"></div>
+   <div class="lightning-bolt bolt-3"></div>
+   <div class="lightning-bolt bolt-4"></div>
+   <div class="lightning-bolt bolt-5"></div>
+  </div>
+  <div class="container"><!-- Slide 1: Opening -->
+   <div class="slide active" id="slide1">
+    <h1 class="glitch-title" id="quiz-title">FAST QUIZ – BẮN TIA CHỚP</h1>
+    <p class="subtitle" id="quiz-subtitle">Chủ đề: Quan hệ song song trong không gian – Toán 11</p><button class="neon-button" onclick="nextSlide()">BẮT ĐẦU ⚡</button>
+   </div><!-- Slide 2: Rules -->
+   <div class="slide" id="slide2">
+    <div class="rules-box">
+     <h2>⚡ LUẬT CHƠI ⚡</h2>
+     <p>🎯 12 câu hỏi – mỗi câu 5 giây</p>
+     <p>⚡ Trả lời càng nhanh càng nhiều điểm</p>
+     <p>🏆 Đội nhanh nhất chiến thắng</p>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="nextSlide()">TIẾP TỤC →</button>
+    </div>
+   </div><!-- Slide 3: Scoreboard -->
+   <div class="slide" id="slide3">
+    <h2 class="glitch-title" style="font-size: 2.5em;">BẢNG ĐIỂM</h2>
+    <div class="scoreboard" id="scoreboard"><!-- Teams will be loaded here -->
+    </div>
+    <div class="loading-spinner" id="scoreboard-loading"></div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="nextSlide()">BẮT ĐẦU QUIZ ⚡</button>
+    </div>
+   </div><!-- Slides 4-15: Questions -->
+   <div class="slide" id="slide4">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 1/12
+     </div>
+     <div class="question-text">
+      Nếu a ∥ b và b ∥ c thì kết luận nào đúng?
+     </div>
+     <div class="timer" id="timer4">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. a ⊥ c
+      </div>
+      <div class="option">
+       B. Chéo nhau
+      </div>
+      <div class="option correct">
+       C. a ∥ c
+      </div>
+      <div class="option">
+       D. Không xác định
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer4">
+      ✅ ĐÁP ÁN ĐÚNG: C. a ∥ c
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(4)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide5">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 2/12
+     </div>
+     <div class="question-text">
+      Hai đường thẳng phân biệt cùng song song với một đường thẳng thứ ba thì:
+     </div>
+     <div class="timer" id="timer5">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Trùng nhau
+      </div>
+      <div class="option correct">
+       B. Song song với nhau
+      </div>
+      <div class="option">
+       C. Vuông góc với nhau
+      </div>
+      <div class="option">
+       D. Chéo nhau
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer5">
+      ✅ ĐÁP ÁN ĐÚNG: B. Song song với nhau
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(5)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide6">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 3/12
+     </div>
+     <div class="question-text">
+      Trong không gian, khi nào hai đường thẳng song song?
+     </div>
+     <div class="timer" id="timer6">
+      5
+     </div>
+     <div class="options">
+      <div class="option correct">
+       A. Đồng phẳng, không cắt nhau
+      </div>
+      <div class="option">
+       B. Không đồng phẳng, không cắt nhau
+      </div>
+      <div class="option">
+       C. Cắt nhau
+      </div>
+      <div class="option">
+       D. Trùng nhau
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer6">
+      ✅ ĐÁP ÁN ĐÚNG: A. Đồng phẳng, không cắt nhau
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(6)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide7">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 4/12
+     </div>
+     <div class="question-text">
+      Cho hai mặt phẳng (P) ∥ (Q). Đường thẳng d ⊂ (P). Kết luận:
+     </div>
+     <div class="timer" id="timer7">
+      5
+     </div>
+     <div class="options">
+      <div class="option correct">
+       A. d ∥ (Q)
+      </div>
+      <div class="option">
+       B. d ⊥ Q
+      </div>
+      <div class="option">
+       C. Chéo nhau
+      </div>
+      <div class="option">
+       D. Không xác định
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer7">
+      ✅ ĐÁP ÁN ĐÚNG: A. d ∥ (Q)
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(7)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide8">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 5/12
+     </div>
+     <div class="question-text">
+      Cho a ∥ b và a ⊂ (P). Vậy b:
+     </div>
+     <div class="timer" id="timer8">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Bắt buộc nằm trong (P)
+      </div>
+      <div class="option correct">
+       B. Có thể trong hoặc ngoài (P)
+      </div>
+      <div class="option">
+       C. Vuông góc với (P)
+      </div>
+      <div class="option">
+       D. Chắc chắn ngoài (P)
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer8">
+      ✅ ĐÁP ÁN ĐÚNG: B. Có thể trong hoặc ngoài (P)
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(8)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide9">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 6/12
+     </div>
+     <div class="question-text">
+      Nếu a ∥ (P) thì:
+     </div>
+     <div class="timer" id="timer9">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Cắt mọi đường trong (P)
+      </div>
+      <div class="option correct">
+       B. Không có điểm chung với (P)
+      </div>
+      <div class="option">
+       C. Nằm trong (P)
+      </div>
+      <div class="option">
+       D. Vuông góc với (P)
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer9">
+      ✅ ĐÁP ÁN ĐÚNG: B. Không có điểm chung với (P)
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(9)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide10">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 7/12
+     </div>
+     <div class="question-text">
+      Nếu (P) chứa hai đường thẳng song song a, b, thì:
+     </div>
+     <div class="timer" id="timer10">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. (P) song song mọi mp chứa a
+      </div>
+      <div class="option">
+       B. (P) song song mọi mp chứa b
+      </div>
+      <div class="option">
+       C. (P) song song mp chứa đường cắt a
+      </div>
+      <div class="option correct">
+       D. (P) song song mp chứa cả a, b
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer10">
+      ✅ ĐÁP ÁN ĐÚNG: D. (P) song song mp chứa cả a, b
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(10)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide11">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 8/12
+     </div>
+     <div class="question-text">
+      Hai đường chéo nhau có thể cùng song song với một mặt phẳng không?
+     </div>
+     <div class="timer" id="timer11">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Không
+      </div>
+      <div class="option correct">
+       B. Có nếu nằm ngoài mp
+      </div>
+      <div class="option">
+       C. Có nếu không cắt mp
+      </div>
+      <div class="option">
+       D. Không xác định
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer11">
+      ✅ ĐÁP ÁN ĐÚNG: B. Có nếu nằm ngoài mp
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(11)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide12">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 9/12
+     </div>
+     <div class="question-text">
+      Cho (P) ∥ (Q). Đường d cắt (P). Vậy:
+     </div>
+     <div class="timer" id="timer12">
+      5
+     </div>
+     <div class="options">
+      <div class="option correct">
+       A. d luôn cắt (Q)
+      </div>
+      <div class="option">
+       B. Luôn song song (Q)
+      </div>
+      <div class="option">
+       C. Luôn chéo (Q)
+      </div>
+      <div class="option">
+       D. Không kết luận được
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer12">
+      ✅ ĐÁP ÁN ĐÚNG: A. d luôn cắt (Q)
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(12)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide13">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 10/12
+     </div>
+     <div class="question-text">
+      Hai mặt phẳng song song thì:
+     </div>
+     <div class="timer" id="timer13">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Mọi đường trong (P) song song mọi đường trong (Q)
+      </div>
+      <div class="option correct">
+       B. Không có điểm chung
+      </div>
+      <div class="option">
+       C. Vuông góc với nhau
+      </div>
+      <div class="option">
+       D. Không xác định
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer13">
+      ✅ ĐÁP ÁN ĐÚNG: B. Không có điểm chung
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(13)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide14">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 11/12
+     </div>
+     <div class="question-text">
+      d ∥ (P), d cắt (Q). Vậy (Q) và (P):
+     </div>
+     <div class="timer" id="timer14">
+      5
+     </div>
+     <div class="options">
+      <div class="option">
+       A. Song song
+      </div>
+      <div class="option">
+       B. Vuông góc
+      </div>
+      <div class="option correct">
+       C. Cắt nhau
+      </div>
+      <div class="option">
+       D. Trùng nhau
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer14">
+      ✅ ĐÁP ÁN ĐÚNG: C. Cắt nhau
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(14)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+    </div>
+   </div>
+   <div class="slide" id="slide15">
+    <div class="question-box">
+     <div class="question-number">
+      CÂU HỎI 12/12
+     </div>
+     <div class="question-text">
+      Phát biểu đúng về quan hệ song song:
+     </div>
+     <div class="timer" id="timer15">
+      5
+     </div>
+     <div class="options">
+      <div class="option correct">
+       A. Có tính bắc cầu
+      </div>
+      <div class="option">
+       B. Không cắt nhau → luôn song song
+      </div>
+      <div class="option">
+       C. Không cắt → vuông góc
+      </div>
+      <div class="option">
+       D. Chéo nhau là song song
+      </div>
+     </div>
+     <div class="answer-revealed" id="answer15">
+      ✅ ĐÁP ÁN ĐÚNG: A. Có tính bắc cầu
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="neon-button" onclick="prevSlide()">← QUAY LẠI</button> <button class="neon-button" onclick="startTimer(15)">BẮT ĐẦU ⏱️</button> <button class="neon-button" onclick="nextSlide()">KẾT THÚC ⚡</button>
+    </div>
+   </div><!-- Slide 16: Ending -->
+   <div class="slide" id="slide16">
+    <div class="victory-burst"></div>
+    <h1 class="glitch-title">YOU ARE LIGHTNING FAST!</h1>
+    <p class="subtitle" style="font-size: 2em;">🏆 HOÀN THÀNH XUẤT SẮC! 🏆</p>
+    <div class="nav-buttons"><button class="neon-button" onclick="goToSlide(3)">XEM ĐIỂM</button> <button class="neon-button" onclick="goToSlide(1)">CHƠI LẠI ⚡</button>
+    </div>
+   </div>
+  </div>
+  <audio id="tick-sound" preload="auto"><source src="data:audio/wav;base64,UklGRhwAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+  <audio id="beep-sound" preload="auto"><source src="data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAAAIAAAAAAAAAAAAAAAA" type="audio/wav">
+  </audio>
+  <script>
+    const defaultConfig = {
+      quiz_title: "FAST QUIZ – BẮN TIA CHỚP",
+      quiz_subtitle: "Quan hệ song song trong không gian – Toán 11",
+      team_red: "ĐỘI ĐỎ",
+      team_blue: "ĐỘI XANH",
+      team_yellow: "ĐỘI VÀNG",
+      team_purple: "ĐỘI TÍM",
+      background_color: "#0a0e27",
+      primary_color: "#00ffff",
+      text_color: "#ffffff",
+      accent_color: "#ffff00",
+      secondary_color: "#ff00ff"
+    };
+
+    let currentSlide = 1;
+    let timerIntervals = {};
+    let teamsData = [];
+
+    const dataHandler = {
+      onDataChanged(data) {
+        teamsData = data;
+        renderScoreboard();
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('quiz-title').textContent = config.quiz_title || defaultConfig.quiz_title;
+            document.getElementById('quiz-subtitle').textContent = config.quiz_subtitle || defaultConfig.quiz_subtitle;
+            
+            document.body.style.background = config.background_color || defaultConfig.background_color;
+            
+            const buttons = document.querySelectorAll('.neon-button');
+            buttons.forEach(btn => {
+              btn.style.borderColor = config.primary_color || defaultConfig.primary_color;
+              btn.style.color = config.primary_color || defaultConfig.primary_color;
+            });
+
+            renderScoreboard();
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.background_color = value;
+                    window.elementSdk.setConfig({ background_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.primary_color || defaultConfig.primary_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.primary_color = value;
+                    window.elementSdk.setConfig({ primary_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.text_color = value;
+                    window.elementSdk.setConfig({ text_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.accent_color || defaultConfig.accent_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.accent_color = value;
+                    window.elementSdk.setConfig({ accent_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.secondary_color || defaultConfig.secondary_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.secondary_color = value;
+                    window.elementSdk.setConfig({ secondary_color: value });
+                  }
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["quiz_title", config.quiz_title || defaultConfig.quiz_title],
+            ["quiz_subtitle", config.quiz_subtitle || defaultConfig.quiz_subtitle],
+            ["team_red", config.team_red || defaultConfig.team_red],
+            ["team_blue", config.team_blue || defaultConfig.team_blue],
+            ["team_yellow", config.team_yellow || defaultConfig.team_yellow],
+            ["team_purple", config.team_purple || defaultConfig.team_purple]
+          ])
+        });
+      }
+    }
+
+    function renderScoreboard() {
+      const scoreboard = document.getElementById('scoreboard');
+      const config = (window.elementSdk && window.elementSdk.config) || defaultConfig;
+      
+      const teams = [
+        { name: config.team_red || defaultConfig.team_red, color: 'red', colorCode: '#ff0066' },
+        { name: config.team_blue || defaultConfig.team_blue, color: 'blue', colorCode: '#00ffff' },
+        { name: config.team_yellow || defaultConfig.team_yellow, color: 'yellow', colorCode: '#ffff00' },
+        { name: config.team_purple || defaultConfig.team_purple, color: 'purple', colorCode: '#ff00ff' }
+      ];
+
+      scoreboard.innerHTML = teams.map(team => {
+        const teamData = teamsData.find(t => t.team_name === team.name);
+        const score = teamData ? teamData.score : 0;
+        
+        return `
+          <div class="team-card ${team.color}">
+            <h3>${team.name}</h3>
+            <input type="number" class="score-input" value="${score}" 
+                   onchange="updateTeamScore('${team.name}', '${team.colorCode}', this.value)"
+                   min="0" step="1">
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateTeamScore(teamName, teamColor, newScore) {
+      if (!window.dataSdk) return;
+
+      const scoreValue = parseInt(newScore) || 0;
+      const existingTeam = teamsData.find(t => t.team_name === teamName);
+
+      const loadingSpinner = document.getElementById('scoreboard-loading');
+      if (loadingSpinner) {
+        loadingSpinner.classList.add('show');
+      }
+
+      if (existingTeam) {
+        const updatedTeam = { ...existingTeam, score: scoreValue };
+        const result = await window.dataSdk.update(updatedTeam);
+        
+        if (!result.isOk) {
+          const errorMsg = document.createElement('div');
+          errorMsg.textContent = 'Không thể cập nhật điểm. Vui lòng thử lại.';
+          errorMsg.style.cssText = 'color: #ff0066; padding: 10px; text-align: center;';
+          document.getElementById('scoreboard').insertAdjacentElement('beforebegin', errorMsg);
+          setTimeout(() => errorMsg.remove(), 3000);
+        }
+      } else {
+        if (teamsData.length >= 999) {
+          const warningMsg = document.createElement('div');
+          warningMsg.textContent = 'Đã đạt giới hạn 999 đội. Vui lòng xóa đội cũ trước khi thêm mới.';
+          warningMsg.style.cssText = 'color: #ffff00; padding: 10px; text-align: center; background: rgba(255,255,0,0.1); border: 2px solid #ffff00; border-radius: 10px; margin: 20px;';
+          document.getElementById('scoreboard').insertAdjacentElement('beforebegin', warningMsg);
+          setTimeout(() => warningMsg.remove(), 5000);
+          if (loadingSpinner) {
+            loadingSpinner.classList.remove('show');
+          }
+          return;
+        }
+
+        const result = await window.dataSdk.create({
+          team_name: teamName,
+          score: scoreValue,
+          color: teamColor
+        });
+
+        if (!result.isOk) {
+          const errorMsg = document.createElement('div');
+          errorMsg.textContent = 'Không thể tạo đội mới. Vui lòng thử lại.';
+          errorMsg.style.cssText = 'color: #ff0066; padding: 10px; text-align: center;';
+          document.getElementById('scoreboard').insertAdjacentElement('beforebegin', errorMsg);
+          setTimeout(() => errorMsg.remove(), 3000);
+        }
+      }
+
+      if (loadingSpinner) {
+        loadingSpinner.classList.remove('show');
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < 16) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    function goToSlide(slideNumber) {
+      document.querySelectorAll('.slide').forEach(slide => {
+        slide.classList.remove('active');
+      });
+      
+      const targetSlide = document.getElementById(`slide${slideNumber}`);
+      if (targetSlide) {
+        targetSlide.classList.add('active');
+        currentSlide = slideNumber;
+      }
+
+      Object.values(timerIntervals).forEach(interval => clearInterval(interval));
+      timerIntervals = {};
+    }
+
+    function startTimer(questionNumber) {
+      if (timerIntervals[questionNumber]) {
+        clearInterval(timerIntervals[questionNumber]);
+      }
+
+      const timerElement = document.getElementById(`timer${questionNumber}`);
+      const answerElement = document.getElementById(`answer${questionNumber}`);
+      const tickSound = document.getElementById('tick-sound');
+      const beepSound = document.getElementById('beep-sound');
+      
+      let timeLeft = 5;
+      timerElement.textContent = timeLeft;
+      
+      if (answerElement) {
+        answerElement.classList.remove('show');
+      }
+
+      timerIntervals[questionNumber] = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+        
+        if (tickSound && timeLeft > 0) {
+          tickSound.currentTime = 0;
+          tickSound.play().catch(() => {});
+        }
+        
+        if (timeLeft === 0) {
+          clearInterval(timerIntervals[questionNumber]);
+          if (beepSound) {
+            beepSound.play().catch(() => {});
+          }
+          if (answerElement) {
+            answerElement.classList.add('show');
+          }
+        }
+      }, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a2c5a0b45bf0441',t:'MTc2Mzg1NTY2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
