@@ -330,6 +330,7 @@
       }
     }
 
+    /* ====== Ô CỜ – đã chỉnh để không “phồng / co” ====== */
     .cell {
       display: flex;
       align-items: center;
@@ -344,7 +345,7 @@
       box-shadow:
         inset 0 0 0 1px rgba(55, 65, 81, 0.9),
         0 6px 14px rgba(0, 0, 0, 0.9),
-        0 0 18px rgba(15, 23, 42, 1);
+        0 0 16px rgba(15, 23, 42, 1);
       transition:
         transform 0.09s ease,
         box-shadow 0.11s ease,
@@ -366,23 +367,22 @@
 
     .cell:hover {
       background: radial-gradient(circle at top, #020617 0%, #020617 50%, #020617 100%);
-      transform: translateY(-1px) scale(1.02);
+      transform: translateY(-1px);
       box-shadow:
         inset 0 0 0 1px rgba(148, 163, 184, 0.98),
         0 10px 20px rgba(15, 23, 42, 1),
-        0 0 26px rgba(56, 189, 248, 0.4);
+        0 0 20px rgba(56, 189, 248, 0.4);
     }
 
     .cell:hover::before {
       opacity: 1;
     }
 
-    /* Khi nhấn – không cho scale nhỏ để tránh biến dạng */
     .cell:active {
       transform: translateY(0);
       box-shadow:
         inset 0 0 0 1px rgba(75, 85, 99, 1),
-        0 3px 8px rgba(0, 0, 0, 1),
+        0 6px 14px rgba(0, 0, 0, 1),
         0 0 16px rgba(15, 23, 42, 1);
       filter: brightness(0.95);
     }
@@ -401,21 +401,21 @@
         0 0 32px rgba(251, 113, 133, 0.9);
     }
 
-    /* Ô đã chọn: X xanh lá, O vàng/cam */
+    /* Ô đã chọn – dùng cùng độ dày shadow với ô thường, chỉ đổi màu */
     .cell.filled-x {
-      background: radial-gradient(circle at top, #16a34a 0%, #15803d 40%, #052e16 100%);
+      background: radial-gradient(circle at top, #16a34a 0%, #15803d 45%, #052e16 100%);
       box-shadow:
         inset 0 0 0 1px rgba(187, 247, 208, 0.9),
-        0 0 18px rgba(34, 197, 94, 0.9),
-        0 0 32px rgba(22, 163, 74, 0.9);
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 16px rgba(34, 197, 94, 0.9);
     }
 
     .cell.filled-o {
       background: radial-gradient(circle at top, #facc15 0%, #f97316 45%, #7c2d12 100%);
       box-shadow:
         inset 0 0 0 1px rgba(254, 249, 195, 0.95),
-        0 0 18px rgba(251, 191, 36, 0.95),
-        0 0 32px rgba(248, 113, 113, 0.9);
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 16px rgba(251, 191, 36, 0.95);
     }
 
     .cell.disabled {
@@ -444,10 +444,9 @@
 
     @keyframes winPulse {
       0% { transform: scale(1); filter: brightness(1); }
-      100% { transform: scale(1.07); filter: brightness(1.25); }
+      100% { transform: scale(1.04); filter: brightness(1.15); }
     }
 
-    /* Nhấp nháy nhiều màu – mỗi ô sẽ set màu riêng bằng biến CSS */
     .cell.blink-multi {
       animation: blinkMulti 0.42s alternate ease-in-out infinite;
     }
@@ -461,11 +460,11 @@
           0 0 10px rgba(15, 23, 42, 1);
       }
       100% {
-        filter: brightness(1.9);
+        filter: brightness(1.7);
         box-shadow:
-          0 0 22px var(--blink-color, rgba(250, 204, 21, 0.9)),
-          0 0 40px var(--blink-color, rgba(250, 204, 21, 0.9)),
-          0 0 60px rgba(15, 23, 42, 1);
+          0 0 18px var(--blink-color, rgba(250, 204, 21, 0.9)),
+          0 0 32px var(--blink-color, rgba(250, 204, 21, 0.9)),
+          0 0 50px rgba(15, 23, 42, 1);
       }
     }
 
@@ -583,7 +582,6 @@
     const scoreXEl = document.getElementById("scoreX");
     const scoreOEl = document.getElementById("scoreO");
 
-    // Web Audio
     let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
@@ -670,7 +668,6 @@
 
       const cell = e.currentTarget;
       const index = parseInt(cell.dataset.index, 10);
-
       if (boardState[index] !== "") return;
 
       boardState[index] = currentPlayer;
@@ -701,7 +698,7 @@
 
     function checkWin() {
       const size = boardSize;
-      const directions = [
+      const dirs = [
         { dr: 0, dc: 1 },
         { dr: 1, dc: 0 },
         { dr: 1, dc: 1 },
@@ -714,7 +711,7 @@
 
         const { row, col } = indexToRC(index);
 
-        for (const { dr, dc } of directions) {
+        for (const { dr, dc } of dirs) {
           const line = [index];
           let ok = true;
 
@@ -742,16 +739,12 @@
     }
 
     function disableBoard() {
-      const cells = boardEl.querySelectorAll(".cell");
-      cells.forEach(cell => cell.classList.add("disabled"));
+      boardEl.querySelectorAll(".cell").forEach(c => c.classList.add("disabled"));
     }
 
     function highlightWinningCells(line) {
       const cells = boardEl.querySelectorAll(".cell");
-      line.forEach(idx => {
-        const cell = cells[idx];
-        if (cell) cell.classList.add("win-cell");
-      });
+      line.forEach(idx => cells[idx] && cells[idx].classList.add("win-cell"));
     }
 
     function handleWin(winInfo) {
@@ -777,18 +770,17 @@
         playerXEl.classList.remove("active");
       }
 
-      // Nhấp nháy nhiều màu – mỗi ô 1 màu & tốc độ khác nhau
       const cells = boardEl.querySelectorAll(".cell");
       const colors = [
-        "rgba(56, 189, 248, 0.95)", // xanh dương
-        "rgba(34, 197, 94, 0.95)",  // xanh lá
-        "rgba(250, 204, 21, 0.95)", // vàng
-        "rgba(251, 113, 133, 0.95)",// hồng
-        "rgba(129, 140, 248, 0.95)" // tím
+        "rgba(56, 189, 248, 0.95)",
+        "rgba(34, 197, 94, 0.95)",
+        "rgba(250, 204, 21, 0.95)",
+        "rgba(251, 113, 133, 0.95)",
+        "rgba(129, 140, 248, 0.95)"
       ];
       cells.forEach(cell => {
         const color = colors[Math.floor(Math.random() * colors.length)];
-        const duration = 0.3 + Math.random() * 0.45;   // ô nháy nhanh/chậm khác nhau
+        const duration = 0.3 + Math.random() * 0.45;
         const delay = Math.random() * 0.35;
         cell.classList.add("blink-multi");
         cell.style.setProperty("--blink-color", color);
@@ -798,7 +790,6 @@
 
       playVictoryMusic();
 
-      // Sau ~4s reset bàn cờ & luân phiên người đi trước
       setTimeout(() => {
         cells.forEach(cell => {
           cell.classList.remove("blink-multi");
@@ -836,18 +827,12 @@
     function updateActivePlayerUI() {
       playerXEl.classList.remove("active");
       playerOEl.classList.remove("active");
-
-      if (currentPlayer === PLAYER_X.symbol) {
-        playerXEl.classList.add("active");
-      } else {
-        playerOEl.classList.add("active");
-      }
+      (currentPlayer === PLAYER_X.symbol ? playerXEl : playerOEl).classList.add("active");
     }
 
     function updateMessage() {
       const playerName = currentPlayer === PLAYER_X.symbol ? PLAYER_X.name : PLAYER_O.name;
-      const symbol = currentPlayer;
-      msgEl.textContent = `Đến lượt: ${playerName} (${symbol}) – hãy chọn 1 ô trống.`;
+      msgEl.textContent = `Đến lượt: ${playerName} (${currentPlayer}) – hãy chọn 1 ô trống.`;
     }
 
     sizeSelect.addEventListener("change", () => {
