@@ -5,7 +5,7 @@
   <title>Caro Eye-Control – Điều khiển bằng ánh mắt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-  <!-- WebGazer.js (dùng bản host công khai) -->
+  <!-- WebGazer.js (thư viện eye tracking) -->
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
@@ -54,8 +54,8 @@
         <div class="panel-block small">
           <h2>Hướng dẫn</h2>
           <ol>
-            <li>Ngồi thẳng, để mặt trong khung webcam.</li>
-            <li>Bấm <strong>BẮT ĐẦU</strong> và nhìn vào giữa bàn cờ vài giây.</li>
+            <li>Ngồi thẳng, để mặt nằm gọn trong khung webcam.</li>
+            <li>Bấm <strong>BẮT ĐẦU</strong> và cho phép trình duyệt dùng camera.</li>
             <li>Nhìn vào ô bạn muốn đánh và giữ ~1 giây.</li>
             <li>Ô được chọn sẽ sáng lên và đánh X/O tự động.</li>
           </ol>
@@ -77,21 +77,23 @@
             </div>
           </div>
 
-          <!-- Con trỏ ánh mắt (chỉ để người xem thấy) -->
+          <!-- Con trỏ ánh mắt (chỉ để hiển thị vị trí nhìn) -->
           <div id="gazeCursor" class="gaze-cursor hidden"></div>
         </div>
 
-        <!-- Khu webcam + debug -->
+        <!-- Khu webcam + tùy chọn -->
         <div class="camera-panel">
-          <h2>Webcam</h2>
-          <p class="camera-note">Khung camera của WebGazer sẽ xuất hiện ở góc dưới bên phải màn hình.</p>
+          <h2>Webcam & tùy chọn</h2>
+          <p class="camera-note">
+            Khi bấm <strong>BẮT ĐẦU</strong>, khung camera nhỏ sẽ xuất hiện ở góc dưới bên phải màn hình.
+          </p>
           <label class="switch-row">
             <input id="toggleCursorCheckbox" type="checkbox" checked />
             <span>Hiện vòng tròn vị trí nhìn</span>
           </label>
           <label class="switch-row">
             <input id="toggleMouseCheckbox" type="checkbox" />
-            <span>Cho phép chọn bằng chuột (dự phòng)</span>
+            <span>Cho phép chọn ô bằng chuột (dự phòng)</span>
           </label>
         </div>
       </section>

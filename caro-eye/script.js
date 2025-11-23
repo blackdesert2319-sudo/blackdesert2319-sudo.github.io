@@ -113,9 +113,6 @@ function handleCellSelection(cell) {
   cell.textContent = currentPlayer;
   cell.classList.add(currentPlayer === "X" ? "x-cell" : "o-cell");
 
-  // TODO: có thể thêm âm thanh "ting" cho mỗi lượt
-  // playMoveSound();
-
   const winInfo = checkWin(row, col, currentPlayer);
   if (winInfo.won) {
     handleWin(winInfo);
@@ -176,11 +173,10 @@ function handleWin(winInfo) {
   gameOver = true;
   gameStatusLabel.textContent = `Người chơi ${currentPlayer} đã chiến thắng!`;
   resultTitle.textContent = `Người chơi ${currentPlayer} thắng! 🎉`;
-  resultMessage.textContent = "Giữ nguyên tư thế để cảm nhận hiệu ứng neon, sau đó nhấn “Chơi lại” nếu muốn chơi tiếp.";
+  resultMessage.textContent = "Nhấn “Chơi lại” để bắt đầu ván mới.";
   resultOverlay.classList.remove("hidden");
   boardEl.classList.add("win-state");
 
-  // tô sáng các ô thắng
   const cells = boardEl.querySelectorAll(".cell");
   winInfo.cells.forEach(([r, c]) => {
     const idx = r * boardSize + c;
@@ -267,14 +263,13 @@ function setupWebGazer() {
     return;
   }
 
-  // Cấu hình cơ bản
   webgazer
-    .setRegression("ridge") // mặc định, đủ dùng
+    .setRegression("ridge")
     .setTracker("clmtrackr")
-    .showPredictionPoints(false) // không cần chấm đỏ mặc định
-    .setGazeListener(onGazeData);
+    .showPredictionPoints(false)
+    .setGazeListener(onGazeData)
+    .saveDataAcrossSessions(false);
 
-  // Chưa bắt đầu ngay – đợi người dùng bấm BẮT ĐẦU
   trackingStatusLabel.textContent = "Sẵn sàng. Bấm BẮT ĐẦU.";
 }
 
@@ -283,7 +278,20 @@ function startTracking() {
 
   if (!trackingStarted) {
     trackingStarted = true;
-    webgazer.start(); // bắt đầu lấy dữ liệu từ webcam
+
+    // Bắt đầu thật sự – WebGazer dùng begin()
+    webgazer.begin();
+
+    // Hiện camera + khung mặt (đã được CSS thu nhỏ)
+    if (webgazer.showVideo) {
+      webgazer.showVideo(true);
+    }
+    if (webgazer.showFaceOverlay) {
+      webgazer.showFaceOverlay(true);
+    }
+    if (webgazer.showFaceFeedbackBox) {
+      webgazer.showFaceFeedbackBox(true);
+    }
   }
 
   gameStatusLabel.textContent = "Đã kích hoạt theo dõi mắt. Nhìn vào các ô để chọn.";
@@ -295,23 +303,15 @@ function startTracking() {
 // Hàm callback nhận dữ liệu nhìn
 function onGazeData(data, timestamp) {
   if (!data) {
-    // Mất tín hiệu
     gazeCellLabel.textContent = "–";
-    if (!gameOver) {
-      // không spam text nếu game đã kết thúc
-      // gameStatusLabel.textContent = "Không nhận diện được mắt. Hãy ngồi lại gần và thẳng hơn.";
-    }
     return;
   }
 
-  // data.x, data.y là tọa độ trên viewport
   const x = data.x;
   const y = data.y;
 
-  // Cập nhật vị trí con trỏ tròn (visual)
   updateGazeCursorPosition(x, y);
 
-  // Kiểm tra xem có nằm trong vùng bàn cờ không
   const rect = boardEl.getBoundingClientRect();
   if (
     x < rect.left ||
@@ -323,7 +323,6 @@ function onGazeData(data, timestamp) {
     return;
   }
 
-  // Tính hàng / cột tương ứng
   const relX = x - rect.left;
   const relY = y - rect.top;
   const cellWidth = rect.width / boardSize;
@@ -359,7 +358,6 @@ function handleGazeOnCell(cell, row, col) {
 
   gazeCellLabel.textContent = `(${row + 1}, ${col + 1})`;
 
-  // Nếu ô đang nhìn khác ô trước đó -> reset timer
   if (currentGazeCell !== cell) {
     if (currentGazeCell) {
       currentGazeCell.classList.remove("hovered");
@@ -371,20 +369,15 @@ function handleGazeOnCell(cell, row, col) {
     return;
   }
 
-  // Nếu vẫn cùng 1 ô, đo thời gian giữ
   const now = performance.now();
   const elapsed = now - gazeStartTime;
 
-  // Khi đã giữ đủ lâu và chưa "lock", ta xem như click
   if (!gazeLocked && elapsed >= dwellThreshold) {
     gazeLocked = true;
-    // Chỉ đánh nếu ô trống và game chưa kết thúc
     if (!cell.dataset.value && !gameOver) {
       handleCellSelection(cell);
     }
   }
-
-  // Nếu đã lock rồi thì chờ người chơi nhìn chỗ khác để reset
 }
 
 // Khi mắt ra khỏi bàn / không trỏ vào ô nào rõ ràng
@@ -397,15 +390,6 @@ function clearGazeCell() {
   gazeLocked = false;
   gazeCellLabel.textContent = "–";
 }
-
-// -------------------------------
-// (Tuỳ chọn) Âm thanh cho từng lượt
-// -------------------------------
-// Bạn có thể dễ dàng thêm âm thanh tại đây nếu muốn,
-// ví dụ bằng Web Audio API, hoặc chèn <audio> trong HTML.
-// function playMoveSound() {
-//   // TODO: implement nếu cần
-// }
 
 // -------------------------------
 // Dọn dẹp khi đóng trang
