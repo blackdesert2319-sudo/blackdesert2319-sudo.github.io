@@ -296,9 +296,11 @@
     }
 
     .board {
-      --size: 5;
-      display: grid;
-      grid-template-columns: repeat(var(--size), minmax(58px, 1fr));
+  --size: 5;
+  display: grid;
+  /* MỖI Ô LUÔN VUÔNG – không co dãn theo nội dung */
+  grid-template-columns: repeat(var(--size), 1fr);
+  grid-auto-rows: 1fr;
       gap: 5px;
       width: min(440px, 96vw);
       aspect-ratio: 1 / 1;
