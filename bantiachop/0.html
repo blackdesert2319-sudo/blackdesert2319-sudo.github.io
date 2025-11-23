@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy V5.1</title>
+  <title>Học viện Anh Hùng – Hero Academy V6</title>
   <style>
     * {
       box-sizing: border-box;
@@ -134,7 +134,7 @@
       }
     }
 
-    /* LEFT HERO (focus chỉ 1 đối tượng) */
+    /* LEFT: hero / weapon + map + quest */
     .left-hero {
       position: relative;
       padding: 14px 12px;
@@ -146,6 +146,7 @@
       gap:10px;
       align-items:center;
       justify-content:space-between;
+      overflow:hidden;
     }
     .hero-main-row {
       display:flex;
@@ -156,6 +157,7 @@
       justify-content:center;
       text-align:center;
       width:100%;
+      position:relative;
     }
     .hero-avatar {
       width:230px;
@@ -165,16 +167,18 @@
       align-items:center;
       justify-content:center;
       font-size:140px;
-      background: radial-gradient(circle, #020617, #020617 40%, #111827 100%);
-      box-shadow: 0 0 40px rgba(56,189,248,.9);
+      background:#020617;
+      box-shadow: 0 0 28px rgba(15,23,42,1);
       transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      position:relative;
+      overflow:visible;
     }
     .hero-avatar.level-up {
       transform:scale(1.06);
-      box-shadow:0 0 40px rgba(251,191,36,1);
+      box-shadow:0 0 42px rgba(251,191,36,1);
     }
     #heroEmoji {
-      filter: drop-shadow(0 0 18px rgba(59,130,246,.9));
+      filter: drop-shadow(0 0 13px rgba(59,130,246,.9));
     }
     .hero-name {
       font-size:18px;
@@ -191,6 +195,101 @@
       text-decoration:underline;
     }
 
+    /* Spark / pháp bảo */
+    .spark-dot {
+      position:absolute;
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      background: radial-gradient(circle,#fef3c7,#facc15,#a855f7);
+      opacity:0.9;
+      mix-blend-mode:screen;
+      animation:spark 1s ease-out forwards;
+    }
+    @keyframes spark {
+      from { transform:scale(0.4); opacity:0.9; }
+      to   { transform:scale(1.4); opacity:0; }
+    }
+
+    .float-xp {
+      position:absolute;
+      font-size:24px;
+      font-weight:700;
+      text-shadow:0 0 10px rgba(0,0,0,.8);
+      pointer-events:none;
+      animation: floatUp 800ms ease-out forwards;
+      z-index:10;
+    }
+    .float-xp.green { color:#4ade80; }
+    .float-xp.red   { color:#f97373; }
+    @keyframes floatUp {
+      from   { opacity:1; transform:translate(-50%,0); }
+      to     { opacity:0; transform:translate(-50%,-70px); }
+    }
+
+    .map-panel {
+      width:100%;
+      margin-top:4px;
+      padding:6px 8px 7px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(15,23,42,.96), rgba(30,64,175,.9));
+      border:1px solid rgba(129,140,248,.9);
+      font-size:11px;
+    }
+    .map-title {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .map-floor {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-bottom:3px;
+      flex-wrap:wrap;
+    }
+    .map-floor-label {
+      width:46px;
+      opacity:.85;
+    }
+    .map-room {
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.9);
+      background:rgba(15,23,42,.98);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:transform .1s ease, box-shadow .1s ease, background .1s ease, border-color .1s ease;
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .map-room.active {
+      background:linear-gradient(135deg,#6366f1,#a855f7);
+      border-color:#a5b4fc;
+      box-shadow:0 0 10px rgba(129,140,248,1);
+    }
+    .map-room.locked {
+      opacity:.35;
+      cursor:default;
+    }
+
+    .quest-panel {
+      width:100%;
+      margin-top:4px;
+      padding:6px 8px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(22,163,74,.22), rgba(15,23,42,.98));
+      border:1px solid rgba(74,222,128,.9);
+      font-size:11px;
+    }
+    .quest-title {
+      font-weight:600;
+      margin-bottom:3px;
+    }
+    #questProgress {
+      margin-top:2px;
+      color:#bbf7d0;
+    }
+
     .chapter-row {
       width:100%;
       display:flex;
@@ -199,6 +298,7 @@
       font-size:11px;
       align-items:center;
       justify-content:flex-start;
+      margin-top:4px;
     }
     .chapter-label {
       opacity:.9;
@@ -222,7 +322,6 @@
       box-shadow:0 0 10px rgba(148,163,184,.9);
     }
 
-    /* Boss panel (vertical HP) */
     .boss-panel {
       width:100%;
       margin-top:6px;
@@ -366,20 +465,20 @@
     .answers {
       flex:1;
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      grid-template-columns:repeat(2,minmax(140px,1fr)); /* hỗ trợ tới 4 nút */
       gap:10px;
       margin-top:8px;
     }
     .answer-btn {
-      padding:14px 10px;
-      border-radius:14px;           /* HÌNH CHỮ NHẬT BO GÓC */
+      padding:8px 10px;
+      border-radius:14px;
       border:1px solid rgba(148,163,184,.9);
       background:rgba(15,23,42,.98);
       color:#f9fafb;
-      font-size:22px;               /* CỠ CHỮ LỚN */
+      font-size:24px;         /* chữ to gần bằng câu hỏi */
       cursor:pointer;
       transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
-      min-height:56px;
+      min-height:52px;        /* thấp hơn, gọn hơn */
     }
     .answer-btn:hover:not(:disabled) {
       transform:translateY(-1px);
@@ -404,6 +503,53 @@
       cursor:default;
       box-shadow:none;
       transform:none;
+    }
+
+    .question-controls {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .btn {
+      padding:8px 14px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      white-space:nowrap;
+    }
+    .btn-primary {
+      background:linear-gradient(135deg,#3b82f6,#22c55e);
+      color:#0b1120;
+      box-shadow:0 0 14px rgba(59,130,246,1);
+    }
+    .btn-secondary {
+      background:rgba(15,23,42,.98);
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,.9);
+    }
+    .btn:hover:not(:disabled) {
+      transform:translateY(-1px);
+      box-shadow:0 0 14px rgba(129,140,248,1);
+    }
+    .btn:disabled {
+      opacity:.55;
+      cursor:default;
+      box-shadow:none;
+      transform:none;
+    }
+    .status {
+      font-size:12px;
+      flex:1;
+      min-height:18px;
     }
 
     .right-bottom {
@@ -471,73 +617,14 @@
       min-height:14px;
     }
 
-    .bottom-row {
+    .exam-row {
       display:flex;
-      flex-wrap:wrap;
       gap:8px;
       align-items:center;
-      margin-top:2px;
-    }
-    .btn {
-      padding:7px 12px;
-      border-radius:999px;
-      border:none;
-      cursor:pointer;
-      font-size:13px;
-      font-weight:600;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-      white-space:nowrap;
-    }
-    .btn-primary {
-      background:linear-gradient(135deg,#3b82f6,#22c55e);
-      color:#0b1120;
-      box-shadow:0 0 14px rgba(59,130,246,1);
-    }
-    .btn-secondary {
-      background:rgba(15,23,42,.98);
-      color:#e5e7eb;
-      border:1px solid rgba(148,163,184,.9);
-    }
-    .btn:hover:not(:disabled) {
-      transform:translateY(-1px);
-      box-shadow:0 0 14px rgba(129,140,248,1);
-    }
-    .btn:disabled {
-      opacity:.55;
-      cursor:default;
-      box-shadow:none;
-      transform:none;
-    }
-    .status {
-      font-size:12px;
-      flex:1;
-      min-height:18px;
+      margin-top:4px;
     }
 
     .hidden { display:none !important; }
-
-    /* FLOATING XP TEXT */
-    .float-xp {
-      position:absolute;
-      left:50%;
-      top:55%;
-      transform:translate(-50%,0);
-      font-size:26px;
-      font-weight:700;
-      text-shadow:0 0 10px rgba(0,0,0,.8);
-      pointer-events:none;
-      animation: floatUp 800ms ease-out forwards;
-      z-index:10;
-    }
-    .float-xp.green { color:#4ade80; }
-    .float-xp.red { color:#f97373; }
-    @keyframes floatUp {
-      from   { opacity:1; transform:translate(-50%,0); }
-      to     { opacity:0; transform:translate(-50%,-70px); }
-    }
 
     /* MODAL */
     .backdrop {
@@ -669,15 +756,42 @@
       <section class="left-hero">
         <div class="hero-main-row">
           <div id="heroAvatar" class="hero-avatar">
-            <span id="heroEmoji">🧒</span>
+            <span id="heroEmoji">🗡️</span>
           </div>
-          <div id="heroName" class="hero-name">Học viên năm nhất</div>
-          <div id="heroPower" class="hero-power">Cấp 1 · Sức mạnh anh hùng 1</div>
+          <div id="heroName" class="hero-name">Kiếm gỗ</div>
+          <div id="heroPower" class="hero-power">Cấp vũ khí: 1 · Level 1</div>
           <div id="changeMode" class="change-mode-link">Đổi chế độ nâng cấp / rèn vũ khí</div>
         </div>
 
+        <!-- Map hành lang 3 tầng -->
+        <div class="map-panel">
+          <div class="map-title">🗺️ Bản đồ Học viện</div>
+          <div class="map-floor">
+            <span class="map-floor-label">Tầng 1</span>
+            <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
+            <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
+          </div>
+          <div class="map-floor">
+            <span class="map-floor-label">Tầng 2</span>
+            <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
+            <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
+          </div>
+          <div class="map-floor">
+            <span class="map-floor-label">Tầng 3</span>
+            <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
+            <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
+          </div>
+        </div>
+
+        <!-- Quest -->
+        <div class="quest-panel">
+          <div class="quest-title">🎯 Nhiệm vụ hiện tại</div>
+          <div id="questText">Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.</div>
+          <div id="questProgress">0 / 5</div>
+        </div>
+
         <div id="chapterRow" class="chapter-row">
-          <span class="chapter-label">📚 Chọn nhiệm vụ:</span>
+          <span class="chapter-label">📚 Chọn nhiệm vụ nhanh:</span>
           <button class="chapter-btn active" data-chapter="all">Tổng hợp</button>
           <button class="chapter-btn" data-chapter="compare">So sánh</button>
           <button class="chapter-btn" data-chapter="add">Cộng</button>
@@ -721,6 +835,14 @@
           <div id="hintBox" class="hint hidden"></div>
 
           <div id="answers" class="answers"></div>
+
+          <!-- Nút control chính dưới đáp án -->
+          <div class="question-controls">
+            <button id="startBtn" class="btn btn-primary">🚀 Bắt đầu</button>
+            <button id="nextBtn" class="btn btn-secondary" disabled>➡ Câu tiếp theo</button>
+            <button id="bossBtn" class="btn btn-secondary" disabled>👾 Đánh Boss</button>
+            <div id="statusText" class="status"></div>
+          </div>
         </div>
 
         <div class="right-bottom">
@@ -755,13 +877,9 @@
             <div id="activeSkillInfo" class="active-skill-info"></div>
           </div>
 
-          <div class="bottom-row">
-            <button id="startBtn" class="btn btn-primary">🚀 Bắt đầu</button>
-            <button id="nextBtn" class="btn btn-secondary" disabled>➡ Câu tiếp theo</button>
-            <button id="bossBtn" class="btn btn-secondary" disabled>👾 Đánh Boss</button>
+          <div class="exam-row">
             <button id="examBtn" class="btn btn-secondary">📋 Chế độ kiểm tra: Tắt</button>
             <button id="endExamBtn" class="btn btn-secondary hidden">✅ Kết thúc kiểm tra</button>
-            <div id="statusText" class="status"></div>
           </div>
         </div>
       </section>
@@ -776,19 +894,19 @@
 
       <p style="margin-top:6px;font-weight:600;">1️⃣ Chế độ chính:</p>
       <div class="choice-row">
-        <button id="choiceHero" class="choice-btn active" data-mode="hero">
+        <button id="choiceHero" class="choice-btn" data-mode="hero">
           <div class="choice-title">Nâng cấp Anh hùng</div>
           <div>Icon anh hùng thay đổi liên tục (40 icon) theo từng cấp.</div>
         </button>
-        <button id="choiceWeapon" class="choice-btn" data-mode="weapon">
+        <button id="choiceWeapon" class="choice-btn active" data-mode="weapon">
           <div class="choice-title">Rèn vũ khí</div>
           <div>Chỉ hiện vũ khí to ở bên trái, nhân vật ẩn đi.</div>
         </button>
       </div>
 
-      <p style="margin-top:8px;font-weight:600;">2️⃣ Nếu chọn Rèn vũ khí: chọn món sẽ rèn</p>
+      <p style="margin-top:8px;font-weight:600;">2️⃣ Rèn vũ khí: chọn món sẽ rèn</p>
       <div class="choice-row">
-        <button class="choice-btn weapon-option" data-weapon="sword">
+        <button class="choice-btn weapon-option active" data-weapon="sword">
           <div class="choice-title">🗡️ Kiếm</div>
           <div>Từ thanh gỗ nhỏ → kiếm rồng rực lửa.</div>
         </button>
@@ -865,8 +983,11 @@
     let examCorrect = 0;
 
     // Progression mode
-    let progressionMode = "hero"; // "hero" | "weapon"
+    let progressionMode = "weapon"; // "hero" | "weapon"
     let selectedWeapon = "sword";
+
+    // Quest
+    let quest = { id: 1, progress: 0, target: 5, completed: false, streak: 0 };
 
     // 40 hero icons
     const heroIcons = [
@@ -902,6 +1023,7 @@
     const bossReadyEl = document.getElementById("bossReady");
     const versionSelect = document.getElementById("versionSelect");
 
+    const leftHero = document.querySelector(".left-hero");
     const heroAvatar = document.getElementById("heroAvatar");
     const heroEmojiEl = document.getElementById("heroEmoji");
     const heroNameEl = document.getElementById("heroName");
@@ -956,13 +1078,14 @@
     const sumRate = document.getElementById("sumRate");
     const closeSummaryBtn = document.getElementById("closeSummary");
 
-    // sounds (gắn src nếu có file)
-    const sndCorrect = new Audio();
-    const sndWrong   = new Audio();
-    const sndLevelUp = new Audio();
-    sndCorrect.src = ""; // "correct.mp3"
-    sndWrong.src   = ""; // "wrong.mp3"
-    sndLevelUp.src = ""; // "levelup.mp3"
+    const mapRoomButtons = Array.from(document.querySelectorAll(".map-room"));
+    const questTextEl = document.getElementById("questText");
+    const questProgressEl = document.getElementById("questProgress");
+
+    // sounds – gắn file mp3 cùng thư mục với html
+    const sndCorrect = new Audio("correct.mp3");
+    const sndWrong   = new Audio("wrong.mp3");
+    const sndLevelUp = new Audio("levelup.mp3");
 
     function playSound(a) {
       if (!a || !a.play) return;
@@ -985,18 +1108,15 @@
       levelLabel.textContent = `Cấp ${level} · ${heroTitleForLevel(level)}`;
 
       if (progressionMode === "hero") {
-        // nhân vật lơ lửng
         const idx = Math.min(level - 1, heroIcons.length - 1);
         heroEmojiEl.textContent = heroIcons[idx];
         heroNameEl.textContent = heroTitleForLevel(level);
         heroPowerEl.textContent = `Cấp ${level} · Sức mạnh anh hùng ${level}`;
       } else {
-        // vũ khí – chỉ hiển thị vũ khí
         const track = weaponTracks[selectedWeapon] || weaponTracks.sword;
         const names = weaponStageNames[selectedWeapon] || weaponStageNames.sword;
         const stage = Math.min(track.length - 1, Math.floor((level - 1) / 5)); // 8 stage cho 40 cấp
         heroEmojiEl.textContent = track[stage];
-
         const weaponName = names[stage];
         heroNameEl.textContent = weaponName;
         heroPowerEl.textContent = `Cấp vũ khí: ${stage + 1} · Level ${level}`;
@@ -1022,10 +1142,12 @@
       updateXpUi();
       if (leveled) {
         heroAvatar.classList.add("level-up");
+        spawnSparkBurst();
         setTimeout(() => heroAvatar.classList.remove("level-up"), 260);
       }
       updateHeroUi();
       updateBossUnlock();
+      updateMapLocks();
     }
 
     function onLevelUp() {
@@ -1121,7 +1243,10 @@
     }
 
     function enterBossMode() {
-      if (!bossUnlocked) return;
+      if (!bossUnlocked) {
+        statusText.textContent = "Chưa đủ điều kiện vào Tháp Boss. Hãy luyện thêm nhé!";
+        return;
+      }
       mode = "boss";
       resetBoss();
       bossBox.classList.remove("hidden");
@@ -1163,6 +1288,12 @@
         b2.textContent = "Anh hùng Học viện";
         badgeRow.appendChild(b1);
         badgeRow.appendChild(b2);
+        if (quest.id === 3 && !quest.completed) {
+          quest.progress = 1;
+          quest.completed = true;
+          addSkill("skip", 1);
+          updateQuestUi();
+        }
       } else {
         modalTitle.textContent = "⚔️ Boss vẫn còn quá mạnh!";
         modalMessage.textContent = "Đừng buồn, hãy luyện thêm và thử lại nhé.";
@@ -1273,15 +1404,41 @@
       timerValueEl.style.color = "#f9fafb";
     }
 
-    // hiệu ứng +XP / -1
+    // hiệu ứng +XP / -1 trên vũ khí / nhân vật
     function spawnFloatText(text, type) {
+      const rect = heroAvatar.getBoundingClientRect();
+      const parentRect = leftHero.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 - parentRect.left;
+      const cy = rect.top + rect.height / 2 - parentRect.top - 10;
+
       const el = document.createElement("div");
       el.className = "float-xp " + (type === "red" ? "red" : "green");
       el.textContent = text;
-      questionCard.appendChild(el);
-      setTimeout(() => {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      }, 900);
+      el.style.left = cx + "px";
+      el.style.top = cy + "px";
+      leftHero.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
+    }
+
+    function spawnSparkBurst() {
+      const rect = heroAvatar.getBoundingClientRect();
+      const parentRect = leftHero.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 - parentRect.left;
+      const cy = rect.top + rect.height / 2 - parentRect.top;
+      const count = 14;
+
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("div");
+        dot.className = "spark-dot";
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 60 + Math.random() * 40;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        dot.style.left = x + "px";
+        dot.style.top = y + "px";
+        leftHero.appendChild(dot);
+        setTimeout(() => { if (dot.parentNode) dot.parentNode.removeChild(dot); }, 1000);
+      }
     }
 
     function handleTimeout() {
@@ -1295,6 +1452,7 @@
       statusText.textContent = "⏱️ Hết giờ! Câu này coi như sai.";
       playSound(sndWrong);
       spawnFloatText("-1", "red");
+      updateQuestOnResult(false);
       if (examRunning) examTotal++;
 
       if (mode === "boss") {
@@ -1367,10 +1525,10 @@
       let b;
       do { b = randInt(0, 13); } while (b === a);
       const sym = a > b ? ">" : "<";
-      const choices = shuffle([">","<","="]);
+      const choices = shuffle([">","<","="]); // 3 nút
       return {
         type: "compare",
-        text: `Điền dấu >, < hoặc = :   ${a}  ?  ${b}`,
+        text: `Điền dấu >, < hoặc = :  ${a}  ?  ${b}`,
         choices,
         correctIndex: choices.indexOf(sym),
         hint: "Số lớn hơn dùng dấu >, số nhỏ hơn dùng dấu <, bằng nhau dùng dấu =."
@@ -1382,10 +1540,9 @@
       let b = randInt(0, maxB);
       const result = a + b;
       let set = new Set([result]);
-      while (set.size < 3) {
-        let d = randInt(-2,2);
-        let c = result + d;
-        if (c < 0 || c > 13 || c === result) continue;
+      while (set.size < 4) {
+        let c = randInt(0, 13);
+        if (c === result) continue;
         set.add(c);
       }
       const arr = shuffle(Array.from(set));
@@ -1402,10 +1559,9 @@
       let b = randInt(0, a);
       const result = a - b;
       let set = new Set([result]);
-      while (set.size < 3) {
-        let d = randInt(-2,2);
-        let c = result + d;
-        if (c < 0 || c > 13 || c === result) continue;
+      while (set.size < 4) {
+        let c = randInt(0, 13);
+        if (c === result) continue;
         set.add(c);
       }
       const arr = shuffle(Array.from(set));
@@ -1448,7 +1604,9 @@
           playSound(sndCorrect);
           statusText.textContent = `✅ Chính xác! Bạn nhận ${gain} XP.`;
           spawnFloatText("+" + gain, "green");
+          spawnSparkBurst();
           if (examRunning) examCorrect++;
+          updateQuestOnResult(true);
         } else {
           if (activeSkill === "double") {
             activeSkillInfo.textContent = "❌ Câu sai, thẻ Nhân đôi XP bị mất.";
@@ -1457,6 +1615,7 @@
           playSound(sndWrong);
           statusText.textContent = "❌ Chưa đúng, hãy thử câu tiếp theo!";
           spawnFloatText("-1", "red");
+          updateQuestOnResult(false);
         }
         updateBossUnlock();
         nextBtn.disabled = false;
@@ -1473,6 +1632,8 @@
           playSound(sndCorrect);
           statusText.textContent = `⚔️ Đúng! Bạn gây ${damage} sát thương cho Boss.`;
           spawnFloatText("-" + damage, "green");
+          spawnSparkBurst();
+          updateQuestOnResult(true);
         } else {
           if (activeSkill === "double") {
             activeSkillInfo.textContent = "❌ Sai rồi, thẻ Nhân đôi XP bị mất.";
@@ -1482,12 +1643,14 @@
           playSound(sndWrong);
           statusText.textContent = "💥 Boss phản công! Bạn mất 1 HP.";
           spawnFloatText("-1 HP", "red");
+          updateQuestOnResult(false);
         }
         updateBossUi();
         if (bossHp <= 0) {
           bossDefeated = true;
           bossUnlocked = false;
           updateBossUnlock();
+          updateMapLocks();
           setTimeout(() => exitBossMode(true), 750);
         } else if (heroHp <= 0) {
           setTimeout(() => exitBossMode(false), 750);
@@ -1501,6 +1664,104 @@
       if (mode === "boss") return;
       generateQuestion();
     }
+
+    // ===== QUEST SYSTEM =====
+    function updateQuestOnResult(isCorrect) {
+      if (!quest) return;
+      if (quest.id === 1) {
+        if (isCorrect) quest.progress++;
+        if (quest.progress >= quest.target && !quest.completed) {
+          quest.completed = true;
+          addSkill("hint", 1);
+          statusText.textContent = "🎯 Hoàn thành nhiệm vụ 1: 5 câu đúng!";
+          quest = { id: 2, progress: 0, target: 3, completed: false, streak: 0 };
+        }
+      } else if (quest.id === 2) {
+        if (isCorrect) {
+          quest.streak = (quest.streak || 0) + 1;
+        } else {
+          quest.streak = 0;
+        }
+        quest.progress = quest.streak;
+        if (quest.progress >= quest.target && !quest.completed) {
+          quest.completed = true;
+          addSkill("double", 1);
+          statusText.textContent = "🔥 Hoàn thành nhiệm vụ 2: 3 câu đúng liên tiếp!";
+          quest = { id: 3, progress: 0, target: 1, completed: false, streak: 0 };
+        }
+      } else if (quest.id === 3) {
+        // hoàn thành khi hạ Boss – xử lý thêm trong showBossSummary
+      }
+      updateQuestUi();
+    }
+
+    function updateQuestUi() {
+      if (!questTextEl) return;
+      let desc = "", progText = "";
+      if (quest.id === 1) {
+        desc = "Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else if (quest.id === 2) {
+        desc = "Nhiệm vụ 2: Đạt 3 câu đúng liên tiếp.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else if (quest.id === 3 && !quest.completed) {
+        desc = "Nhiệm vụ 3: Hạ gục Boss Cuối Kỳ 1 lần.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else {
+        desc = "Tạm hết nhiệm vụ, hãy tiếp tục luyện tập nhé!";
+        progText = "";
+      }
+      questTextEl.textContent = desc;
+      questProgressEl.textContent = progText;
+    }
+
+    // ===== MAP HỌC VIỆN =====
+    function updateMapLocks() {
+      let unlockFloor = 1;
+      if (level >= 2) unlockFloor = 2;
+      if (level >= 4 || bossDefeated) unlockFloor = 3;
+
+      mapRoomButtons.forEach(btn => {
+        const floor = parseInt(btn.getAttribute("data-floor") || "1", 10);
+        if (floor > unlockFloor) {
+          btn.disabled = true;
+          btn.classList.add("locked");
+        } else {
+          btn.disabled = false;
+          btn.classList.remove("locked");
+        }
+      });
+    }
+
+    document.querySelector(".map-panel").addEventListener("click", e => {
+      const btn = e.target.closest(".map-room");
+      if (!btn || btn.disabled) return;
+      const room = btn.getAttribute("data-room");
+
+      mapRoomButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (room === "lobby") {
+        chapterMode = "all";
+        statusText.textContent = "Bạn đang ở Sảnh chính – luyện tập tổng hợp.";
+      } else if (room === "compare") {
+        chapterMode = "compare";
+        statusText.textContent = "Bạn đang ở Phòng So sánh.";
+      } else if (room === "add") {
+        chapterMode = "add";
+        statusText.textContent = "Bạn đang ở Phòng Cộng.";
+      } else if (room === "sub") {
+        chapterMode = "sub";
+        statusText.textContent = "Bạn đang ở Phòng Trừ.";
+      } else if (room === "forge") {
+        chapterMode = "all";
+        statusText.textContent = "🔨 Phòng Rèn vũ khí – trả lời đúng để rèn kiếm mạnh hơn!";
+      } else if (room === "bossTower") {
+        enterBossMode();
+        return;
+      }
+      if (currentQuestion) generateQuestion();
+    });
 
     // ===== SETUP MODAL =====
     function updateSetupUi() {
@@ -1555,16 +1816,19 @@
     choiceHeroBtn.addEventListener("click", () => {
       progressionMode = "hero";
       updateSetupUi();
+      updateHeroUi();
     });
     choiceWeaponBtn.addEventListener("click", () => {
       progressionMode = "weapon";
       updateSetupUi();
+      updateHeroUi();
     });
     weaponOptionBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         selectedWeapon = btn.getAttribute("data-weapon");
         progressionMode = "weapon";
         updateSetupUi();
+        updateHeroUi();
       });
     });
     confirmSetupBtn.addEventListener("click", () => {
@@ -1592,6 +1856,8 @@
       updateBossUnlock();
       applyVersionConfig();
       updateSetupUi();
+      updateQuestUi();
+      updateMapLocks();
       statusText.textContent = "Chọn kiểu nâng cấp trong hộp thoại, sau đó Bắt đầu để chơi.";
     })();
   </script>
