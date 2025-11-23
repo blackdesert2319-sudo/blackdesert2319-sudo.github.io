@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy (V4)</title>
+  <title>Học viện Anh Hùng – Hero Academy V7.2</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,52 +14,62 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at top, #3b82f6 0, #0f172a 40%, #020617 100%);
+      background: radial-gradient(circle at top, #2563eb 0, #020617 50%, #000 100%);
       color: #f9fafb;
     }
-    .game {
-      width: min(1100px, 100vw - 24px);
-      padding: 14px 18px 18px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(15,23,42,0.94), rgba(15,23,42,0.98));
-      border: 1px solid rgba(148,163,184,0.6);
-      box-shadow: 0 24px 50px rgba(0,0,0,0.7);
+    .game-shell {
+      width: min(1400px, 100vw - 8px);
+      height: min(95vh, 720px);
+      padding: 16px 18px 14px;
+      border-radius: 22px;
+      background: radial-gradient(circle at top, #111827, #020617 55%, #000 100%);
+      box-shadow: 0 26px 60px rgba(0,0,0,.85);
+      border: 1px solid rgba(148,163,184,.7);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.game-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .title-block {
+      flex: 1;
     }
     h1 {
       margin: 0;
-      text-align: center;
       font-size: 26px;
-      letter-spacing: .03em;
+      letter-spacing: .04em;
     }
     .subtitle {
-      text-align: center;
+      margin-top: 3px;
       font-size: 13px;
       color: #cbd5f5;
-      margin-bottom: 10px;
     }
-
-    .top-row {
+    .top-info-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
       align-items: center;
-      margin-bottom: 10px;
-    }
-    .top-row > * {
-      /* grow nicely */
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
     }
     .level-chip {
       padding: 6px 10px;
       border-radius: 999px;
-      background: linear-gradient(135deg, #f97316, #facc15);
-      color: #111827;
-      font-weight: 700;
-      font-size: 13px;
-      min-width: 100px;
-      text-align: center;
+      background: linear-gradient(135deg,#f97316,#facc15);
+      color:#111827;
+      font-weight:700;
+      font-size:13px;
+      min-width:110px;
+      text-align:center;
     }
     .xp-block {
       flex: 1;
+      min-width: 180px;
     }
     .xp-label {
       font-size: 11px;
@@ -68,593 +78,813 @@
     .xp-bar {
       height: 12px;
       border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(148,163,184,0.8);
+      background: rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.8);
       overflow: hidden;
     }
     .xp-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #22c55e, #4ade80, #a3e635);
-      transition: width .25s ease;
+      height:100%;
+      width:0%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#22c55e,#4ade80,#a3e635);
+      transition:width .25s ease;
     }
     .xp-text {
-      margin-top: 2px;
-      font-size: 11px;
-      color: #cbd5f5;
+      font-size:11px;
+      color:#cbd5f5;
+      margin-top:2px;
     }
     .chip {
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.8);
-      font-size: 11px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
-      background: rgba(15,23,42,0.96);
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.8);
+      font-size:11px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      white-space:nowrap;
+      background:rgba(15,23,42,.96);
     }
-
     .version-select {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:11px;
     }
     .version-select select {
-      font-size: 11px;
-      padding: 3px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.9);
-      background: #020617;
-      color: #e5e7eb;
+      padding:3px 6px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.9);
+      background:#020617;
+      color:#e5e7eb;
     }
 
-    .main {
-      display: grid;
-      grid-template-columns: minmax(0, 0.38fr) minmax(0, 0.62fr);
-      gap: 14px;
-      margin-bottom: 10px;
+    .layout {
+      flex:1;
+      display:grid;
+      grid-template-columns: 0.48fr 0.52fr;
+      gap:14px;
+      min-height: 0;
     }
-    @media (max-width: 880px) {
-      .main {
+    @media (max-width: 900px) {
+      .layout {
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
       }
     }
 
-    .panel {
-      border-radius: 18px;
-      padding: 12px 14px;
-      border: 1px solid rgba(148,163,184,0.7);
-      background: radial-gradient(circle at top left, rgba(37,99,235,0.18), rgba(15,23,42,0.96));
+    .left-hero {
+      position: relative;
+      padding: 18px 12px 32px;
+      border-radius: 20px;
+      background: radial-gradient(circle at top left, rgba(96,165,250,.35), rgba(15,23,42,.98));
+      box-shadow: inset 0 0 40px rgba(15,23,42,.9);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      text-align:center;
+    }
+    .hero-main-row {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      justify-content:center;
+      text-align:center;
+      position:relative;
     }
 
     .hero-avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 999px;
-      margin: 0 auto 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 70px;
-      box-shadow: 0 0 20px rgba(56,189,248,0.5);
-      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      width:340px;
+      height:260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:190px;
+      position:relative;
+      overflow:visible;
+      background:transparent;
+      box-shadow:none;
     }
-    .hero-avatar.stage-1 {
-      background: radial-gradient(circle, #1e293b, #020617);
-      box-shadow: 0 0 18px rgba(148,163,184,0.7);
-    }
-    .hero-avatar.stage-2 {
-      background: radial-gradient(circle, #22c55e, #064e3b);
-      box-shadow: 0 0 22px rgba(74,222,128,0.9);
-    }
-    .hero-avatar.stage-3 {
-      background: radial-gradient(circle, #38bdf8, #0f172a);
-      box-shadow: 0 0 24px rgba(56,189,248,1);
-    }
-    .hero-avatar.stage-4 {
-      background: radial-gradient(circle, #a855f7, #0b1120);
-      box-shadow: 0 0 26px rgba(217,70,239,1);
+    #heroEmoji {
+      position:relative;
+      z-index:2;
+      filter: drop-shadow(0 0 13px rgba(59,130,246,.9));
     }
     .hero-avatar.level-up {
-      transform: scale(1.06);
+      transform:scale(1.06);
+      transition: transform .2s ease, box-shadow .2s ease;
     }
+
     .hero-name {
-      text-align: center;
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 4px;
+      font-size:20px;
+      font-weight:700;
+      margin-top:4px;
+      margin-bottom:0;
     }
-    .hero-power, .hero-extra {
-      text-align: center;
-      font-size: 12px;
-      color: #cbd5f5;
+
+    .hero-footer{
+      position:absolute;
+      bottom:8px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      align-items:center;
+      text-align:center;
+    }
+    .hero-power {
+      font-size:13px;
+      color:#e5e7eb;
+    }
+    .change-mode-link {
+      font-size:11px;
+      color:#93c5fd;
+      cursor:pointer;
+      text-decoration:underline;
+    }
+
+    .orbit-wrapper{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:0;
+      height:0;
+      animation:orbit-spin 18s linear infinite;
+      pointer-events:none;
+      filter:blur(0.2px);
+      mix-blend-mode:screen;
+      z-index:1;
+    }
+    .orbit-dot{
+      position:absolute;
+      width:5px;
+      height:5px;
+      border-radius:999px;
+      background:radial-gradient(circle,#fef3c7,#facc15,#a855f7);
+      transform:rotate(var(--angle)) translateX(var(--radius));
+      box-shadow:0 0 6px rgba(250,204,21,.9);
+    }
+    @keyframes orbit-spin{
+      from{ transform:translate(-50%,-50%) rotate(0deg); }
+      to  { transform:translate(-50%,-50%) rotate(360deg); }
+    }
+
+    .spark-dot {
+      position:absolute;
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      background: radial-gradient(circle,#fef3c7,#facc15,#a855f7);
+      opacity:0.9;
+      mix-blend-mode:screen;
+      animation:spark 1s ease-out forwards;
+      z-index:3;
+    }
+    @keyframes spark {
+      from { transform:scale(0.4); opacity:0.9; }
+      to   { transform:scale(1.4); opacity:0; }
+    }
+
+    .float-xp {
+      position:absolute;
+      font-size:24px;
+      font-weight:700;
+      text-shadow:0 0 10px rgba(0,0,0,.8);
+      pointer-events:none;
+      animation: floatUp 800ms ease-out forwards;
+      z-index:10;
+    }
+    .float-xp.green { color:#4ade80; }
+    .float-xp.red   { color:#f97373; }
+    @keyframes floatUp {
+      from   { opacity:1; transform:translate(-50%,0); }
+      to     { opacity:0; transform:translate(-50%,-70px); }
+    }
+
+    .map-panel {
+      width:100%;
+      padding:6px 8px 7px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(15,23,42,.96), rgba(30,64,175,.9));
+      border:1px solid rgba(129,140,248,.9);
+      font-size:11px;
+    }
+    .map-title {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .map-floor {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-bottom:3px;
+      flex-wrap:wrap;
+    }
+    .map-floor-label {
+      width:46px;
+      opacity:.85;
+    }
+    .map-room {
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.9);
+      background:rgba(15,23,42,.98);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:transform .1s ease, box-shadow .1s ease, background .1s ease, border-color .1s ease;
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .map-room.active {
+      background:linear-gradient(135deg,#6366f1,#a855f7);
+      border-color:#a5b4fc;
+      box-shadow:0 0 10px rgba(129,140,248,1);
+    }
+    .map-room.locked {
+      opacity:.35;
+      cursor:default;
+    }
+
+    .quest-panel {
+      width:100%;
+      padding:6px 8px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(22,163,74,.22), rgba(15,23,42,.98));
+      border:1px solid rgba(74,222,128,.9);
+      font-size:11px;
+    }
+    .quest-title {
+      font-weight:600;
+      margin-bottom:3px;
+    }
+    #questProgress {
+      margin-top:2px;
+      color:#bbf7d0;
     }
 
     .chapter-row {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-      font-size: 11px;
+      width:100%;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      font-size:11px;
+      align-items:center;
+      justify-content:flex-start;
+      margin-top:4px;
+    }
+    .chapter-label {
+      opacity:.9;
     }
     .chapter-btn {
-      padding: 5px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(129,140,248,0.9);
-      background: rgba(15,23,42,0.96);
-      color: #e5e7eb;
-      cursor: pointer;
-      transition: transform .1s ease, box-shadow .1s ease, background .1s ease;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(129,140,248,.95);
+      background:rgba(15,23,42,.96);
+      color:#e5e7eb;
+      font-size:11px;
+      cursor:pointer;
+      transition:transform .1s ease, box-shadow .1s ease, background .1s ease;
     }
     .chapter-btn.active {
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      box-shadow: 0 0 12px rgba(129,140,248,0.9);
+      background:linear-gradient(135deg,#6366f1,#a855f7);
+      box-shadow:0 0 12px rgba(129,140,248,.95);
     }
     .chapter-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 10px rgba(148,163,184,0.9);
+      transform:translateY(-1px);
+      box-shadow:0 0 10px rgba(148,163,184,.9);
     }
 
-    .boss-box {
-      margin-top: 10px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(220,38,38,0.2), rgba(127,29,29,0.7));
-      border: 1px solid rgba(248,113,113,0.9);
-      font-size: 12px;
+    .boss-panel {
+      width:100%;
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(220,38,38,.23), rgba(127,29,29,.8));
+      border:1px solid rgba(248,113,113,.9);
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
-    .boss-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
+    .boss-panel.hidden { display:none; }
+    .boss-header-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
     .boss-name {
-      font-weight: 600;
-      font-size: 13px;
+      font-weight:600;
+      font-size:13px;
     }
-    .boss-hp-bar {
-      height: 9px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(248,113,113,0.8);
-      overflow: hidden;
+    .boss-body-row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .boss-avatar {
+      width:80px;
+      height:80px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:44px;
+      background:radial-gradient(circle,#7f1d1d,#020617);
+      box-shadow:0 0 20px rgba(248,113,113,1);
+    }
+    .boss-hp-column {
+      position:relative;
+      width:18px;
+      height:110px;
+      border-radius:999px;
+      background:rgba(15,23,42,.95);
+      border:1px solid rgba(254,202,202,.9);
+      overflow:hidden;
     }
     .boss-hp-fill {
-      height: 100%;
-      width: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #ef4444, #f97316, #facc15);
-      transition: width .25s ease;
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(180deg,#f97316,#ef4444,#7f1d1d);
+      transition:height .25s ease;
     }
-    .boss-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      margin-top: 2px;
-      color: #fecaca;
+    .boss-footer-row {
+      display:flex;
+      justify-content:space-between;
+      font-size:11px;
+      color:#fecaca;
+    }
+
+    .right-side {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-height:0;
+    }
+    .question-card {
+      flex:1;
+      min-height:0;
+      padding:12px 14px 10px;
+      border-radius:20px;
+      background:radial-gradient(circle at top right, rgba(59,130,246,.3), rgba(15,23,42,.98));
+      box-shadow:inset 0 0 32px rgba(15,23,42,.9);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      position:relative;
+      overflow:hidden;
     }
 
     .mode-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      margin-bottom: 4px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:12px;
+      gap:8px;
     }
     .mode-tag {
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      background: linear-gradient(135deg, #22c55e, #a3e635);
-      color: #0f172a;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:600;
+      background:linear-gradient(135deg,#22c55e,#a3e635);
+      color:#0f172a;
     }
     .mode-tag.boss {
-      background: linear-gradient(135deg, #f97316, #ef4444);
-      color: #0b1120;
+      background:linear-gradient(135deg,#f97316,#ef4444);
+      color:#0b1120;
     }
     .mode-tag.exam {
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
-      color: #020617;
+      background:linear-gradient(135deg,#38bdf8,#6366f1);
+      color:#020617;
     }
+    .timer {
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .timer-value { font-weight:700; }
 
     .question-text {
-      font-size: 26px;
-      font-weight: 700;
-      text-align: center;
-      padding: 8px 10px 10px;
-      border-radius: 14px;
-      background: rgba(15,23,42,0.95);
-      border: 1px solid rgba(148,163,184,0.8);
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      flex:0 0 auto;
+      font-size:28px;
+      font-weight:700;
+      text-align:center;
+      padding:10px 10px 12px;
+      border-radius:16px;
+      background:rgba(15,23,42,.98);
+      border:1px solid rgba(148,163,184,.9);
+      min-height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
     .hint {
-      margin-top: 6px;
-      font-size: 13px;
-      color: #bbf7d0;
-      background: rgba(22,163,74,0.2);
-      border: 1px dashed rgba(74,222,128,0.8);
-      border-radius: 10px;
-      padding: 6px 8px;
+      font-size:13px;
+      color:#bbf7d0;
+      padding:6px 8px;
+      border-radius:10px;
+      background:rgba(22,163,74,.22);
+      border:1px dashed rgba(74,222,128,.9);
     }
+    .hint.hidden { display:none; }
 
     .answers {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 8px;
+      flex:1;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(140px,1fr));
+      gap:10px;
+      margin-top:8px;
     }
     .answer-btn {
-      padding: 12px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.9);
-      background: rgba(15,23,42,0.98);
-      color: #f9fafb;
-      font-size: 20px;
-      cursor: pointer;
-      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.9);
+      background:rgba(15,23,42,.98);
+      color:#f9fafb;
+      font-size:24px;
+      cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      min-height:52px;
     }
     .answer-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 12px rgba(59,130,246,0.8);
-      border-color: #60a5fa;
-      background: rgba(15,23,42,1);
+      transform:translateY(-1px);
+      box-shadow:0 0 12px rgba(59,130,246,.95);
+      border-color:#60a5fa;
+      background:rgba(15,23,42,1);
     }
     .answer-btn.correct {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: #bbf7d0;
-      color: #052e16;
-      box-shadow: 0 0 14px rgba(34,197,94,1);
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      border-color:#bbf7d0;
+      color:#052e16;
+      box-shadow:0 0 14px rgba(34,197,94,1);
     }
     .answer-btn.wrong {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      border-color: #fecaca;
-      color: #fef2f2;
-      box-shadow: 0 0 14px rgba(248,113,113,1);
+      background:linear-gradient(135deg,#ef4444,#b91c1c);
+      border-color:#fecaca;
+      color:#fef2f2;
+      box-shadow:0 0 14px rgba(248,113,113,1);
     }
     .answer-btn:disabled {
-      opacity: 0.9;
-      cursor: default;
-      transform: none;
-      box-shadow: none;
+      opacity:.9;
+      cursor:default;
+      box-shadow:none;
+      transform:none;
     }
 
-    .timer {
-      font-size: 13px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .timer-value {
-      font-weight: 700;
-    }
-
-    .skills-panel {
-      border-radius: 18px;
-      padding: 8px 10px;
-      background: radial-gradient(circle at top right, rgba(129,140,248,0.35), rgba(15,23,42,0.98));
-      border: 1px solid rgba(165,180,252,0.9);
-      margin-bottom: 8px;
-    }
-    .skills-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-    .skills-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .skill-card {
-      flex: 1;
-      min-width: 120px;
-      padding: 6px 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(191,219,254,0.9);
-      background: rgba(15,23,42,0.98);
-      font-size: 11px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      transition: transform .1s ease, box-shadow .1s ease, background .1s ease, border-color .1s ease;
-    }
-    .skill-card.disabled {
-      opacity: .45;
-      cursor: default;
-    }
-    .skill-card:hover:not(.disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 12px rgba(129,140,248,1);
-      background: rgba(15,23,42,1);
-    }
-    .skill-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-    }
-    .skill-desc {
-      color: #c7d2fe;
-    }
-    .skill-card.double { border-color: #bef264; }
-    .skill-card.hint { border-color: #6ee7b7; }
-    .skill-card.skip { border-color: #facc15; }
-    .skill-count {
-      font-size: 11px;
-      color: #bfdbfe;
-    }
-    .active-skill {
-      margin-top: 4px;
-      font-size: 11px;
-      color: #fef9c3;
-      min-height: 14px;
-    }
-
-    .bottom-row {
-      margin-top: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
+    .question-controls {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-start;
     }
     .btn {
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-      white-space: nowrap;
+      padding:8px 14px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      white-space:nowrap;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #22c55e);
-      color: #0b1120;
-      box-shadow: 0 0 14px rgba(59,130,246,1);
+      background:linear-gradient(135deg,#3b82f6,#22c55e);
+      color:#0b1120;
+      box-shadow:0 0 14px rgba(59,130,246,1);
     }
     .btn-secondary {
-      background: rgba(15,23,42,0.98);
-      color: #e5e7eb;
-      border: 1px solid rgba(148,163,184,0.9);
+      background:rgba(15,23,42,.98);
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,.9);
     }
     .btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 14px rgba(129,140,248,1);
+      transform:translateY(-1px);
+      box-shadow:0 0 14px rgba(129,140,248,1);
     }
     .btn:disabled {
-      opacity: .55;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
+      opacity:.55;
+      cursor:default;
+      box-shadow:none;
+      transform:none;
     }
     .status {
-      font-size: 12px;
-      flex: 1;
-      min-height: 18px;
+      font-size:12px;
+      flex:1;
+      min-height:18px;
     }
 
-    .hidden {
-      display: none !important;
+    .right-bottom {
+      flex:0 0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
 
-    /* modal */
+    .academy-panel{
+      border-radius:16px;
+      padding:8px 10px;
+      background:radial-gradient(circle at top right, rgba(129,140,248,.35), rgba(15,23,42,.98));
+      border:1px solid rgba(165,180,252,.9);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .exam-row {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:2px;
+    }
+
+    .hidden { display:none !important; }
+
     .backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
     }
     .modal {
-      width: min(420px, 90vw);
-      padding: 14px 14px 10px;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, #1f2937, #020617);
-      border: 1px solid rgba(249,250,251,0.8);
-      box-shadow: 0 24px 50px rgba(0,0,0,0.85);
-      text-align: center;
+      width:min(460px, 92vw);
+      padding:14px 14px 10px;
+      border-radius:18px;
+      background:radial-gradient(circle at top,#1f2937,#020617);
+      border:1px solid rgba(249,250,251,.85);
+      box-shadow:0 24px 50px rgba(0,0,0,.9);
+      color:#e5e7eb;
     }
     .modal h2 {
-      margin: 0 0 6px;
-      font-size: 21px;
+      margin:0 0 6px;
+      font-size:20px;
     }
     .modal p {
-      margin: 4px 0;
-      font-size: 13px;
-      color: #e5e7eb;
+      margin:4px 0;
+      font-size:13px;
     }
+    .choice-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:6px;
+    }
+    .choice-btn {
+      flex:1;
+      min-width:140px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.9);
+      background:rgba(15,23,42,.98);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      font-size:12px;
+      transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease, background .1s ease;
+    }
+    .choice-btn.active {
+      border-color:#4ade80;
+      box-shadow:0 0 14px rgba(74,222,128,1);
+      background:rgba(22,163,74,1);
+      color:#022c22;
+    }
+    .choice-title { font-weight:600; font-size:13px; }
     .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      margin: 6px 0;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:6px;
+      margin:6px 0;
     }
     .badge {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      background: linear-gradient(135deg, #4ade80, #a3e635);
-      color: #0f172a;
+      padding:3px 8px;
+      border-radius:999px;
+      font-size:11px;
+      background:linear-gradient(135deg,#4ade80,#a3e635);
+      color:#0f172a;
     }
     .badge.boss {
-      background: linear-gradient(135deg, #f97316, #facc15);
+      background:linear-gradient(135deg,#f97316,#facc15);
     }
     .badge.exam {
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
-      color: #020617;
+      background:linear-gradient(135deg,#38bdf8,#6366f1);
+      color:#020617;
     }
     .table-summary {
-      margin-top: 6px;
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
+      margin-top:6px;
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
     }
     .table-summary td {
-      padding: 2px 4px;
-      border-bottom: 1px solid rgba(55,65,81,0.7);
-      text-align: left;
+      padding:2px 4px;
+      border-bottom:1px solid rgba(55,65,81,.8);
+      text-align:left;
     }
     .table-summary td:first-child {
-      color: #9ca3af;
-      width: 55%;
+      width:55%;
+      color:#9ca3af;
     }
   </style>
 </head>
 <body>
-  <div class="game">
-    <h1>Học viện Anh Hùng – Hero Academy</h1>
-    <div class="subtitle">Toán lớp 1 · So sánh & cộng trừ trong phạm vi 13</div>
+  <div class="game-shell">
+    <header class="game-header">
+      <div class="title-block">
+        <h1>Học viện Anh Hùng – Hero Academy</h1>
+        <div class="subtitle">Toán lớp 1 · So sánh & cộng trừ trong phạm vi 13</div>
 
-    <div class="top-row">
-      <div class="level-chip" id="levelLabel">Cấp 1 · Học viên mới</div>
-
-      <div class="xp-block">
-        <div class="xp-label">XP tri thức</div>
-        <div class="xp-bar">
-          <div class="xp-fill" id="xpFill"></div>
-        </div>
-        <div class="xp-text" id="xpText">0 / 50 XP</div>
-      </div>
-
-      <div class="chip">
-        ⭐ Đúng: <span id="correctCount" style="font-weight:600;">0</span> câu
-      </div>
-      <div class="chip">
-        👾 Boss: <span id="bossReady" style="font-weight:600;">Chưa mở</span>
-      </div>
-      <div class="version-select">
-        <span>Phiên bản:</span>
-        <select id="versionSelect">
-          <option value="1">V1 – Cơ bản</option>
-          <option value="2">V2 – Thêm Timer & âm thanh</option>
-          <option value="3">V3 – Thêm Nhiệm vụ / Chương</option>
-          <option value="4" selected>V4 – Full (Timer + Nhiệm vụ + Kiểm tra)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="main">
-      <!-- HERO PANEL -->
-      <div class="panel">
-        <div id="heroAvatar" class="hero-avatar stage-1">🧒</div>
-        <div id="heroName" class="hero-name">Học viên năm nhất</div>
-        <div id="heroPower" class="hero-power">Sức mạnh anh hùng: 1</div>
-        <div id="heroExtra" class="hero-extra">Trả lời đúng để tăng XP và lên cấp!</div>
-
-        <!-- Chapter buttons (V3, V4) -->
-        <div id="chapterRow" class="chapter-row hidden">
-          <span>📚 Chọn nhiệm vụ:</span>
-          <button class="chapter-btn active" data-chapter="all">Tổng hợp</button>
-          <button class="chapter-btn" data-chapter="compare">So sánh</button>
-          <button class="chapter-btn" data-chapter="add">Cộng</button>
-          <button class="chapter-btn" data-chapter="sub">Trừ</button>
-        </div>
-
-        <!-- Boss panel -->
-        <div id="bossBox" class="boss-box hidden">
-          <div class="boss-header">
-            <span class="boss-name">Boss Cuối Kỳ</span>
-            <span>👾</span>
+        <div class="top-info-row">
+          <div class="level-chip" id="levelLabel">Cấp 1 · Học viên mới</div>
+          <div class="xp-block">
+            <div class="xp-label">XP tri thức</div>
+            <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+            <div class="xp-text" id="xpText">0 / 50 XP</div>
           </div>
-          <div class="boss-hp-bar">
-            <div id="bossHpFill" class="boss-hp-fill"></div>
+          <div class="chip">
+            ⭐ Đúng: <span id="correctCount" style="font-weight:600;">0</span> câu
           </div>
-          <div class="boss-footer">
-            <span id="bossHpText">Máu Boss: 100 / 100</span>
-            <span id="heroHpText">HP Anh hùng: 3</span>
+          <div class="chip">
+            👾 Boss: <span id="bossReady" style="font-weight:600;">Chưa mở</span>
+          </div>
+          <div class="version-select">
+            <span>Phiên bản:</span>
+            <select id="versionSelect">
+              <option value="1">V1 – Cơ bản</option>
+              <option value="2">V2 – Timer + âm thanh</option>
+              <option value="3">V3 – Nhiệm vụ / Chương</option>
+              <option value="4" selected>V4 – Full + Kiểm tra</option>
+            </select>
           </div>
         </div>
       </div>
+    </header>
 
-      <!-- QUESTION PANEL -->
-      <div class="panel">
-        <div class="mode-row">
-          <div>
-            Chế độ:
-            <strong id="modeText">Luyện tập</strong>
+    <div class="layout">
+      <section class="left-hero">
+        <div class="hero-main-row">
+          <div id="heroAvatar" class="hero-avatar">
+            <span id="heroEmoji">🗡️</span>
           </div>
-          <div>
-            <span id="modeTag" class="mode-tag">Practice</span>
-            <span class="timer" id="timerChip">
-              ⏱️ <span class="timer-value" id="timerValue">--</span>s
-            </span>
+          <div id="heroName" class="hero-name">Kiếm gỗ</div>
+        </div>
+        <div class="hero-footer">
+          <div id="heroPower" class="hero-power">Cấp vũ khí: 1 · Level 1</div>
+          <div id="changeMode" class="change-mode-link">Đổi chế độ nâng cấp / rèn vũ khí</div>
+        </div>
+      </section>
+
+      <section class="right-side">
+        <div class="question-card" id="questionCard">
+          <div class="mode-row">
+            <div>Chế độ: <strong id="modeText">Luyện tập</strong></div>
+            <div>
+              <span id="modeTag" class="mode-tag">Practice</span>
+              <span id="timerChip" class="timer">
+                ⏱️ <span id="timerValue" class="timer-value">--</span>s
+              </span>
+            </div>
+          </div>
+
+          <div id="questionText" class="question-text">
+            Nhấn <strong>“Bắt đầu”</strong> để vào Học viện Anh Hùng!
+          </div>
+          <div id="hintBox" class="hint hidden"></div>
+
+          <div id="answers" class="answers"></div>
+
+          <div class="question-controls">
+            <button id="startBtn" class="btn btn-primary">🚀 Bắt đầu</button>
+            <button id="nextBtn" class="btn btn-secondary" disabled>➡ Câu tiếp theo</button>
+            <button id="bossBtn" class="btn btn-secondary" disabled>👾 Đánh Boss</button>
+            <div id="statusText" class="status"></div>
           </div>
         </div>
 
-        <div id="questionText" class="question-text">
-          Nhấn <strong>“Bắt đầu”</strong> để vào Học viện Anh Hùng!
+        <div class="right-bottom">
+          <div class="academy-panel">
+            <div class="map-panel">
+              <div class="map-title">🗺️ Sảnh Học viện</div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 1</span>
+                <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
+                <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
+              </div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 2</span>
+                <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
+                <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
+              </div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 3</span>
+                <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
+                <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
+              </div>
+            </div>
+
+            <div class="quest-panel">
+              <div class="quest-title">🎯 Nhiệm vụ hiện tại</div>
+              <div id="questText">Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.</div>
+              <div id="questProgress">0 / 5</div>
+            </div>
+
+            <div id="chapterRow" class="chapter-row">
+              <span class="chapter-label">📚 Chọn nhiệm vụ nhanh:</span>
+              <button class="chapter-btn active" data-chapter="all">Tổng hợp</button>
+              <button class="chapter-btn" data-chapter="compare">So sánh</button>
+              <button class="chapter-btn" data-chapter="add">Cộng</button>
+              <button class="chapter-btn" data-chapter="sub">Trừ</button>
+            </div>
+
+            <div id="bossBox" class="boss-panel hidden">
+              <div class="boss-header-row">
+                <span class="boss-name">Boss Cuối Kỳ</span>
+                <span id="bossModeLabel">Chưa giao chiến</span>
+              </div>
+              <div class="boss-body-row">
+                <div class="boss-avatar">👹</div>
+                <div class="boss-hp-column">
+                  <div id="bossHpFill" class="boss-hp-fill"></div>
+                </div>
+              </div>
+              <div class="boss-footer-row">
+                <span id="bossHpText">Máu Boss: 100 / 100</span>
+                <span id="heroHpText">HP Anh hùng: 3</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="exam-row">
+            <button id="examBtn" class="btn btn-secondary">📋 Chế độ kiểm tra: Tắt</button>
+            <button id="endExamBtn" class="btn btn-secondary hidden">✅ Kết thúc kiểm tra</button>
+          </div>
         </div>
-        <div id="hintBox" class="hint hidden"></div>
-
-        <div id="answers" class="answers"></div>
-      </div>
-    </div>
-
-    <!-- SKILLS -->
-    <div class="skills-panel">
-      <div class="skills-header">
-        <span>🎴 Thẻ kỹ năng</span>
-        <span style="font-size:11px;color:#c7d2fe;">Mở dần khi lên cấp · Nhấn để dùng</span>
-      </div>
-      <div class="skills-row">
-        <button id="skillDouble" class="skill-card double disabled">
-          <div class="skill-label">
-            <span>🟦 Nhân đôi XP</span>
-            <span id="skillDoubleCount" class="skill-count">x0</span>
-          </div>
-          <div class="skill-desc">Câu đúng kế tiếp được nhân đôi XP.</div>
-        </button>
-        <button id="skillHint" class="skill-card hint disabled">
-          <div class="skill-label">
-            <span>🟩 Gợi ý</span>
-            <span id="skillHintCount" class="skill-count">x0</span>
-          </div>
-          <div class="skill-desc">Hiện gợi ý cách làm cho câu đang làm.</div>
-        </button>
-        <button id="skillSkip" class="skill-card skip disabled">
-          <div class="skill-label">
-            <span>🟨 Bỏ qua</span>
-            <span id="skillSkipCount" class="skill-count">x0</span>
-          </div>
-          <div class="skill-desc">Bỏ câu khó, sang câu mới không bị phạt.</div>
-        </button>
-      </div>
-      <div id="activeSkillInfo" class="active-skill"></div>
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="bottom-row">
-      <button id="startBtn" class="btn btn-primary">🚀 Bắt đầu</button>
-      <button id="nextBtn" class="btn btn-secondary" disabled>➡ Câu tiếp theo</button>
-      <button id="bossBtn" class="btn btn-secondary" disabled>👾 Đánh Boss</button>
-      <button id="examBtn" class="btn btn-secondary">📋 Chế độ kiểm tra: Tắt</button>
-      <button id="endExamBtn" class="btn btn-secondary hidden">✅ Kết thúc kiểm tra</button>
-      <div id="statusText" class="status"></div>
+      </section>
     </div>
   </div>
 
-  <!-- MODAL (Boss / Exam summary) -->
-  <div id="backdrop" class="backdrop hidden">
+  <!-- Hộp thoại chọn chế độ nâng cấp -->
+  <div id="setupBackdrop" class="backdrop">
+    <div class="modal">
+      <h2>Chọn kiểu nâng cấp</h2>
+      <p>Trước khi vào Học viện, hãy chọn phong cách phát triển nhân vật.</p>
+
+      <p style="margin-top:6px;font-weight:600;">1️⃣ Chế độ chính:</p>
+      <div class="choice-row">
+        <button id="choiceHero" class="choice-btn" data-mode="hero">
+          <div class="choice-title">Nâng cấp Anh hùng</div>
+          <div>Icon anh hùng thay đổi liên tục (40 icon) theo từng cấp.</div>
+        </button>
+        <button id="choiceWeapon" class="choice-btn active" data-mode="weapon">
+          <div class="choice-title">Rèn vũ khí</div>
+          <div>Chỉ hiện vũ khí to ở bên trái, nhân vật ẩn đi.</div>
+        </button>
+      </div>
+
+      <p style="margin-top:8px;font-weight:600;">2️⃣ Rèn vũ khí: chọn món sẽ rèn</p>
+      <div class="choice-row">
+        <button class="choice-btn weapon-option active" data-weapon="sword">
+          <div class="choice-title">🗡️ Kiếm</div>
+          <div>Từ thanh gỗ nhỏ → kiếm rồng rực lửa.</div>
+        </button>
+        <button class="choice-btn weapon-option" data-weapon="pen">
+          <div class="choice-title">🖊️ Bút</div>
+          <div>“Ngòi bút tri thức” nâng cấp dần.</div>
+        </button>
+        <button class="choice-btn weapon-option" data-weapon="axe">
+          <div class="choice-title">🪓 Rìu / Búa</div>
+          <div>Đập lỗi sai, phá giáp Boss.</div>
+        </button>
+        <button class="choice-btn weapon-option" data-weapon="book">
+          <div class="choice-title">📘 Sách ma thuật</div>
+          <div>Mở dần các trang phép thuật.</div>
+        </button>
+      </div>
+
+      <button id="confirmSetup" class="btn btn-primary" style="margin-top:10px;">✨ Vào Học viện</button>
+    </div>
+  </div>
+
+  <!-- Hộp thoại tổng kết -->
+  <div id="summaryBackdrop" class="backdrop hidden">
     <div class="modal">
       <h2 id="modalTitle">Kết quả</h2>
       <p id="modalMessage"></p>
@@ -666,62 +896,88 @@
           <tr><td>Tỉ lệ đúng</td><td id="sumRate">0%</td></tr>
         </tbody>
       </table>
-      <button id="closeModalBtn" class="btn btn-primary" style="margin-top:6px;">✨ Tiếp tục</button>
+      <button id="closeSummary" class="btn btn-primary" style="margin-top:6px;">Tiếp tục chơi</button>
     </div>
   </div>
 
   <script>
-    // ======== STATE ========
     let level = 1;
     let xp = 0;
     let xpToNext = 50;
     const baseXpPerCorrect = 10;
 
     let correctCount = 0;
-    let mode = "practice"; // "practice" | "boss"
+    let mode = "practice";
+    let chapterMode = "all";
+    let version = 4;
+
     let currentQuestion = null;
     let answered = false;
 
-    // timer (V2+)
     let timerEnabled = true;
     let timerSeconds = 20;
     let timerId = null;
-    let lastTickQuestionId = 0;
+    let lastTickId = 0;
 
-    // boss
     let bossMaxHp = 100;
     let bossHp = bossMaxHp;
     let heroHp = 3;
     let bossUnlocked = false;
     let bossDefeated = false;
 
-    // skills
     const skillCounts = { double: 0, hint: 0, skip: 0 };
-    let activeSkill = null; // "double"
-    let examMode = true;    // only active in Version 4; but can be toggled
+    let activeSkill = null;
+
     let examRunning = false;
     let examTotal = 0;
     let examCorrect = 0;
 
-    let chapterMode = "all"; // "all" | "compare" | "add" | "sub"
-    let version = 4;
+    let progressionMode = "weapon";
+    let selectedWeapon = "sword";
 
-    // ======== DOM ========
+    let quest = { id: 1, progress: 0, target: 5, completed: false, streak: 0 };
+
+    const heroIcons = [
+      "👦","🧒","🧑‍🎓","👨‍🎓","👩‍🎓",
+      "🧑‍🏫","👨‍🏫","👩‍🏫","🧑‍💻","👨‍💻",
+      "👩‍💻","🧑‍🔬","👨‍🔬","👩‍🔬","🧙‍♂️",
+      "🧙‍♀️","🧚‍♂️","🧚‍♀️","🧝‍♂️","🧝‍♀️",
+      "🧑‍🚀","👨‍🚀","👩‍🚀","🦸‍♂️","🦸‍♀️",
+      "⚔️","🛡️","🔥","⚡","🌟",
+      "🐉","👑","📘","📗","📕",
+      "📙","🔮","💫","🌈","🪽"
+    ];
+
+    const weaponTracks = {
+      sword: ["🪵","🔪","🗡️","⚔️","🔥⚔️","⚡⚔️","🌈⚔️","🐉⚔️"],
+      pen:   ["✏️","🖊️","🖋️","🖌️","📜🖋️","✨🖊️","📘✨","📚💫"],
+      axe:   ["🪓","🔨","⚒️","🪓🔥","🪓⚡","🛠️✨","🪵💥","💣🪓"],
+      book:  ["📗","📘","📙","📕✨","📚✨","📖🔮","📖💫","📖🌈"]
+    };
+    const weaponStageNames = {
+      sword: ["Kiếm gỗ","Dao nhỏ","Kiếm sắt","Kiếm bạc","Kiếm lửa","Kiếm sét","Kiếm cầu vồng","Kiếm rồng"],
+      pen:   ["Bút chì","Bút mực","Bút máy","Cọ vẽ","Bút ghi chép","Bút phép thuật","Sách bút thần","Bộ sách tri thức"],
+      axe:   ["Rìu gỗ","Búa nhỏ","Bộ búa rèn","Rìu lửa","Rìu sét","Búa thợ rèn","Rìu phá giáp","Búa nổ"],
+      book:  ["Sách xanh","Sách xanh dương","Sách cam","Sách sáng","Tủ sách nhỏ","Sách ma thuật","Sách ánh sáng","Sách cầu vồng"]
+    };
+
     const levelLabel = document.getElementById("levelLabel");
     const xpFill = document.getElementById("xpFill");
     const xpText = document.getElementById("xpText");
     const correctCountEl = document.getElementById("correctCount");
     const bossReadyEl = document.getElementById("bossReady");
+    const versionSelect = document.getElementById("versionSelect");
 
+    const leftHero = document.querySelector(".left-hero");
     const heroAvatar = document.getElementById("heroAvatar");
-    const heroName = document.getElementById("heroName");
-    const heroPower = document.getElementById("heroPower");
-    const heroExtra = document.getElementById("heroExtra");
+    const heroEmojiEl = document.getElementById("heroEmoji");
+    const heroNameEl = document.getElementById("heroName");
+    const heroPowerEl = document.getElementById("heroPower");
+    const changeModeLink = document.getElementById("changeMode");
 
     const chapterRow = document.getElementById("chapterRow");
-    const chapterButtons = () => Array.from(document.querySelectorAll(".chapter-btn"));
-
     const bossBox = document.getElementById("bossBox");
+    const bossModeLabel = document.getElementById("bossModeLabel");
     const bossHpFill = document.getElementById("bossHpFill");
     const bossHpText = document.getElementById("bossHpText");
     const heroHpText = document.getElementById("heroHpText");
@@ -734,14 +990,7 @@
     const questionTextEl = document.getElementById("questionText");
     const hintBox = document.getElementById("hintBox");
     const answersEl = document.getElementById("answers");
-
-    const skillDoubleBtn = document.getElementById("skillDouble");
-    const skillHintBtn = document.getElementById("skillHint");
-    const skillSkipBtn = document.getElementById("skillSkip");
-    const skillDoubleCountEl = document.getElementById("skillDoubleCount");
-    const skillHintCountEl = document.getElementById("skillHintCount");
-    const skillSkipCountEl = document.getElementById("skillSkipCount");
-    const activeSkillInfo = document.getElementById("activeSkillInfo");
+    const questionCard = document.getElementById("questionCard");
 
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
@@ -749,9 +998,14 @@
     const examBtn = document.getElementById("examBtn");
     const endExamBtn = document.getElementById("endExamBtn");
     const statusText = document.getElementById("statusText");
-    const versionSelect = document.getElementById("versionSelect");
 
-    const backdrop = document.getElementById("backdrop");
+    const setupBackdrop = document.getElementById("setupBackdrop");
+    const choiceHeroBtn = document.getElementById("choiceHero");
+    const choiceWeaponBtn = document.getElementById("choiceWeapon");
+    const weaponOptionBtns = Array.from(document.querySelectorAll(".weapon-option"));
+    const confirmSetupBtn = document.getElementById("confirmSetup");
+
+    const summaryBackdrop = document.getElementById("summaryBackdrop");
     const modalTitle = document.getElementById("modalTitle");
     const modalMessage = document.getElementById("modalMessage");
     const badgeRow = document.getElementById("badgeRow");
@@ -759,60 +1013,52 @@
     const sumTotal = document.getElementById("sumTotal");
     const sumCorrect = document.getElementById("sumCorrect");
     const sumRate = document.getElementById("sumRate");
-    const closeModalBtn = document.getElementById("closeModalBtn");
+    const closeSummaryBtn = document.getElementById("closeSummary");
 
-// Âm thanh (đặt correct.mp3, wrong.mp3, levelup.mp3 cùng thư mục với file HTML)
-const sndCorrect = new Audio("correct.mp3");
-const sndWrong = new Audio("wrong.mp3");
-const sndLevelUp = new Audio("levelup.mp3");
+    const mapRoomButtons = Array.from(document.querySelectorAll(".map-room"));
+    const questTextEl = document.getElementById("questText");
+    const questProgressEl = document.getElementById("questProgress");
 
+    const sndCorrect = new Audio("correct.mp3");
+    const sndWrong   = new Audio("wrong.mp3");
+    const sndLevelUp = new Audio("levelup.mp3");
 
-    function playSound(audio) {
-      if (!timerEnabled && version === 1) return; // bản 1 không cần âm cũng được
-      if (!audio || !audio.play) return;
-      try { audio.currentTime = 0; audio.play(); } catch (e) {}
+    function playSound(a) {
+      if (!a || !a.play) return;
+      try { a.currentTime = 0; a.play(); } catch(e){}
     }
 
-    // ======== UTILS ========
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    function shuffle(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
+    const orbitWrapper = document.createElement("div");
+    orbitWrapper.className = "orbit-wrapper";
+    heroAvatar.appendChild(orbitWrapper);
 
-    // ======== HERO / LEVEL ========
-    function updateHeroUi() {
-      levelLabel.textContent = `Cấp ${level} · ${getHeroTitle(level)}`;
-      heroName.textContent = getHeroTitle(level);
-      heroPower.textContent = `Sức mạnh anh hùng: ${level}`;
-      heroExtra.textContent =
-        level < 3 ? "Trả lời đúng để mở khóa thẻ kỹ năng!"
-      : level < 5 ? "Bạn đã có thẻ kỹ năng, hãy tận dụng nhé!"
-      : "Anh hùng mạnh mẽ! Đã sẵn sàng đánh Boss Cuối Kỳ.";
-
-      let stage = 1;
-      if (level >= 7) stage = 4;
-      else if (level >= 5) stage = 3;
-      else if (level >= 3) stage = 2;
-      heroAvatar.className = "hero-avatar stage-" + stage;
-      heroAvatar.textContent = stage === 1 ? "🧒" : stage === 2 ? "🧙‍♂️" : stage === 3 ? "🦸‍♀️" : "🦸‍♂️";
-    }
-
-    function getHeroTitle(lv) {
+    function heroTitleForLevel(lv) {
       if (lv <= 1) return "Học viên năm nhất";
       if (lv === 2) return "Học viên chăm chỉ";
       if (lv === 3) return "Học viên ưu tú";
       if (lv === 4) return "Trợ giảng anh hùng";
       if (lv === 5) return "Anh hùng năm cuối";
-      if (lv === 6) return "Siêu anh hùng học viện";
+      if (lv === 6) return "Siêu anh hùng Học viện";
       if (lv === 7) return "Huyền thoại Học viện";
       return "Đại Hiệp Sĩ Tri Thức";
+    }
+
+    function updateHeroUi() {
+      levelLabel.textContent = `Cấp ${level} · ${heroTitleForLevel(level)}`;
+      if (progressionMode === "hero") {
+        const idx = Math.min(level - 1, heroIcons.length - 1);
+        heroEmojiEl.textContent = heroIcons[idx];
+        heroNameEl.textContent = heroTitleForLevel(level);
+        heroPowerEl.textContent = `Cấp ${level} · Sức mạnh anh hùng ${level}`;
+      } else {
+        const track = weaponTracks[selectedWeapon] || weaponTracks.sword;
+        const names = weaponStageNames[selectedWeapon] || weaponStageNames.sword;
+        const stage = Math.min(track.length - 1, Math.floor((level - 1) / 5));
+        heroEmojiEl.textContent = track[stage];
+        const weaponName = names[stage];
+        heroNameEl.textContent = weaponName;
+        heroPowerEl.textContent = `Cấp vũ khí: ${stage + 1} · Level ${level}`;
+      }
     }
 
     function updateXpUi() {
@@ -834,86 +1080,19 @@ const sndLevelUp = new Audio("levelup.mp3");
       updateXpUi();
       if (leveled) {
         heroAvatar.classList.add("level-up");
+        spawnSparkBurst();
         setTimeout(() => heroAvatar.classList.remove("level-up"), 260);
       }
       updateHeroUi();
       updateBossUnlock();
+      updateMapLocks();
     }
 
     function onLevelUp() {
       statusText.textContent = `🎉 Bạn đã lên cấp ${level}!`;
       playSound(sndLevelUp);
-      if (level === 2) addSkill("hint", 1);
-      else if (level === 3) addSkill("double", 1);
-      else if (level === 4) addSkill("skip", 1);
-      else if (level >= 5) {
-        addSkill("double", 1);
-        addSkill("hint", 1);
-      }
     }
 
-    // ======== SKILLS ========
-    function addSkill(type, count) {
-      if (!skillCounts[type]) skillCounts[type] = 0;
-      skillCounts[type] += count;
-      updateSkillUi();
-      statusText.textContent = `🎴 Nhận được thẻ: ${skillLabel(type)} (x${count}).`;
-    }
-    function skillLabel(type) {
-      if (type === "double") return "Nhân đôi XP";
-      if (type === "hint") return "Gợi ý";
-      if (type === "skip") return "Bỏ qua";
-      return "Skill";
-    }
-    function updateSkillUi() {
-      skillDoubleCountEl.textContent = "x" + skillCounts.double;
-      skillHintCountEl.textContent = "x" + skillCounts.hint;
-      skillSkipCountEl.textContent = "x" + skillCounts.skip;
-      toggleSkillBtn(skillDoubleBtn, skillCounts.double > 0);
-      toggleSkillBtn(skillHintBtn, skillCounts.hint > 0);
-      toggleSkillBtn(skillSkipBtn, skillCounts.skip > 0);
-    }
-    function toggleSkillBtn(btn, on) {
-      if (on) btn.classList.remove("disabled");
-      else btn.classList.add("disabled");
-    }
-
-    function useSkill(type) {
-      if (!currentQuestion) {
-        statusText.textContent = "Hãy bấm Bắt đầu trước đã.";
-        return;
-      }
-      if (answered && type !== "skip") {
-        statusText.textContent = "Câu này đã xong, dùng skill ở câu tiếp theo nhé.";
-        return;
-      }
-      if (skillCounts[type] <= 0) return;
-
-      if (type === "double") {
-        activeSkill = "double";
-        skillCounts.double--;
-        updateSkillUi();
-        activeSkillInfo.textContent = "🟦 Đang bật Nhân đôi XP cho câu trả lời đúng kế tiếp.";
-        statusText.textContent = "Nhân đôi XP đã sẵn sàng!";
-      } else if (type === "hint") {
-        if (!currentQuestion.hint) {
-          statusText.textContent = "Câu này khá dễ, không cần gợi ý đâu!";
-        } else {
-          hintBox.textContent = "💡 " + currentQuestion.hint;
-          hintBox.classList.remove("hidden");
-          skillCounts.hint--;
-          updateSkillUi();
-          statusText.textContent = "Đã dùng thẻ Gợi ý.";
-        }
-      } else if (type === "skip") {
-        skillCounts.skip--;
-        updateSkillUi();
-        statusText.textContent = "🟨 Bạn bỏ qua câu này, không bị phạt.";
-        nextQuestion();
-      }
-    }
-
-    // ======== BOSS ========
     function resetBoss() {
       bossMaxHp = 100;
       bossHp = bossMaxHp;
@@ -924,10 +1103,9 @@ const sndLevelUp = new Audio("levelup.mp3");
       bossHpText.textContent = `Máu Boss: ${bossHp} / ${bossMaxHp}`;
       heroHpText.textContent = `HP Anh hùng: ${heroHp}`;
       const pct = Math.max(0, Math.min(100, (bossHp / bossMaxHp) * 100));
-      bossHpFill.style.width = pct + "%";
+      bossHpFill.style.height = pct + "%";
     }
     function updateBossUnlock() {
-      // điều kiện mở Boss: level >= 3 & đúng >= 8 câu
       bossUnlocked = level >= 3 && correctCount >= 8;
       bossReadyEl.textContent = bossUnlocked ? "Sẵn sàng" : "Chưa mở";
       bossReadyEl.style.color = bossUnlocked ? "#4ade80" : "#f9fafb";
@@ -935,23 +1113,27 @@ const sndLevelUp = new Audio("levelup.mp3");
     }
 
     function enterBossMode() {
-      if (!bossUnlocked) return;
+      if (!bossUnlocked) {
+        statusText.textContent = "Chưa đủ điều kiện vào Tháp Boss. Hãy luyện thêm nhé!";
+        return;
+      }
       mode = "boss";
       resetBoss();
       bossBox.classList.remove("hidden");
+      bossModeLabel.textContent = "Đang giao chiến";
       modeTextEl.textContent = "Đấu Boss Cuối Kỳ";
       modeTag.textContent = "Boss Fight";
       modeTag.classList.add("boss");
       modeTag.classList.remove("exam");
       statusText.textContent = "👾 Mỗi câu đúng làm Boss mất máu. Sai 3 lần là thua.";
       nextBtn.disabled = true;
-      startTimerIfNeeded();
       generateQuestion();
+      startTimerIfNeeded();
     }
 
     function exitBossMode(victory) {
       mode = "practice";
-      bossBox.classList.add("hidden");
+      bossModeLabel.textContent = "Chưa giao chiến";
       modeTextEl.textContent = "Luyện tập";
       modeTag.textContent = "Practice";
       modeTag.classList.remove("boss");
@@ -962,13 +1144,12 @@ const sndLevelUp = new Audio("levelup.mp3");
     }
 
     function showBossSummary(victory) {
-      backdrop.classList.remove("hidden");
+      summaryBackdrop.classList.remove("hidden");
       badgeRow.innerHTML = "";
       summaryTable.classList.add("hidden");
-
       if (victory) {
         modalTitle.textContent = "🎉 Bạn đã đánh bại Boss!";
-        modalMessage.textContent = `Anh hùng cấp ${level} với ${correctCount} câu đúng. Học viện rất tự hào!`;
+        modalMessage.textContent = `Anh hùng cấp ${level} với ${correctCount} câu đúng. Học viện rất tự hào về bạn!`;
         const b1 = document.createElement("div");
         b1.className = "badge boss";
         b1.textContent = "Boss Slayer";
@@ -987,27 +1168,24 @@ const sndLevelUp = new Audio("levelup.mp3");
       }
     }
 
-    // ======== EXAM ========
     function toggleExamMode() {
       if (version < 4) {
-        statusText.textContent = "Chế độ kiểm tra chỉ bật ở phiên bản 4.";
+        statusText.textContent = "Chế độ kiểm tra chỉ dùng ở phiên bản 4.";
         return;
       }
       if (!examRunning) {
-        // bật
         examRunning = true;
         examTotal = 0;
         examCorrect = 0;
         examBtn.textContent = "📋 Chế độ kiểm tra: Đang thi";
         examBtn.classList.add("btn-primary");
         endExamBtn.classList.remove("hidden");
-        statusText.textContent = "Bạn đang ở chế độ kiểm tra. Trả lời và bấm 'Kết thúc kiểm tra' để xem kết quả.";
         modeTextEl.textContent = "Kiểm tra";
         modeTag.textContent = "Exam";
         modeTag.classList.add("exam");
         modeTag.classList.remove("boss");
+        statusText.textContent = "Đang ở chế độ kiểm tra. Làm bài rồi bấm 'Kết thúc kiểm tra' để xem kết quả.";
       } else {
-        // tắt giữa chừng
         endExam();
       }
     }
@@ -1019,25 +1197,24 @@ const sndLevelUp = new Audio("levelup.mp3");
       examBtn.classList.remove("btn-primary");
       endExamBtn.classList.add("hidden");
 
-      // show summary
       const total = examTotal;
       const correct = examCorrect;
-      const rate = total > 0 ? Math.round((correct / total) * 100) : 0;
+      const rate = total > 0 ? Math.round(correct / total * 100) : 0;
 
-      backdrop.classList.remove("hidden");
+      summaryBackdrop.classList.remove("hidden");
       badgeRow.innerHTML = "";
       summaryTable.classList.remove("hidden");
       modalTitle.textContent = "📊 Kết quả kiểm tra";
-      modalMessage.textContent = "Bạn có thể chụp lại màn hình này để lưu kết quả.";
+      modalMessage.textContent = "Bạn có thể chụp màn hình để lưu lại kết quả.";
       sumTotal.textContent = total;
       sumCorrect.textContent = correct;
       sumRate.textContent = rate + "%";
 
       const b1 = document.createElement("div");
       b1.className = "badge exam";
-      b1.textContent = rate >= 80 ? "Học sinh xuất sắc" :
-                       rate >= 50 ? "Đang tiến bộ" :
-                                    "Cần cố gắng thêm";
+      b1.textContent =
+        rate >= 80 ? "Học sinh xuất sắc" :
+        rate >= 50 ? "Đang tiến bộ" : "Cần cố gắng thêm";
       badgeRow.appendChild(b1);
 
       modeTextEl.textContent = "Luyện tập";
@@ -1046,56 +1223,35 @@ const sndLevelUp = new Audio("levelup.mp3");
       statusText.textContent = "Đã kết thúc kiểm tra. Bạn có thể tiếp tục luyện tập.";
     }
 
-    function showModalExamOnlyIfRunning() {
-      // dùng chung modal; đã làm ở endExam()
-    }
-
-    // ======== VERSION / MODE CONFIG ========
     function applyVersionConfig() {
       version = parseInt(versionSelect.value, 10);
-      // V1: không timer, không chapter, không exam
-      // V2: có timer + âm thanh, không chapter, không exam
-      // V3: có timer + chapter, không exam
-      // V4: tất cả
       timerEnabled = version >= 2;
-      chapterRow.classList.toggle("hidden", version < 3);
-
+      chapterRow.style.display = version >= 3 ? "flex" : "none";
       if (version < 4) {
         examRunning = false;
         examBtn.textContent = "📋 Chế độ kiểm tra: Tắt";
-        examBtn.classList.add("btn-secondary");
         examBtn.classList.remove("btn-primary");
         endExamBtn.classList.add("hidden");
       }
       timerChip.classList.toggle("hidden", !timerEnabled);
       timerValueEl.textContent = timerEnabled ? timerSeconds : "--";
       statusText.textContent = `Đang dùng phiên bản V${version}.`;
-
-      if (version === 1) {
-        modeTextEl.textContent = "Luyện tập";
-        modeTag.textContent = "Practice";
-      }
     }
 
-    // ======== TIMER ========
     function startTimerIfNeeded() {
       stopTimer();
       if (!timerEnabled) return;
       timerSeconds = 20;
       timerValueEl.textContent = timerSeconds;
-      const myQuestionId = ++lastTickQuestionId;
+      const myId = ++lastTickId;
       timerId = setInterval(() => {
-        if (myQuestionId !== lastTickQuestionId) {
+        if (myId !== lastTickId) {
           clearInterval(timerId);
           return;
         }
         timerSeconds--;
         timerValueEl.textContent = timerSeconds;
-        if (timerSeconds <= 5) {
-          timerValueEl.style.color = "#f97316";
-        } else {
-          timerValueEl.style.color = "#f9fafb";
-        }
+        timerValueEl.style.color = timerSeconds <= 5 ? "#f97316" : "#f9fafb";
         if (timerSeconds <= 0) {
           clearInterval(timerId);
           handleTimeout();
@@ -1109,18 +1265,86 @@ const sndLevelUp = new Audio("levelup.mp3");
       timerValueEl.style.color = "#f9fafb";
     }
 
+    function spawnFloatText(text, type) {
+      const rect = heroAvatar.getBoundingClientRect();
+      const parentRect = leftHero.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 - parentRect.left;
+      const cy = rect.top + rect.height / 2 - parentRect.top - 10;
+
+      const el = document.createElement("div");
+      el.className = "float-xp " + (type === "red" ? "red" : "green");
+      el.textContent = text;
+      el.style.left = cx + "px";
+      el.style.top = cy + "px";
+      leftHero.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
+    }
+
+    function spawnSparkBurst() {
+      const rect = heroAvatar.getBoundingClientRect();
+      const parentRect = leftHero.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 - parentRect.left;
+      const cy = rect.top + rect.height / 2 - parentRect.top;
+      const count = 14;
+
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radiusOuter = 60 + Math.random() * 40;
+        const x = cx + Math.cos(angle) * radiusOuter;
+        const y = cy + Math.sin(angle) * radiusOuter;
+        const dot = document.createElement("div");
+        dot.className = "spark-dot";
+        dot.style.left = x + "px";
+        dot.style.top = y + "px";
+        leftHero.appendChild(dot);
+
+        const radiusInner = Math.random() * 35;
+        const ix = cx + Math.cos(angle) * radiusInner;
+        const iy = cy + Math.sin(angle) * radiusInner;
+        const innerDot = document.createElement("div");
+        innerDot.className = "spark-dot";
+        innerDot.style.left = ix + "px";
+        innerDot.style.top = iy + "px";
+        leftHero.appendChild(innerDot);
+
+        setTimeout(() => {
+          if (dot.parentNode) dot.parentNode.removeChild(dot);
+          if (innerDot.parentNode) innerDot.parentNode.removeChild(innerDot);
+        }, 1000);
+      }
+    }
+
+    function addOrbitDust(count = 4) {
+      const existing = orbitWrapper.querySelectorAll(".orbit-dot").length;
+      const maxDots = 60;
+      const toCreate = Math.max(0, Math.min(count, maxDots - existing));
+      const rect = heroAvatar.getBoundingClientRect();
+      const radiusBase = rect.width / 2 + 12;
+
+      for (let i = 0; i < toCreate; i++) {
+        const dot = document.createElement("div");
+        dot.className = "orbit-dot";
+        const angle = Math.random() * 360;
+        const radius = radiusBase + Math.random() * 30;
+        dot.style.setProperty("--angle", angle + "deg");
+        dot.style.setProperty("--radius", radius + "px");
+        orbitWrapper.appendChild(dot);
+      }
+    }
+
     function handleTimeout() {
       if (!currentQuestion || answered) return;
-      // hết giờ = như trả lời sai
+      answered = true;
       const buttons = Array.from(answersEl.querySelectorAll(".answer-btn"));
       buttons.forEach((btn, i) => {
         btn.disabled = true;
         if (i === currentQuestion.correctIndex) btn.classList.add("correct");
       });
-      answered = true;
-      statusText.textContent = "⏱️ Hết giờ! Câu này coi như sai. Hãy chú ý nhanh hơn nhé.";
+      statusText.textContent = "⏱️ Hết giờ! Câu này coi như sai.";
       playSound(sndWrong);
+      spawnFloatText("-1", "red");
       if (examRunning) examTotal++;
+
       if (mode === "boss") {
         heroHp = Math.max(0, heroHp - 1);
         updateBossUi();
@@ -1134,18 +1358,24 @@ const sndLevelUp = new Audio("levelup.mp3");
       }
     }
 
-    // ======== QUESTIONS ========
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
     function generateQuestion() {
       answered = false;
       hintBox.classList.add("hidden");
       hintBox.textContent = "";
       answersEl.innerHTML = "";
-      activeSkillInfo.textContent =
-        activeSkill === "double"
-          ? "🟦 Nhân đôi XP đang chờ câu trả lời đúng!"
-          : "";
 
-      // select question type
       let type;
       if (chapterMode === "compare") type = "compare";
       else if (chapterMode === "add") type = "add";
@@ -1162,12 +1392,11 @@ const sndLevelUp = new Audio("levelup.mp3");
       else currentQuestion = genSubQuestion();
 
       questionTextEl.textContent = currentQuestion.text;
-
       currentQuestion.choices.forEach((choice, idx) => {
         const btn = document.createElement("button");
         btn.className = "answer-btn";
         btn.textContent = choice;
-        btn.addEventListener("click", () => handleAnswer(idx, btn));
+        btn.addEventListener("click", () => handleAnswer(idx));
         answersEl.appendChild(btn);
       });
 
@@ -1181,13 +1410,12 @@ const sndLevelUp = new Audio("levelup.mp3");
       let b;
       do { b = randInt(0, 13); } while (b === a);
       const sym = a > b ? ">" : "<";
-      const choices = shuffle([">", "<", "="]);
-      const correctIndex = choices.indexOf(sym);
+      const choices = shuffle([">","<","="]);
       return {
         type: "compare",
-        text: `Điền dấu >, < hoặc = :   ${a}  ?  ${b}`,
+        text: `Điền dấu >, < hoặc = :  ${a}  ?  ${b}`,
         choices,
-        correctIndex,
+        correctIndex: choices.indexOf(sym),
         hint: "Số lớn hơn dùng dấu >, số nhỏ hơn dùng dấu <, bằng nhau dùng dấu =."
       };
     }
@@ -1197,20 +1425,18 @@ const sndLevelUp = new Audio("levelup.mp3");
       let b = randInt(0, maxB);
       const result = a + b;
       let set = new Set([result]);
-      while (set.size < 3) {
-        let d = randInt(-2, 2);
-        let c = result + d;
-        if (c < 0 || c > 13 || c === result) continue;
+      while (set.size < 4) {
+        let c = randInt(0, 13);
+        if (c === result) continue;
         set.add(c);
       }
       const arr = shuffle(Array.from(set));
-      const idx = arr.indexOf(result);
       return {
         type: "add",
         text: `Tính:  ${a}  +  ${b}  =  ?`,
         choices: arr.map(String),
-        correctIndex: idx,
-        hint: "Đếm thêm từ số thứ nhất: lấy " + a + " rồi đếm thêm " + b + " đơn vị."
+        correctIndex: arr.indexOf(result),
+        hint: `Bắt đầu từ ${a} rồi đếm thêm ${b} đơn vị.`
       };
     }
     function genSubQuestion() {
@@ -1218,25 +1444,22 @@ const sndLevelUp = new Audio("levelup.mp3");
       let b = randInt(0, a);
       const result = a - b;
       let set = new Set([result]);
-      while (set.size < 3) {
-        let d = randInt(-2, 2);
-        let c = result + d;
-        if (c < 0 || c > 13 || c === result) continue;
+      while (set.size < 4) {
+        let c = randInt(0, 13);
+        if (c === result) continue;
         set.add(c);
       }
       const arr = shuffle(Array.from(set));
-      const idx = arr.indexOf(result);
       return {
         type: "sub",
         text: `Tính:  ${a}  -  ${b}  =  ?`,
         choices: arr.map(String),
-        correctIndex: idx,
-        hint: "Có " + a + " bớt đi " + b + " thì đếm lùi " + b + " bước."
+        correctIndex: arr.indexOf(result),
+        hint: `Có ${a}, bớt đi ${b} thì đếm lùi ${b} bước.`
       };
     }
 
-    // ======== ANSWER HANDLING ========
-    function handleAnswer(index, btn) {
+    function handleAnswer(index) {
       if (answered) return;
       answered = true;
       stopTimer();
@@ -1255,54 +1478,46 @@ const sndLevelUp = new Audio("levelup.mp3");
       if (mode === "practice") {
         if (isCorrect) {
           let gain = baseXpPerCorrect;
-          if (activeSkill === "double") {
-            gain *= 2;
-            activeSkillInfo.textContent = "✅ Thẻ Nhân đôi XP đã được dùng.";
-            activeSkill = null;
-          }
           correctCount++;
           correctCountEl.textContent = correctCount;
           gainXp(gain);
           playSound(sndCorrect);
           statusText.textContent = `✅ Chính xác! Bạn nhận ${gain} XP.`;
+          spawnFloatText("+" + gain, "green");
+          spawnSparkBurst();
+          addOrbitDust(5);
           if (examRunning) examCorrect++;
+          updateQuestOnResult(true);
         } else {
-          if (activeSkill === "double") {
-            activeSkillInfo.textContent = "❌ Câu sai, thẻ Nhân đôi XP bị mất.";
-            activeSkill = null;
-          }
           playSound(sndWrong);
           statusText.textContent = "❌ Chưa đúng, hãy thử câu tiếp theo!";
+          spawnFloatText("-1", "red");
+          updateQuestOnResult(false);
         }
         updateBossUnlock();
         nextBtn.disabled = false;
       } else if (mode === "boss") {
         if (isCorrect) {
           let damage = 20;
-          if (activeSkill === "double") {
-            damage *= 2;
-            activeSkillInfo.textContent =
-              "🟦 Nhân đôi XP giúp đòn đánh mạnh hơn!";
-            activeSkill = null;
-          }
           bossHp = Math.max(0, bossHp - damage);
           gainXp(baseXpPerCorrect);
           playSound(sndCorrect);
           statusText.textContent = `⚔️ Đúng! Bạn gây ${damage} sát thương cho Boss.`;
+          spawnFloatText("-" + damage, "green");
+          spawnSparkBurst();
+          addOrbitDust(5);
         } else {
-          if (activeSkill === "double") {
-            activeSkillInfo.textContent = "❌ Sai rồi, thẻ Nhân đôi XP bị mất.";
-            activeSkill = null;
-          }
           heroHp = Math.max(0, heroHp - 1);
           playSound(sndWrong);
           statusText.textContent = "💥 Boss phản công! Bạn mất 1 HP.";
+          spawnFloatText("-1 HP", "red");
         }
         updateBossUi();
         if (bossHp <= 0) {
           bossDefeated = true;
           bossUnlocked = false;
           updateBossUnlock();
+          updateMapLocks();
           setTimeout(() => exitBossMode(true), 750);
         } else if (heroHp <= 0) {
           setTimeout(() => exitBossMode(false), 750);
@@ -1317,12 +1532,113 @@ const sndLevelUp = new Audio("levelup.mp3");
       generateQuestion();
     }
 
-    // ======== MODAL ========
-    function closeModal() {
-      backdrop.classList.add("hidden");
+    function updateQuestOnResult(isCorrect) {
+      if (!quest) return;
+      if (quest.id === 1) {
+        if (isCorrect) quest.progress++;
+        if (quest.progress >= quest.target && !quest.completed) {
+          quest.completed = true;
+          statusText.textContent = "🎯 Hoàn thành nhiệm vụ 1: 5 câu đúng!";
+          quest = { id: 2, progress: 0, target: 3, completed: false, streak: 0 };
+        }
+      } else if (quest.id === 2) {
+        if (isCorrect) {
+          quest.streak = (quest.streak || 0) + 1;
+        } else {
+          quest.streak = 0;
+        }
+        quest.progress = quest.streak;
+        if (quest.progress >= quest.target && !quest.completed) {
+          quest.completed = true;
+          statusText.textContent = "🔥 Hoàn thành nhiệm vụ 2: 3 câu đúng liên tiếp!";
+          quest = { id: 3, progress: 0, target: 1, completed: false, streak: 0 };
+        }
+      }
+      updateQuestUi();
     }
 
-    // ======== EVENTS ========
+    function updateQuestUi() {
+      if (!questTextEl) return;
+      let desc = "", progText = "";
+      if (quest.id === 1) {
+        desc = "Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else if (quest.id === 2) {
+        desc = "Nhiệm vụ 2: Đạt 3 câu đúng liên tiếp.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else if (quest.id === 3 && !quest.completed) {
+        desc = "Nhiệm vụ 3: Hạ gục Boss Cuối Kỳ 1 lần.";
+        progText = `${quest.progress} / ${quest.target}`;
+      } else {
+        desc = "Tạm hết nhiệm vụ, hãy tiếp tục luyện tập nhé!";
+        progText = "";
+      }
+      questTextEl.textContent = desc;
+      questProgressEl.textContent = progText;
+    }
+
+    function updateMapLocks() {
+      let unlockFloor = 1;
+      if (level >= 2) unlockFloor = 2;
+      if (level >= 4 || bossDefeated) unlockFloor = 3;
+
+      mapRoomButtons.forEach(btn => {
+        const floor = parseInt(btn.getAttribute("data-floor") || "1", 10);
+        if (floor > unlockFloor) {
+          btn.disabled = true;
+          btn.classList.add("locked");
+        } else {
+          btn.disabled = false;
+          btn.classList.remove("locked");
+        }
+      });
+    }
+
+    document.querySelector(".map-panel").addEventListener("click", e => {
+      const btn = e.target.closest(".map-room");
+      if (!btn || btn.disabled) return;
+      const room = btn.getAttribute("data-room");
+
+      mapRoomButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (room === "lobby") {
+        chapterMode = "all";
+        statusText.textContent = "Bạn đang ở Sảnh chính – luyện tập tổng hợp.";
+      } else if (room === "compare") {
+        chapterMode = "compare";
+        statusText.textContent = "Bạn đang ở Phòng So sánh.";
+      } else if (room === "add") {
+        chapterMode = "add";
+        statusText.textContent = "Bạn đang ở Phòng Cộng.";
+      } else if (room === "sub") {
+        chapterMode = "sub";
+        statusText.textContent = "Bạn đang ở Phòng Trừ.";
+      } else if (room === "forge") {
+        chapterMode = "all";
+        statusText.textContent = "🔨 Phòng Rèn vũ khí – trả lời đúng để rèn kiếm mạnh hơn!";
+      } else if (room === "bossTower") {
+        enterBossMode();
+        return;
+      }
+      if (currentQuestion) generateQuestion();
+    });
+
+    function updateSetupUi() {
+      if (progressionMode === "hero") {
+        choiceHeroBtn.classList.add("active");
+        choiceWeaponBtn.classList.remove("active");
+      } else {
+        choiceHeroBtn.classList.remove("active");
+        choiceWeaponBtn.classList.add("active");
+      }
+      weaponOptionBtns.forEach(btn => {
+        const w = btn.getAttribute("data-weapon");
+        if (w === selectedWeapon) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+    }
+
     startBtn.addEventListener("click", () => {
       startBtn.disabled = true;
       statusText.textContent = "Bắt đầu luyện tập! Hãy chinh phục các câu hỏi Toán nào.";
@@ -1336,47 +1652,67 @@ const sndLevelUp = new Audio("levelup.mp3");
     examBtn.addEventListener("click", toggleExamMode);
     endExamBtn.addEventListener("click", endExam);
 
-    skillDoubleBtn.addEventListener("click", () => useSkill("double"));
-    skillHintBtn.addEventListener("click", () => useSkill("hint"));
-    skillSkipBtn.addEventListener("click", () => useSkill("skip"));
+    versionSelect.addEventListener("change", applyVersionConfig);
 
-    closeModalBtn.addEventListener("click", closeModal);
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) closeModal();
-    });
-
-    versionSelect.addEventListener("change", () => {
-      applyVersionConfig();
-    });
-
-    chapterRow.addEventListener("click", (e) => {
+    document.getElementById("chapterRow").addEventListener("click", e => {
       const btn = e.target.closest(".chapter-btn");
       if (!btn) return;
-      const val = btn.getAttribute("data-chapter");
-      chapterMode = val;
-      chapterButtons().forEach((b) => b.classList.remove("active"));
+      chapterMode = btn.getAttribute("data-chapter");
+      Array.from(document.querySelectorAll(".chapter-btn")).forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      statusText.textContent =
-        val === "all"
-          ? "Đang luyện tập tổng hợp cả 3 dạng."
-          : val === "compare"
-          ? "Đang luyện dạng So sánh."
-          : val === "add"
-          ? "Đang luyện dạng Cộng."
-          : "Đang luyện dạng Trừ.";
+      if (chapterMode === "all") statusText.textContent = "Đang luyện tập tổng hợp 3 dạng.";
+      else if (chapterMode === "compare") statusText.textContent = "Đang luyện dạng So sánh.";
+      else if (chapterMode === "add") statusText.textContent = "Đang luyện dạng Cộng.";
+      else statusText.textContent = "Đang luyện dạng Trừ.";
       if (currentQuestion) generateQuestion();
     });
 
-    // ======== INIT ========
-    (function init() {
+    choiceHeroBtn.addEventListener("click", () => {
+      progressionMode = "hero";
+      updateSetupUi();
+      updateHeroUi();
+    });
+    choiceWeaponBtn.addEventListener("click", () => {
+      progressionMode = "weapon";
+      updateSetupUi();
+      updateHeroUi();
+    });
+    weaponOptionBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedWeapon = btn.getAttribute("data-weapon");
+        progressionMode = "weapon";
+        updateSetupUi();
+        updateHeroUi();
+      });
+    });
+    confirmSetupBtn.addEventListener("click", () => {
+      setupBackdrop.classList.add("hidden");
+      updateHeroUi();
+    });
+
+    changeModeLink.addEventListener("click", () => {
+      setupBackdrop.classList.remove("hidden");
+      updateSetupUi();
+    });
+
+    closeSummaryBtn.addEventListener("click", () => {
+      summaryBackdrop.classList.add("hidden");
+    });
+    summaryBackdrop.addEventListener("click", e => {
+      if (e.target === summaryBackdrop) summaryBackdrop.classList.add("hidden");
+    });
+
+    function init() {
       updateHeroUi();
       updateXpUi();
-      updateSkillUi();
       updateBossUnlock();
       applyVersionConfig();
-      // mặc định V4 cho phép bật / tắt chế độ kiểm tra
-      statusText.textContent = "Chọn phiên bản ở góc phải trên, sau đó Bắt đầu để chơi.";
-    })();
+      updateSetupUi();
+      updateQuestUi();
+      updateMapLocks();
+      statusText.textContent = "Chọn kiểu nâng cấp trong hộp thoại, sau đó Bắt đầu để chơi.";
+    }
+    init();
   </script>
 </body>
 </html>
