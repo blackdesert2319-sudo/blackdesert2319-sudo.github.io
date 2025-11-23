@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Caro Eye-Control – Điều khiển bằng ánh mắt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- WebGazer.js (dùng bản host công khai) -->
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Caro Eye-Control</h1>
+      <p class="subtitle">Điều khiển bàn cờ bằng ánh mắt (Webcam)</p>
+    </header>
+
+    <main class="app-main">
+      <!-- Thanh điều khiển bên trái -->
+      <section class="control-panel">
+        <div class="panel-block">
+          <h2>Cài đặt ván chơi</h2>
+          <div class="board-size-group">
+            <label>Kích thước bàn:</label>
+            <div class="btn-group">
+              <button class="btn size-btn active" data-size="3">3 x 3</button>
+              <button class="btn size-btn" data-size="4">4 x 4</button>
+              <button class="btn size-btn" data-size="5">5 x 5</button>
+            </div>
+          </div>
+
+          <div class="panel-row">
+            <label>Thời gian giữ mắt để chọn ô:</label>
+            <div class="slider-row">
+              <input id="dwellSlider" type="range" min="600" max="1800" step="100" value="1000" />
+              <span id="dwellLabel">1.0s</span>
+            </div>
+          </div>
+
+          <div class="panel-row">
+            <button id="startGameBtn" class="btn primary">BẮT ĐẦU</button>
+            <button id="resetGameBtn" class="btn ghost">Chơi lại</button>
+          </div>
+        </div>
+
+        <div class="panel-block">
+          <h2>Trạng thái</h2>
+          <p>Người chơi hiện tại: <span id="currentPlayerLabel" class="badge badge-x">X</span></p>
+          <p>Trạng thái trò chơi: <span id="gameStatusLabel">Đang chờ bắt đầu…</span></p>
+          <p>Eye tracking: <span id="trackingStatusLabel" class="badge badge-off">Chưa khởi động</span></p>
+          <p>Ô đang nhìn: <span id="gazeCellLabel">–</span></p>
+        </div>
+
+        <div class="panel-block small">
+          <h2>Hướng dẫn</h2>
+          <ol>
+            <li>Ngồi thẳng, để mặt trong khung webcam.</li>
+            <li>Bấm <strong>BẮT ĐẦU</strong> và nhìn vào giữa bàn cờ vài giây.</li>
+            <li>Nhìn vào ô bạn muốn đánh và giữ ~1 giây.</li>
+            <li>Ô được chọn sẽ sáng lên và đánh X/O tự động.</li>
+          </ol>
+          <p class="note">Gợi ý: hạn chế lắc đầu mạnh, ngồi cách màn hình ~50–70cm.</p>
+        </div>
+      </section>
+
+      <!-- Khu vực bàn cờ -->
+      <section class="board-section">
+        <div class="board-wrapper">
+          <div id="board" class="board size-3"></div>
+
+          <!-- Overlay kết quả -->
+          <div id="resultOverlay" class="overlay hidden">
+            <div class="overlay-content">
+              <h2 id="resultTitle">X thắng!</h2>
+              <p id="resultMessage">Nhấn “Chơi lại” để bắt đầu ván mới.</p>
+              <button id="overlayRestartBtn" class="btn primary">Chơi lại</button>
+            </div>
+          </div>
+
+          <!-- Con trỏ ánh mắt (chỉ để người xem thấy) -->
+          <div id="gazeCursor" class="gaze-cursor hidden"></div>
+        </div>
+
+        <!-- Khu webcam + debug -->
+        <div class="camera-panel">
+          <h2>Webcam</h2>
+          <p class="camera-note">Khung camera của WebGazer sẽ xuất hiện ở góc dưới bên phải màn hình.</p>
+          <label class="switch-row">
+            <input id="toggleCursorCheckbox" type="checkbox" checked />
+            <span>Hiện vòng tròn vị trí nhìn</span>
+          </label>
+          <label class="switch-row">
+            <input id="toggleMouseCheckbox" type="checkbox" />
+            <span>Cho phép chọn bằng chuột (dự phòng)</span>
+          </label>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Dự án demo: điều khiển cờ caro bằng ánh mắt – sử dụng WebGazer.js &amp; WebCam</span>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
