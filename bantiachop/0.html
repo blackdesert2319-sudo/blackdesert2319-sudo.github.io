@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy V6.2</title>
+  <title>Học viện Anh Hùng – Hero Academy V7.0</title>
   <style>
     * {
       box-sizing: border-box;
@@ -140,27 +140,21 @@
       background: radial-gradient(circle at top left, rgba(96,165,250,.35), rgba(15,23,42,.98));
       box-shadow: inset 0 0 40px rgba(15,23,42,.9);
       display:flex;
-      flex-direction:row;
+      flex-direction:column;
       gap:10px;
-      align-items:stretch;
+      align-items:center;
+      justify-content:center;
       overflow:hidden;
+      text-align:center;
     }
     .hero-main-row {
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:10px;
-      flex:0 0 60%;
       justify-content:center;
       text-align:center;
       position:relative;
-    }
-    .left-side-info{
-      flex:0 0 40%;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      justify-content:flex-start;
     }
 
     .hero-avatar {
@@ -171,17 +165,30 @@
       align-items:center;
       justify-content:center;
       font-size:190px;
-      background:#020617;
-      box-shadow: 0 0 40px rgba(15,23,42,1);
-      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
       position:relative;
       overflow:visible;
+      background:transparent;
+      box-shadow:none;
+    }
+    .hero-avatar::before {
+      content:"";
+      position:absolute;
+      left:50%;
+      top:60%;
+      transform:translate(-50%,-50%);
+      width:230px;
+      height:230px;
+      border-radius:999px;
+      background:#020617;
+      box-shadow:0 0 40px rgba(15,23,42,1);
     }
     .hero-avatar.level-up {
       transform:scale(1.06);
-      box-shadow:0 0 60px rgba(251,191,36,1);
+      transition: transform .2s ease, box-shadow .2s ease;
     }
     #heroEmoji {
+      position:relative;
+      z-index:2;
       filter: drop-shadow(0 0 13px rgba(59,130,246,.9));
     }
     .hero-name {
@@ -202,13 +209,14 @@
     .orbit-wrapper{
       position:absolute;
       left:50%;
-      top:50%;
+      top:60%;
       width:0;
       height:0;
       animation:orbit-spin 18s linear infinite;
       pointer-events:none;
       filter:blur(0.2px);
       mix-blend-mode:screen;
+      z-index:1;
     }
     .orbit-dot{
       position:absolute;
@@ -233,6 +241,7 @@
       opacity:0.9;
       mix-blend-mode:screen;
       animation:spark 1s ease-out forwards;
+      z-index:3;
     }
     @keyframes spark {
       from { transform:scale(0.4); opacity:0.9; }
@@ -583,70 +592,22 @@
       flex-direction:column;
       gap:6px;
     }
-    .skills-panel {
+
+    .academy-panel{
       border-radius:16px;
       padding:8px 10px;
-      background:radial-gradient(circle at top right, rgba(129,140,248,.4), rgba(15,23,42,.98));
+      background:radial-gradient(circle at top right, rgba(129,140,248,.35), rgba(15,23,42,.98));
       border:1px solid rgba(165,180,252,.9);
-    }
-    .skills-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size:13px;
-      margin-bottom:6px;
-    }
-    .skills-row {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .skill-card {
-      flex:1;
-      min-width:125px;
-      padding:6px 8px;
-      border-radius:12px;
-      border:1px solid rgba(191,219,254,.9);
-      background:rgba(15,23,42,.98);
-      font-size:11px;
-      cursor:pointer;
       display:flex;
       flex-direction:column;
-      gap:2px;
-      transition:transform .1s ease, box-shadow .1s ease, background .1s ease, border-color .1s ease;
-    }
-    .skill-card.disabled {
-      opacity:.45;
-      cursor:default;
-    }
-    .skill-card:hover:not(.disabled) {
-      transform:translateY(-1px);
-      box-shadow:0 0 12px rgba(129,140,248,1);
-      background:rgba(15,23,42,1);
-    }
-    .skill-label {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-weight:600;
-    }
-    .skill-desc { color:#c7d2fe; }
-    .skill-count { color:#bfdbfe; }
-    .skill-card.double { border-color:#bef264; }
-    .skill-card.hint { border-color:#6ee7b7; }
-    .skill-card.skip { border-color:#facc15; }
-    .active-skill-info {
-      font-size:11px;
-      color:#fef9c3;
-      margin-top:4px;
-      min-height:14px;
+      gap:6px;
     }
 
     .exam-row {
       display:flex;
       gap:8px;
       align-items:center;
-      margin-top:4px;
+      margin-top:2px;
     }
 
     .hidden { display:none !important; }
@@ -785,58 +746,6 @@
           <div id="heroPower" class="hero-power">Cấp vũ khí: 1 · Level 1</div>
           <div id="changeMode" class="change-mode-link">Đổi chế độ nâng cấp / rèn vũ khí</div>
         </div>
-
-        <div class="left-side-info">
-          <div class="map-panel">
-            <div class="map-title">🗺️ Bản đồ Học viện</div>
-            <div class="map-floor">
-              <span class="map-floor-label">Tầng 1</span>
-              <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
-              <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
-            </div>
-            <div class="map-floor">
-              <span class="map-floor-label">Tầng 2</span>
-              <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
-              <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
-            </div>
-            <div class="map-floor">
-              <span class="map-floor-label">Tầng 3</span>
-              <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
-              <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
-            </div>
-          </div>
-
-          <div class="quest-panel">
-            <div class="quest-title">🎯 Nhiệm vụ hiện tại</div>
-            <div id="questText">Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.</div>
-            <div id="questProgress">0 / 5</div>
-          </div>
-
-          <div id="chapterRow" class="chapter-row">
-            <span class="chapter-label">📚 Chọn nhiệm vụ nhanh:</span>
-            <button class="chapter-btn active" data-chapter="all">Tổng hợp</button>
-            <button class="chapter-btn" data-chapter="compare">So sánh</button>
-            <button class="chapter-btn" data-chapter="add">Cộng</button>
-            <button class="chapter-btn" data-chapter="sub">Trừ</button>
-          </div>
-
-          <div id="bossBox" class="boss-panel hidden">
-            <div class="boss-header-row">
-              <span class="boss-name">Boss Cuối Kỳ</span>
-              <span id="bossModeLabel">Chưa giao chiến</span>
-            </div>
-            <div class="boss-body-row">
-              <div class="boss-avatar">👹</div>
-              <div class="boss-hp-column">
-                <div id="bossHpFill" class="boss-hp-fill"></div>
-              </div>
-            </div>
-            <div class="boss-footer-row">
-              <span id="bossHpText">Máu Boss: 100 / 100</span>
-              <span id="heroHpText">HP Anh hùng: 3</span>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section class="right-side">
@@ -867,35 +776,56 @@
         </div>
 
         <div class="right-bottom">
-          <div class="skills-panel">
-            <div class="skills-header">
-              <span>🎴 Thẻ kỹ năng</span>
-              <span style="font-size:11px;color:#c7d2fe;">Mở dần khi lên cấp · Nhấn để dùng</span>
+          <div class="academy-panel">
+            <div class="map-panel">
+              <div class="map-title">🗺️ Sảnh Học viện</div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 1</span>
+                <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
+                <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
+              </div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 2</span>
+                <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
+                <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
+              </div>
+              <div class="map-floor">
+                <span class="map-floor-label">Tầng 3</span>
+                <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
+                <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
+              </div>
             </div>
-            <div class="skills-row">
-              <button id="skillDouble" class="skill-card double disabled">
-                <div class="skill-label">
-                  <span>🟦 Nhân đôi XP</span>
-                  <span id="skillDoubleCount" class="skill-count">x0</span>
-                </div>
-                <div class="skill-desc">Câu đúng kế tiếp được nhân đôi XP.</div>
-              </button>
-              <button id="skillHint" class="skill-card hint disabled">
-                <div class="skill-label">
-                  <span>🟩 Gợi ý</span>
-                  <span id="skillHintCount" class="skill-count">x0</span>
-                </div>
-                <div class="skill-desc">Hiện gợi ý cách làm cho câu đang làm.</div>
-              </button>
-              <button id="skillSkip" class="skill-card skip disabled">
-                <div class="skill-label">
-                  <span>🟨 Bỏ qua</span>
-                  <span id="skillSkipCount" class="skill-count">x0</span>
-                </div>
-                <div class="skill-desc">Bỏ câu khó, sang câu mới không bị phạt.</div>
-              </button>
+
+            <div class="quest-panel">
+              <div class="quest-title">🎯 Nhiệm vụ hiện tại</div>
+              <div id="questText">Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.</div>
+              <div id="questProgress">0 / 5</div>
             </div>
-            <div id="activeSkillInfo" class="active-skill-info"></div>
+
+            <div id="chapterRow" class="chapter-row">
+              <span class="chapter-label">📚 Chọn nhiệm vụ nhanh:</span>
+              <button class="chapter-btn active" data-chapter="all">Tổng hợp</button>
+              <button class="chapter-btn" data-chapter="compare">So sánh</button>
+              <button class="chapter-btn" data-chapter="add">Cộng</button>
+              <button class="chapter-btn" data-chapter="sub">Trừ</button>
+            </div>
+
+            <div id="bossBox" class="boss-panel hidden">
+              <div class="boss-header-row">
+                <span class="boss-name">Boss Cuối Kỳ</span>
+                <span id="bossModeLabel">Chưa giao chiến</span>
+              </div>
+              <div class="boss-body-row">
+                <div class="boss-avatar">👹</div>
+                <div class="boss-hp-column">
+                  <div id="bossHpFill" class="boss-hp-fill"></div>
+                </div>
+              </div>
+              <div class="boss-footer-row">
+                <span id="bossHpText">Máu Boss: 100 / 100</span>
+                <span id="heroHpText">HP Anh hùng: 3</span>
+              </div>
+            </div>
           </div>
 
           <div class="exam-row">
@@ -1184,6 +1114,7 @@
       return "Skill";
     }
     function updateSkillUi() {
+      if (!skillDoubleCountEl || !skillHintCountEl || !skillSkipCountEl) return;
       skillDoubleCountEl.textContent = "x" + (skillCounts.double || 0);
       skillHintCountEl.textContent   = "x" + (skillCounts.hint || 0);
       skillSkipCountEl.textContent   = "x" + (skillCounts.skip || 0);
@@ -1192,6 +1123,7 @@
       toggleSkillBtn(skillSkipBtn,   skillCounts.skip > 0);
     }
     function toggleSkillBtn(btn, enabled) {
+      if (!btn) return;
       if (enabled) btn.classList.remove("disabled");
       else btn.classList.add("disabled");
     }
@@ -1211,7 +1143,7 @@
         activeSkill = "double";
         skillCounts.double--;
         updateSkillUi();
-        activeSkillInfo.textContent = "🟦 Đang bật Nhân đôi XP cho câu trả lời đúng kế tiếp.";
+        if (activeSkillInfo) activeSkillInfo.textContent = "🟦 Đang bật Nhân đôi XP cho câu trả lời đúng kế tiếp.";
         statusText.textContent = "Nhân đôi XP đã sẵn sàng!";
       } else if (type === "hint") {
         if (!currentQuestion.hint) {
@@ -1432,16 +1364,30 @@
       const count = 14;
 
       for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radiusOuter = 60 + Math.random() * 40;
+        const x = cx + Math.cos(angle) * radiusOuter;
+        const y = cy + Math.sin(angle) * radiusOuter;
         const dot = document.createElement("div");
         dot.className = "spark-dot";
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 60 + Math.random() * 40;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
         dot.style.left = x + "px";
         dot.style.top = y + "px";
         leftHero.appendChild(dot);
-        setTimeout(() => { if (dot.parentNode) dot.parentNode.removeChild(dot); }, 1000);
+
+        // hạt trên bề mặt vũ khí (gần trung tâm hơn)
+        const radiusInner = Math.random() * 35;
+        const ix = cx + Math.cos(angle) * radiusInner;
+        const iy = cy + Math.sin(angle) * radiusInner;
+        const innerDot = document.createElement("div");
+        innerDot.className = "spark-dot";
+        innerDot.style.left = ix + "px";
+        innerDot.style.top = iy + "px";
+        leftHero.appendChild(innerDot);
+
+        setTimeout(() => {
+          if (dot.parentNode) dot.parentNode.removeChild(dot);
+          if (innerDot.parentNode) innerDot.parentNode.removeChild(innerDot);
+        }, 1000);
       }
     }
 
@@ -1507,10 +1453,12 @@
       hintBox.classList.add("hidden");
       hintBox.textContent = "";
       answersEl.innerHTML = "";
-      activeSkillInfo.textContent =
-        activeSkill === "double"
-          ? "🟦 Nhân đôi XP đang chờ câu trả lời đúng!"
-          : "";
+      if (activeSkillInfo) {
+        activeSkillInfo.textContent =
+          activeSkill === "double"
+            ? "🟦 Nhân đôi XP đang chờ câu trả lời đúng!"
+            : "";
+      }
 
       let type;
       if (chapterMode === "compare") type = "compare";
@@ -1616,7 +1564,7 @@
           let gain = baseXpPerCorrect;
           if (activeSkill === "double") {
             gain *= 2;
-            activeSkillInfo.textContent = "✅ Thẻ Nhân đôi XP đã được dùng.";
+            if (activeSkillInfo) activeSkillInfo.textContent = "✅ Thẻ Nhân đôi XP đã được dùng.";
             activeSkill = null;
           }
           correctCount++;
@@ -1631,7 +1579,7 @@
           updateQuestOnResult(true);
         } else {
           if (activeSkill === "double") {
-            activeSkillInfo.textContent = "❌ Câu sai, thẻ Nhân đôi XP bị mất.";
+            if (activeSkillInfo) activeSkillInfo.textContent = "❌ Câu sai, thẻ Nhân đôi XP bị mất.";
             activeSkill = null;
           }
           playSound(sndWrong);
@@ -1646,7 +1594,7 @@
           let damage = 20;
           if (activeSkill === "double") {
             damage *= 2;
-            activeSkillInfo.textContent = "🟦 Nhân đôi XP giúp đòn đánh mạnh hơn!";
+            if (activeSkillInfo) activeSkillInfo.textContent = "🟦 Nhân đôi XP giúp đòn đánh mạnh hơn!";
             activeSkill = null;
           }
           bossHp = Math.max(0, bossHp - damage);
@@ -1659,7 +1607,7 @@
           updateQuestOnResult(true);
         } else {
           if (activeSkill === "double") {
-            activeSkillInfo.textContent = "❌ Sai rồi, thẻ Nhân đôi XP bị mất.";
+            if (activeSkillInfo) activeSkillInfo.textContent = "❌ Sai rồi, thẻ Nhân đôi XP bị mất.";
             activeSkill = null;
           }
           heroHp = Math.max(0, heroHp - 1);
@@ -1810,9 +1758,9 @@
     examBtn.addEventListener("click", toggleExamMode);
     endExamBtn.addEventListener("click", endExam);
 
-    skillDoubleBtn.addEventListener("click", () => useSkill("double"));
-    skillHintBtn.addEventListener("click", () => useSkill("hint"));
-    skillSkipBtn.addEventListener("click", () => useSkill("skip"));
+    if (skillDoubleBtn) skillDoubleBtn.addEventListener("click", () => useSkill("double"));
+    if (skillHintBtn)   skillHintBtn.addEventListener("click", () => useSkill("hint"));
+    if (skillSkipBtn)   skillSkipBtn.addEventListener("click", () => useSkill("skip"));
 
     versionSelect.addEventListener("change", applyVersionConfig);
 
