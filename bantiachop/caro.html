@@ -21,7 +21,6 @@
       transition: background 0.4s ease;
     }
 
-    /* Đổi màu nền khi có người thắng */
     body.winner-x {
       background: radial-gradient(circle at top, #1d2a4a 0, #020617 50%, #020617 100%);
     }
@@ -143,11 +142,10 @@
     }
 
     button:active {
-      transform: translateY(1px) scale(0.98);
+      transform: translateY(0);
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
     }
 
-    /* Khu vực chính: người chơi 2 bên – bàn cờ ở giữa */
     .arena {
       position: relative;
       z-index: 1;
@@ -278,7 +276,6 @@
       50% { opacity: 0.5; text-shadow: 0 0 28px rgba(248, 250, 252, 1); }
     }
 
-    /* Player thắng – tô vàng */
     .player.win-celebrate {
       box-shadow:
         0 0 30px rgba(250, 204, 21, 0.9),
@@ -380,13 +377,14 @@
       opacity: 1;
     }
 
+    /* Khi nhấn – không cho scale nhỏ để tránh biến dạng */
     .cell:active {
-      transform: translateY(1px) scale(0.98);
+      transform: translateY(0);
       box-shadow:
         inset 0 0 0 1px rgba(75, 85, 99, 1),
         0 3px 8px rgba(0, 0, 0, 1),
         0 0 16px rgba(15, 23, 42, 1);
-      filter: brightness(0.9);
+      filter: brightness(0.95);
     }
 
     .cell.X {
@@ -401,6 +399,23 @@
       text-shadow:
         0 0 18px rgba(251, 113, 133, 1),
         0 0 32px rgba(251, 113, 133, 0.9);
+    }
+
+    /* Ô đã chọn: X xanh lá, O vàng/cam */
+    .cell.filled-x {
+      background: radial-gradient(circle at top, #16a34a 0%, #15803d 40%, #052e16 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(187, 247, 208, 0.9),
+        0 0 18px rgba(34, 197, 94, 0.9),
+        0 0 32px rgba(22, 163, 74, 0.9);
+    }
+
+    .cell.filled-o {
+      background: radial-gradient(circle at top, #facc15 0%, #f97316 45%, #7c2d12 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(254, 249, 195, 0.95),
+        0 0 18px rgba(251, 191, 36, 0.95),
+        0 0 32px rgba(248, 113, 113, 0.9);
     }
 
     .cell.disabled {
@@ -432,30 +447,28 @@
       100% { transform: scale(1.07); filter: brightness(1.25); }
     }
 
-    /* TẤT CẢ Ô NHẤP NHÁY KHI KẾT THÚC VÁN */
-    .board.blink-all .cell {
-      animation: blinkAllCells 0.4s alternate ease-in-out infinite;
+    /* Nhấp nháy nhiều màu – mỗi ô sẽ set màu riêng bằng biến CSS */
+    .cell.blink-multi {
+      animation: blinkMulti 0.42s alternate ease-in-out infinite;
     }
 
-    @keyframes blinkAllCells {
+    @keyframes blinkMulti {
       0% {
-        filter: brightness(1);
+        filter: brightness(0.6);
         box-shadow:
-          inset 0 0 0 1px rgba(148, 163, 184, 0.7),
-          0 8px 18px rgba(15, 23, 42, 1),
-          0 0 12px rgba(56, 189, 248, 0.4);
+          inset 0 0 0 1px rgba(31, 41, 55, 0.9),
+          0 6px 12px rgba(0, 0, 0, 1),
+          0 0 10px rgba(15, 23, 42, 1);
       }
       100% {
-        filter: brightness(1.6);
+        filter: brightness(1.9);
         box-shadow:
-          inset 0 0 0 1px rgba(248, 250, 252, 0.95),
-          0 10px 24px rgba(15, 23, 42, 1),
-          0 0 26px rgba(250, 204, 21, 0.9),
-          0 0 40px rgba(252, 211, 77, 0.9);
+          0 0 22px var(--blink-color, rgba(250, 204, 21, 0.9)),
+          0 0 40px var(--blink-color, rgba(250, 204, 21, 0.9)),
+          0 0 60px rgba(15, 23, 42, 1);
       }
     }
 
-    /* Hòa – lắc bàn cờ */
     .board.shake {
       animation: shakeDraw 0.4s ease-in-out;
     }
@@ -523,7 +536,6 @@
     </div>
 
     <div class="arena">
-      <!-- Người chơi bên trái -->
       <div class="player" id="playerX">
         <div class="name">ĐỨC QUANG</div>
         <div class="info-row">
@@ -533,12 +545,10 @@
         <div class="wins">Ván thắng: <span id="scoreX">0</span></div>
       </div>
 
-      <!-- Bàn cờ ở giữa -->
       <div class="board-wrap">
         <div id="board" class="board"></div>
       </div>
 
-      <!-- Người chơi bên phải -->
       <div class="player" id="playerO">
         <div class="name">BÁ TRỰC</div>
         <div class="info-row">
@@ -573,7 +583,7 @@
     const scoreXEl = document.getElementById("scoreX");
     const scoreOEl = document.getElementById("scoreO");
 
-    // Web Audio – tạo âm thanh
+    // Web Audio
     let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
@@ -599,23 +609,20 @@
       playTone(620, 90, "square", 0.14);
     }
 
-    // Nhạc chiến thắng – nhỏ gọn nhưng có cảm giác "win"
     function playVictoryMusic() {
       if (!audioCtx) return;
       const notes = [
-        { f: 523, d: 160 }, // C5
-        { f: 659, d: 160 }, // E5
-        { f: 784, d: 180 }, // G5
-        { f: 988, d: 220 }, // B5
-        { f: 1047, d: 260 } // C6
+        { f: 523, d: 160 },
+        { f: 659, d: 160 },
+        { f: 784, d: 180 },
+        { f: 988, d: 220 },
+        { f: 1047, d: 260 }
       ];
       let offset = 0;
       notes.forEach(n => {
         playTone(n.f, n.d, "triangle", 0.18, offset / 1000);
         offset += n.d - 40;
       });
-
-      // thêm chút "tail" sáng
       playTone(1319, 260, "sawtooth", 0.11, 0.8);
     }
 
@@ -638,7 +645,7 @@
       }
 
       gameOver = false;
-      boardEl.classList.remove("blink-all", "shake");
+      boardEl.classList.remove("shake");
       playerXEl.classList.remove("win-celebrate");
       playerOEl.classList.remove("win-celebrate");
       document.body.classList.remove("winner-x", "winner-o");
@@ -669,6 +676,11 @@
       boardState[index] = currentPlayer;
       cell.textContent = currentPlayer;
       cell.classList.add(currentPlayer);
+      if (currentPlayer === PLAYER_X.symbol) {
+        cell.classList.add("filled-x");
+      } else {
+        cell.classList.add("filled-o");
+      }
       playClickSound();
 
       const winInfo = checkWin();
@@ -690,10 +702,10 @@
     function checkWin() {
       const size = boardSize;
       const directions = [
-        { dr: 0, dc: 1 },   // ngang
-        { dr: 1, dc: 0 },   // dọc
-        { dr: 1, dc: 1 },   // chéo xuống phải
-        { dr: 1, dc: -1 }   // chéo xuống trái
+        { dr: 0, dc: 1 },
+        { dr: 1, dc: 0 },
+        { dr: 1, dc: 1 },
+        { dr: 1, dc: -1 }
       ];
 
       for (let index = 0; index < boardState.length; index++) {
@@ -755,7 +767,6 @@
       const winnerName = winnerSymbol === PLAYER_X.symbol ? PLAYER_X.name : PLAYER_O.name;
       msgEl.textContent = `${winnerName} thắng ván này với chuỗi 3 ô liên tiếp! 🎉`;
 
-      // Đổi màu nền + làm nổi player thắng
       if (winnerSymbol === PLAYER_X.symbol) {
         document.body.classList.add("winner-x");
         playerXEl.classList.add("win-celebrate");
@@ -766,15 +777,36 @@
         playerXEl.classList.remove("active");
       }
 
-      // Cho toàn bộ ô nhấp nháy neon ~4s
-      boardEl.classList.add("blink-all");
+      // Nhấp nháy nhiều màu – mỗi ô 1 màu & tốc độ khác nhau
+      const cells = boardEl.querySelectorAll(".cell");
+      const colors = [
+        "rgba(56, 189, 248, 0.95)", // xanh dương
+        "rgba(34, 197, 94, 0.95)",  // xanh lá
+        "rgba(250, 204, 21, 0.95)", // vàng
+        "rgba(251, 113, 133, 0.95)",// hồng
+        "rgba(129, 140, 248, 0.95)" // tím
+      ];
+      cells.forEach(cell => {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const duration = 0.3 + Math.random() * 0.45;   // ô nháy nhanh/chậm khác nhau
+        const delay = Math.random() * 0.35;
+        cell.classList.add("blink-multi");
+        cell.style.setProperty("--blink-color", color);
+        cell.style.animationDuration = duration + "s";
+        cell.style.animationDelay = delay + "s";
+      });
 
-      // Nhạc chiến thắng
       playVictoryMusic();
 
-      // Sau 4 giây thì reset bàn cờ – đổi người đi trước
+      // Sau ~4s reset bàn cờ & luân phiên người đi trước
       setTimeout(() => {
-        boardEl.classList.remove("blink-all");
+        cells.forEach(cell => {
+          cell.classList.remove("blink-multi");
+          cell.style.removeProperty("--blink-color");
+          cell.style.animationDuration = "";
+          cell.style.animationDelay = "";
+        });
+
         playerXEl.classList.remove("win-celebrate");
         playerOEl.classList.remove("win-celebrate");
         document.body.classList.remove("winner-x", "winner-o");
@@ -818,7 +850,6 @@
       msgEl.textContent = `Đến lượt: ${playerName} (${symbol}) – hãy chọn 1 ô trống.`;
     }
 
-    // Event listeners
     sizeSelect.addEventListener("change", () => {
       boardSize = parseInt(sizeSelect.value, 10);
       startingPlayer = PLAYER_X.symbol;
@@ -833,7 +864,6 @@
       msgEl.textContent = "Đã bắt đầu ván mới. ĐỨC QUANG (X) đi trước.";
     });
 
-    // Khởi tạo
     (function init() {
       createBoard();
       msgEl.textContent = "ĐỨC QUANG (X) đi trước. Hãy chọn 1 ô để bắt đầu!";
