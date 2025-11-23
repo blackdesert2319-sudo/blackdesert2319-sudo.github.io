@@ -25,11 +25,18 @@ const toggleCursorCheckbox = document.getElementById("toggleCursorCheckbox");
 const toggleMouseCheckbox = document.getElementById("toggleMouseCheckbox");
 const sizeButtons = Array.from(document.querySelectorAll(".size-btn"));
 
+// Huấn luyện
+const trainBtn = document.getElementById("trainBtn");
+const trainingOverlay = document.getElementById("trainingOverlay");
+const trainingDot = document.getElementById("trainingDot");
+const trainingStepText = document.getElementById("trainingStepText");
+const finishTrainingBtn = document.getElementById("finishTrainingBtn");
+
 // Thời gian giữ mắt để chọn ô (ms)
 let dwellThreshold = parseInt(dwellSlider.value, 10);
 
 // -------------------------------
-// Trạng thái eye-tracking
+// Trạng thái eye-tracking & huấn luyện
 // -------------------------------
 let trackingStarted = false;
 let allowMouseClick = false;
@@ -38,6 +45,21 @@ let allowMouseClick = false;
 let currentGazeCell = null;
 let gazeStartTime = 0;
 let gazeLocked = false;
+
+// Huấn luyện
+let isTraining = false;
+const trainingPoints = [
+  { x: 0.5, y: 0.5 }, // giữa
+  { x: 0.15, y: 0.15 },
+  { x: 0.85, y: 0.15 },
+  { x: 0.15, y: 0.85 },
+  { x: 0.85, y: 0.85 },
+  { x: 0.5, y: 0.15 },
+  { x: 0.5, y: 0.85 },
+  { x: 0.15, y: 0.5 },
+  { x: 0.85, y: 0.5 }
+];
+let trainingIndex = 0;
 
 // -------------------------------
 // Khởi tạo
@@ -90,7 +112,7 @@ function initBoard(size) {
 
   currentPlayer = "X";
   updateCurrentPlayerLabel();
-  gameStatusLabel.textContent = "Bàn cờ đã sẵn sàng. Bấm BẮT ĐẦU để kích hoạt theo dõi mắt.";
+  gameStatusLabel.textContent = "Bàn cờ đã sẵn sàng. Hãy huấn luyện rồi bấm BẮT ĐẦU để chơi bằng mắt.";
   gazeCellLabel.textContent = "–";
 }
 
@@ -215,10 +237,11 @@ function setupUIEvents() {
     });
   });
 
-  // Start game (kích hoạt eye tracking)
+  // Start game (kích hoạt eye tracking để chơi)
   startGameBtn.addEventListener("click", () => {
     resetGame();
     startTracking();
+    gameStatusLabel.textContent = "Đã kích hoạt theo dõi mắt. Nhìn vào các ô để chọn.";
   });
 
   resetGameBtn.addEventListener("click", () => {
@@ -246,6 +269,21 @@ function setupUIEvents() {
   toggleMouseCheckbox.addEventListener("change", () => {
     allowMouseClick = toggleMouseCheckbox.checked;
   });
+
+  // Nút HUẤN LUYỆN
+  trainBtn.addEventListener("click", () => {
+    startTracking();
+    startTraining();
+  });
+
+  trainingDot.addEventListener("click", () => {
+    if (!isTraining) return;
+    nextTrainingPoint();
+  });
+
+  finishTrainingBtn.addEventListener("click", () => {
+    stopTraining();
+  });
 }
 
 function updateDwellLabel() {
@@ -270,7 +308,12 @@ function setupWebGazer() {
     .setGazeListener(onGazeData)
     .saveDataAcrossSessions(false);
 
-  trackingStatusLabel.textContent = "Sẵn sàng. Bấm BẮT ĐẦU.";
+  // Cho phép WebGazer thu thập dữ liệu từ các lần click chuột
+  if (webgazer.addMouseEventListeners) {
+    webgazer.addMouseEventListeners();
+  }
+
+  trackingStatusLabel.textContent = "Sẵn sàng. Hãy bấm Huấn luyện trước.";
 }
 
 function startTracking() {
@@ -294,7 +337,6 @@ function startTracking() {
     }
   }
 
-  gameStatusLabel.textContent = "Đã kích hoạt theo dõi mắt. Nhìn vào các ô để chọn.";
   trackingStatusLabel.textContent = "Đang theo dõi";
   trackingStatusLabel.classList.remove("badge-off");
   trackingStatusLabel.classList.add("badge-on");
@@ -311,6 +353,12 @@ function onGazeData(data, timestamp) {
   const y = data.y;
 
   updateGazeCursorPosition(x, y);
+
+  // Nếu đang huấn luyện → chỉ hiển thị cursor, không xử lý chọn ô
+  if (isTraining) {
+    clearGazeCell();
+    return;
+  }
 
   const rect = boardEl.getBoundingClientRect();
   if (
@@ -389,6 +437,47 @@ function clearGazeCell() {
   gazeStartTime = 0;
   gazeLocked = false;
   gazeCellLabel.textContent = "–";
+}
+
+// -------------------------------
+// Chế độ HUẤN LUYỆN
+// -------------------------------
+function startTraining() {
+  isTraining = true;
+  trainingIndex = 0;
+  trainingOverlay.classList.remove("hidden");
+  moveTrainingDot();
+  gameStatusLabel.textContent = "Chế độ huấn luyện: nhìn vào chấm và click chuột vào đó.";
+}
+
+function moveTrainingDot() {
+  if (trainingIndex >= trainingPoints.length) {
+    trainingStepText.textContent = "Đã thu thập đủ 9 điểm. Bạn có thể nhấn 'Kết thúc huấn luyện'.";
+    trainingDot.style.display = "none";
+    return;
+  }
+
+  const p = trainingPoints[trainingIndex];
+  trainingDot.style.display = "block";
+
+  // Đặt chấm theo phần trăm trong vùng overlay (trùng với vùng bàn cờ)
+  trainingDot.style.left = (p.x * 100) + "%";
+  trainingDot.style.top = (p.y * 100) + "%";
+
+  trainingStepText.textContent =
+    `Bước ${trainingIndex + 1}/${trainingPoints.length}: Nhìn vào chấm vàng và click chuột vào đó.`;
+}
+
+function nextTrainingPoint() {
+  trainingIndex++;
+  moveTrainingDot();
+}
+
+function stopTraining() {
+  isTraining = false;
+  trainingOverlay.classList.add("hidden");
+  trainingDot.style.display = "none";
+  gameStatusLabel.textContent = "Huấn luyện xong. Bây giờ hãy bấm BẮT ĐẦU và thử chơi bằng mắt.";
 }
 
 // -------------------------------

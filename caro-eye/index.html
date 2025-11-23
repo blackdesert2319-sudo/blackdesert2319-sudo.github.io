@@ -37,8 +37,12 @@
             </div>
           </div>
 
-          <div class="panel-row">
+          <div class="panel-row btn-row">
             <button id="startGameBtn" class="btn primary">BẮT ĐẦU</button>
+            <button id="trainBtn" class="btn">Huấn luyện</button>
+          </div>
+
+          <div class="panel-row">
             <button id="resetGameBtn" class="btn ghost">Chơi lại</button>
           </div>
         </div>
@@ -54,10 +58,10 @@
         <div class="panel-block small">
           <h2>Hướng dẫn</h2>
           <ol>
-            <li>Ngồi thẳng, để mặt nằm gọn trong khung webcam.</li>
-            <li>Bấm <strong>BẮT ĐẦU</strong> và cho phép trình duyệt dùng camera.</li>
+            <li>Bấm <strong>Huấn luyện</strong>, nhìn theo chấm và click vào chấm ở 9 vị trí.</li>
+            <li>Sau khi huấn luyện xong, bấm <strong>BẮT ĐẦU</strong>.</li>
+            <li>Ngồi thẳng, để mặt trong khung webcam ở góc phải dưới.</li>
             <li>Nhìn vào ô bạn muốn đánh và giữ ~1 giây.</li>
-            <li>Ô được chọn sẽ sáng lên và đánh X/O tự động.</li>
           </ol>
           <p class="note">Gợi ý: hạn chế lắc đầu mạnh, ngồi cách màn hình ~50–70cm.</p>
         </div>
@@ -77,6 +81,16 @@
             </div>
           </div>
 
+          <!-- Overlay HUẤN LUYỆN -->
+          <div id="trainingOverlay" class="overlay hidden">
+            <div class="overlay-message">
+              <h2>Chế độ huấn luyện mắt</h2>
+              <p id="trainingStepText">Bước 1/9: Nhìn vào chấm và click chuột vào chấm.</p>
+              <button id="finishTrainingBtn" class="btn ghost small-btn">Kết thúc huấn luyện</button>
+            </div>
+            <div id="trainingDot" class="training-dot"></div>
+          </div>
+
           <!-- Con trỏ ánh mắt (chỉ để hiển thị vị trí nhìn) -->
           <div id="gazeCursor" class="gaze-cursor hidden"></div>
         </div>
@@ -85,7 +99,7 @@
         <div class="camera-panel">
           <h2>Webcam & tùy chọn</h2>
           <p class="camera-note">
-            Khi bấm <strong>BẮT ĐẦU</strong>, khung camera nhỏ sẽ xuất hiện ở góc dưới bên phải màn hình.
+            Khi bấm <strong>BẮT ĐẦU</strong> hoặc <strong>Huấn luyện</strong>, khung camera nhỏ sẽ xuất hiện ở góc dưới bên phải màn hình.
           </p>
           <label class="switch-row">
             <input id="toggleCursorCheckbox" type="checkbox" checked />
