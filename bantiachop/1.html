@@ -765,9 +765,11 @@
     const sndCorrect = new Audio();
     const sndWrong = new Audio();
     const sndLevelUp = new Audio();
-    sndCorrect.src = ""; // "correct.mp3"
-    sndWrong.src = "";   // "wrong.mp3"
-    sndLevelUp.src = ""; // "levelup.mp3"
+// Âm thanh (đặt correct.mp3, wrong.mp3, levelup.mp3 cùng thư mục với file HTML)
+const sndCorrect = new Audio("correct.mp3");
+const sndWrong   = new Audio("wrong.mp3");
+const sndLevelUp = new Audio("levelup.mp3");
+
 
     function playSound(audio) {
       if (!timerEnabled && version === 1) return; // bản 1 không cần âm cũng được
