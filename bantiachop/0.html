@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy V7.0</title>
+  <title>Học viện Anh Hùng – Hero Academy V7.1</title>
   <style>
     * {
       box-sizing: border-box;
@@ -135,7 +135,7 @@
 
     .left-hero {
       position: relative;
-      padding: 14px 12px;
+      padding: 14px 12px 40px;
       border-radius: 20px;
       background: radial-gradient(circle at top left, rgba(96,165,250,.35), rgba(15,23,42,.98));
       box-shadow: inset 0 0 40px rgba(15,23,42,.9);
@@ -159,10 +159,9 @@
 
     .hero-avatar {
       width:340px;
-      height:340px;
-      border-radius:999px;
+      height:260px;
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:center;
       font-size:190px;
       position:relative;
@@ -170,30 +169,45 @@
       background:transparent;
       box-shadow:none;
     }
-    .hero-avatar::before {
-      content:"";
+    /* Vòng tròn đen dưới vũ khí */
+    .hero-base-circle{
       position:absolute;
+      bottom:-60px;
       left:50%;
-      top:60%;
-      transform:translate(-50%,-50%);
+      transform:translateX(-50%);
       width:230px;
       height:230px;
       border-radius:999px;
       background:#020617;
       box-shadow:0 0 40px rgba(15,23,42,1);
-    }
-    .hero-avatar.level-up {
-      transform:scale(1.06);
-      transition: transform .2s ease, box-shadow .2s ease;
+      z-index:1;
     }
     #heroEmoji {
       position:relative;
       z-index:2;
       filter: drop-shadow(0 0 13px rgba(59,130,246,.9));
     }
+    .hero-avatar.level-up {
+      transform:scale(1.06);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
     .hero-name {
       font-size:20px;
       font-weight:700;
+      margin-top:26px;
+    }
+
+    .hero-footer{
+      position:absolute;
+      bottom:10px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      align-items:center;
+      text-align:center;
     }
     .hero-power {
       font-size:13px;
@@ -209,7 +223,7 @@
     .orbit-wrapper{
       position:absolute;
       left:50%;
-      top:60%;
+      top:65%;
       width:0;
       height:0;
       animation:orbit-spin 18s linear infinite;
@@ -740,9 +754,12 @@
       <section class="left-hero">
         <div class="hero-main-row">
           <div id="heroAvatar" class="hero-avatar">
+            <div class="hero-base-circle"></div>
             <span id="heroEmoji">🗡️</span>
           </div>
           <div id="heroName" class="hero-name">Kiếm gỗ</div>
+        </div>
+        <div class="hero-footer">
           <div id="heroPower" class="hero-power">Cấp vũ khí: 1 · Level 1</div>
           <div id="changeMode" class="change-mode-link">Đổi chế độ nâng cấp / rèn vũ khí</div>
         </div>
@@ -1128,41 +1145,6 @@
       else btn.classList.add("disabled");
     }
 
-    function useSkill(type) {
-      if (!currentQuestion) {
-        statusText.textContent = "Hãy bấm Bắt đầu trước đã.";
-        return;
-      }
-      if (answered && type !== "skip") {
-        statusText.textContent = "Câu này đã xong, dùng skill ở câu tiếp theo nhé.";
-        return;
-      }
-      if (skillCounts[type] <= 0) return;
-
-      if (type === "double") {
-        activeSkill = "double";
-        skillCounts.double--;
-        updateSkillUi();
-        if (activeSkillInfo) activeSkillInfo.textContent = "🟦 Đang bật Nhân đôi XP cho câu trả lời đúng kế tiếp.";
-        statusText.textContent = "Nhân đôi XP đã sẵn sàng!";
-      } else if (type === "hint") {
-        if (!currentQuestion.hint) {
-          statusText.textContent = "Câu này khá dễ, không cần gợi ý đâu!";
-        } else {
-          hintBox.textContent = "💡 " + currentQuestion.hint;
-          hintBox.classList.remove("hidden");
-          skillCounts.hint--;
-          updateSkillUi();
-          statusText.textContent = "Đã dùng thẻ Gợi ý.";
-        }
-      } else if (type === "skip") {
-        skillCounts.skip--;
-        updateSkillUi();
-        statusText.textContent = "🟨 Bạn đã bỏ qua câu này, không bị phạt.";
-        nextQuestion();
-      }
-    }
-
     function resetBoss() {
       bossMaxHp = 100;
       bossHp = bossMaxHp;
@@ -1228,12 +1210,6 @@
         b2.textContent = "Anh hùng Học viện";
         badgeRow.appendChild(b1);
         badgeRow.appendChild(b2);
-        if (quest.id === 3 && !quest.completed) {
-          quest.progress = 1;
-          quest.completed = true;
-          addSkill("skip", 1);
-          updateQuestUi();
-        }
       } else {
         modalTitle.textContent = "⚔️ Boss vẫn còn quá mạnh!";
         modalMessage.textContent = "Đừng buồn, hãy luyện thêm và thử lại nhé.";
@@ -1374,7 +1350,6 @@
         dot.style.top = y + "px";
         leftHero.appendChild(dot);
 
-        // hạt trên bề mặt vũ khí (gần trung tâm hơn)
         const radiusInner = Math.random() * 35;
         const ix = cx + Math.cos(angle) * radiusInner;
         const iy = cy + Math.sin(angle) * radiusInner;
@@ -1420,7 +1395,6 @@
       statusText.textContent = "⏱️ Hết giờ! Câu này coi như sai.";
       playSound(sndWrong);
       spawnFloatText("-1", "red");
-      updateQuestOnResult(false);
       if (examRunning) examTotal++;
 
       if (mode === "boss") {
@@ -1562,11 +1536,6 @@
       if (mode === "practice") {
         if (isCorrect) {
           let gain = baseXpPerCorrect;
-          if (activeSkill === "double") {
-            gain *= 2;
-            if (activeSkillInfo) activeSkillInfo.textContent = "✅ Thẻ Nhân đôi XP đã được dùng.";
-            activeSkill = null;
-          }
           correctCount++;
           correctCountEl.textContent = correctCount;
           gainXp(gain);
@@ -1578,10 +1547,6 @@
           if (examRunning) examCorrect++;
           updateQuestOnResult(true);
         } else {
-          if (activeSkill === "double") {
-            if (activeSkillInfo) activeSkillInfo.textContent = "❌ Câu sai, thẻ Nhân đôi XP bị mất.";
-            activeSkill = null;
-          }
           playSound(sndWrong);
           statusText.textContent = "❌ Chưa đúng, hãy thử câu tiếp theo!";
           spawnFloatText("-1", "red");
@@ -1592,11 +1557,6 @@
       } else if (mode === "boss") {
         if (isCorrect) {
           let damage = 20;
-          if (activeSkill === "double") {
-            damage *= 2;
-            if (activeSkillInfo) activeSkillInfo.textContent = "🟦 Nhân đôi XP giúp đòn đánh mạnh hơn!";
-            activeSkill = null;
-          }
           bossHp = Math.max(0, bossHp - damage);
           gainXp(baseXpPerCorrect);
           playSound(sndCorrect);
@@ -1604,17 +1564,11 @@
           spawnFloatText("-" + damage, "green");
           spawnSparkBurst();
           addOrbitDust(5);
-          updateQuestOnResult(true);
         } else {
-          if (activeSkill === "double") {
-            if (activeSkillInfo) activeSkillInfo.textContent = "❌ Sai rồi, thẻ Nhân đôi XP bị mất.";
-            activeSkill = null;
-          }
           heroHp = Math.max(0, heroHp - 1);
           playSound(sndWrong);
           statusText.textContent = "💥 Boss phản công! Bạn mất 1 HP.";
           spawnFloatText("-1 HP", "red");
-          updateQuestOnResult(false);
         }
         updateBossUi();
         if (bossHp <= 0) {
@@ -1642,7 +1596,6 @@
         if (isCorrect) quest.progress++;
         if (quest.progress >= quest.target && !quest.completed) {
           quest.completed = true;
-          addSkill("hint", 1);
           statusText.textContent = "🎯 Hoàn thành nhiệm vụ 1: 5 câu đúng!";
           quest = { id: 2, progress: 0, target: 3, completed: false, streak: 0 };
         }
@@ -1655,7 +1608,6 @@
         quest.progress = quest.streak;
         if (quest.progress >= quest.target && !quest.completed) {
           quest.completed = true;
-          addSkill("double", 1);
           statusText.textContent = "🔥 Hoàn thành nhiệm vụ 2: 3 câu đúng liên tiếp!";
           quest = { id: 3, progress: 0, target: 1, completed: false, streak: 0 };
         }
@@ -1815,7 +1767,6 @@
     function init() {
       updateHeroUi();
       updateXpUi();
-      updateSkillUi();
       updateBossUnlock();
       applyVersionConfig();
       updateSetupUi();
