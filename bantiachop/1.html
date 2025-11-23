@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hero Academy V2 – Timer & Sound</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #3b82f6 0, #0f172a 50%, #020617 100%);
+      color: #f9fafb;
+    }
+    .game-container {
+      width: min(1000px, 100vw - 24px);
+      padding: 16px 20px 20px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(15,23,42,0.94), rgba(15,23,42,0.98));
+      box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+      border: 1px solid rgba(148,163,184,0.5);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      text-align: center;
+      letter-spacing: .03em;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #cbd5f5;
+      margin-bottom: 12px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .level-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      color: #111827;
+      font-weight: 700;
+      font-size: 13px;
+      min-width: 80px;
+      text-align: center;
+    }
+    .xp-wrapper {
+      flex: 1;
+    }
+    .xp-label {
+      font-size: 11px;
+      margin-bottom: 2px;
+      color: #e5e7eb;
+    }
+    .xp-bar {
+      position: relative;
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.7);
+    }
+    .xp-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #22c55e, #4ade80, #a3e635);
+      transition: width 0.3s ease;
+    }
+    .xp-text {
+      font-size: 11px;
+      margin-top: 2px;
+      color: #cbd5f5;
+    }
+    .info-chip {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148,163,184,0.8);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.9);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .timer-chip {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: radial-gradient(circle, #f97316, #b91c1c);
+      border: 1px solid rgba(252,211,77,0.9);
+      color: #fef9c3;
+      min-width: 80px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .middle {
+      display: grid;
+      grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 800px) {
+      .middle {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-panel, .question-panel {
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.3), rgba(15,23,42,0.96));
+      border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    .hero-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      margin: 0 auto 8px;
+      box-shadow: 0 0 20px rgba(56,189,248,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .hero-avatar.stage-1 {
+      background: radial-gradient(circle, #1e293b, #020617);
+      box-shadow: 0 0 18px rgba(148,163,184,0.5);
+    }
+    .hero-avatar.stage-2 {
+      background: radial-gradient(circle, #22c55e, #064e3b);
+      box-shadow: 0 0 22px rgba(74,222,128,0.7);
+    }
+    .hero-avatar.stage-3 {
+      background: radial-gradient(circle, #38bdf8, #0f172a);
+      box-shadow: 0 0 24px rgba(56,189,248,0.9);
+    }
+    .hero-avatar.stage-4 {
+      background: radial-gradient(circle, #a855f7, #0b1120);
+      box-shadow: 0 0 28px rgba(217,70,239,0.95);
+    }
+    .hero-avatar.level-up {
+      transform: scale(1.05);
+    }
+
+    .hero-name {
+      text-align: center;
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .hero-power, .hero-extra {
+      text-align: center;
+      font-size: 12px;
+      color: #cbd5f5;
+    }
+
+    .mode-label {
+      font-size: 12px;
+      color: #e5e7eb;
+      opacity: 0.9;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .mode-tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0f172a;
+      background: linear-gradient(135deg, #22c55e, #a3e635);
+    }
+
+    .question-text {
+      margin-top: 4px;
+      font-size: 26px; /* chữ to hơn bản 1 */
+      font-weight: 700;
+      padding: 8px 10px 10px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.7);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .answers {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    .answer-btn {
+      padding: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.9);
+      background: rgba(15,23,42,0.95);
+      color: #f9fafb;
+      font-size: 20px; /* đáp án to rõ */
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+    .answer-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 12px rgba(59,130,246,0.65);
+      border-color: #60a5fa;
+      background: rgba(15,23,42,1);
+    }
+    .answer-btn.correct {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: #bbf7d0;
+      color: #052e16;
+      box-shadow: 0 0 15px rgba(34,197,94,0.9);
+    }
+    .answer-btn.wrong {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      border-color: #fecaca;
+      color: #fef2f2;
+      box-shadow: 0 0 12px rgba(248,113,113,0.9);
+    }
+    .answer-btn:disabled {
+      cursor: default;
+      opacity: 0.9;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .primary-btn, .secondary-btn {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+      white-space: nowrap;
+    }
+    .primary-btn {
+      background: linear-gradient(135deg, #3b82f6, #22c55e);
+      color: #0b1120;
+      box-shadow: 0 0 15px rgba(59,130,246,0.9);
+    }
+    .secondary-btn {
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.95);
+    }
+    .primary-btn:hover:not(:disabled),
+    .secondary-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 14px rgba(129,140,248,0.9);
+    }
+    .primary-btn:disabled,
+    .secondary-btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    .status-text {
+      font-size: 12px;
+      color: #e5e7eb;
+      flex: 1;
+      min-height: 18px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Học viện Anh Hùng – Hero Academy V2</h1>
+    <div class="subtitle">Toán lớp 1 · So sánh · Cộng – Trừ trong phạm vi 13 · Có timer & âm thanh</div>
+
+    <div class="top-bar">
+      <div class="level-badge" id="level-label">Cấp 1 · Học viên mới</div>
+      <div class="xp-wrapper">
+        <div class="xp-label">XP tri thức</div>
+        <div class="xp-bar">
+          <div class="xp-fill" id="xp-fill"></div>
+        </div>
+        <div class="xp-text" id="xp-text">0 / 50 XP</div>
+      </div>
+      <div class="info-chip">
+        ⭐ Đúng: <span id="correct-count" style="font-weight:600;margin-left:4px;">0</span> câu
+      </div>
+      <div class="timer-chip" id="timer-chip">⏱ 20s</div>
+    </div>
+
+    <div class="middle">
+      <div class="hero-panel">
+        <div id="hero-avatar" class="hero-avatar stage-1">🧒</div>
+        <div id="hero-name" class="hero-name">Học viên năm nhất</div>
+        <div id="hero-power" class="hero-power">Sức mạnh anh hùng: 1</div>
+        <div id="hero-extra" class="hero-extra">Trả lời đúng để tăng XP và lên cấp!</div>
+      </div>
+
+      <div class="question-panel">
+        <div class="mode-label">
+          <span>Chế độ hiện tại: <strong id="mode-text">Luyện tập</strong></span>
+          <span id="mode-tag" class="mode-tag">Practice</span>
+        </div>
+        <div id="question-text" class="question-text">
+          Nhấn <strong>“Bắt đầu”</strong> để vào Học viện Anh Hùng!
+        </div>
+        <div id="answer-buttons" class="answers"></div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button id="start-btn" class="primary-btn">🚀 Bắt đầu</button>
+      <button id="next-btn" class="secondary-btn" disabled>➡ Câu tiếp theo</button>
+      <div id="status-text" class="status-text"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- STATE ---
+    let level = 1;
+    let xp = 0;
+    const baseXpToLevel = 50;
+    let xpToNextLevel = baseXpToLevel;
+    const baseXpPerCorrect = 10;
+
+    let correctCount = 0;
+    let currentQuestion = null;
+    let questionAnswered = false;
+
+    // Timer
+    let timePerQuestion = 20; // giây
+    let timeLeft = timePerQuestion;
+    let timerId = null;
+
+    // --- DOM ---
+    const levelLabel = document.getElementById("level-label");
+    const xpFill = document.getElementById("xp-fill");
+    const xpText = document.getElementById("xp-text");
+    const correctCountSpan = document.getElementById("correct-count");
+
+    const heroAvatar = document.getElementById("hero-avatar");
+    const heroName = document.getElementById("hero-name");
+    const heroPower = document.getElementById("hero-power");
+    const heroExtra = document.getElementById("hero-extra");
+
+    const modeText = document.getElementById("mode-text");
+    const modeTag = document.getElementById("mode-tag");
+    const questionTextEl = document.getElementById("question-text");
+    const answerButtonsContainer = document.getElementById("answer-buttons");
+    const timerChip = document.getElementById("timer-chip");
+
+    const startBtn = document.getElementById("start-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const statusText = document.getElementById("status-text");
+
+    // --- SOUND (Web Audio) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(type) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === "correct") {
+        osc.frequency.value = 880; // cao
+      } else if (type === "wrong") {
+        osc.frequency.value = 220; // thấp
+      } else {
+        osc.frequency.value = 440;
+      }
+
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+
+    // --- UTIL ---
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // --- HERO / LEVEL ---
+    function updateLevelAndHero() {
+      levelLabel.textContent = `Cấp ${level} · ${getHeroTitle(level)}`;
+      heroPower.textContent = `Sức mạnh anh hùng: ${level}`;
+      heroName.textContent = getHeroTitle(level);
+      heroExtra.textContent =
+        level < 3
+          ? "Hãy trả lời đúng để tăng XP!"
+          : "Bạn ngày càng mạnh hơn, tiếp tục nhé!";
+
+      let stage = 1;
+      if (level >= 7) stage = 4;
+      else if (level >= 5) stage = 3;
+      else if (level >= 3) stage = 2;
+      heroAvatar.className = "hero-avatar stage-" + stage;
+      heroAvatar.textContent =
+        stage === 1 ? "🧒" : stage === 2 ? "🧙‍♂️" : stage === 3 ? "🦸‍♀️" : "🦸‍♂️";
+    }
+
+    function getHeroTitle(lv) {
+      if (lv <= 1) return "Học viên năm nhất";
+      if (lv === 2) return "Học viên chăm chỉ";
+      if (lv === 3) return "Học viên ưu tú";
+      if (lv === 4) return "Trợ giảng anh hùng";
+      if (lv === 5) return "Anh hùng năm cuối";
+      if (lv === 6) return "Siêu anh hùng học viện";
+      if (lv === 7) return "Huyền thoại Học viện";
+      if (lv >= 8) return "Đại Hiệp Sĩ Tri Thức";
+      return "Học viên";
+    }
+
+    function updateXpUi() {
+      const percent = Math.max(0, Math.min(100, (xp / xpToNextLevel) * 100));
+      xpFill.style.width = percent + "%";
+      xpText.textContent = `${xp} / ${xpToNextLevel} XP`;
+    }
+
+    function gainXp(amount) {
+      xp += amount;
+      let leveled = false;
+      while (xp >= xpToNextLevel) {
+        xp -= xpToNextLevel;
+        level++;
+        xpToNextLevel = baseXpToLevel + (level - 1) * 10;
+        leveled = true;
+      }
+      updateXpUi();
+      if (leveled) {
+        heroAvatar.classList.add("level-up");
+        setTimeout(() => heroAvatar.classList.remove("level-up"), 280);
+        statusText.textContent = `🎉 Bạn đã lên cấp ${level}!`;
+      }
+      updateLevelAndHero();
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+      stopTimer();
+      timeLeft = timePerQuestion;
+      updateTimerUi();
+      timerId = setInterval(() => {
+        timeLeft--;
+        updateTimerUi();
+        if (timeLeft <= 0) {
+          stopTimer();
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function updateTimerUi() {
+      timerChip.textContent = `⏱ ${timeLeft}s`;
+      if (timeLeft <= 5) {
+        timerChip.style.background = "radial-gradient(circle, #ef4444, #7f1d1d)";
+      } else {
+        timerChip.style.background = "radial-gradient(circle, #f97316, #b91c1c)";
+      }
+    }
+
+    function handleTimeout() {
+      if (!currentQuestion || questionAnswered) return;
+      questionAnswered = true;
+      playBeep("wrong");
+
+      const buttons = Array.from(
+        answerButtonsContainer.querySelectorAll(".answer-btn")
+      );
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === currentQuestion.correctIndex) {
+          btn.classList.add("correct");
+        }
+      });
+      statusText.textContent = "⏰ Hết giờ rồi! Hãy thử câu tiếp theo nhé.";
+      nextBtn.disabled = false;
+    }
+
+    // --- QUESTION GEN ---
+    function generateQuestion() {
+      questionAnswered = false;
+      answerButtonsContainer.innerHTML = "";
+      statusText.textContent = "";
+      // chọn ngẫu nhiên loại câu
+      const r = Math.random();
+      let q;
+      if (r < 0.4) q = genCompareQuestion();
+      else if (r < 0.75) q = genAddQuestion();
+      else q = genSubQuestion();
+      currentQuestion = q;
+      questionTextEl.textContent = q.text;
+
+      q.choices.forEach((choice, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = choice;
+        btn.addEventListener("click", () => handleAnswer(idx, btn));
+        answerButtonsContainer.appendChild(btn);
+      });
+
+      nextBtn.disabled = true;
+      startTimer();
+    }
+
+    function genCompareQuestion() {
+      let a = randInt(0, 13);
+      let b;
+      do {
+        b = randInt(0, 13);
+      } while (b === a);
+      const symbol = a > b ? ">" : "<";
+      const choices = shuffle([">", "<", "="]);
+      const correctIndex = choices.indexOf(symbol);
+      return {
+        type: "compare",
+        text: `Điền dấu >, < hoặc = :   ${a}  ?  ${b}`,
+        choices,
+        correctIndex
+      };
+    }
+
+    function genAddQuestion() {
+      let a = randInt(0, 9);
+      let maxB = 13 - a;
+      let b = randInt(0, maxB);
+      const result = a + b;
+      let choices = new Set([result]);
+      while (choices.size < 3) {
+        const delta = randInt(-2, 2);
+        const c = result + delta;
+        if (c < 0 || c > 13 || c === result) continue;
+        choices.add(c);
+      }
+      const arr = shuffle(Array.from(choices));
+      const correctIndex = arr.indexOf(result);
+      return {
+        type: "add",
+        text: `Tính:  ${a}  +  ${b}  =  ?`,
+        choices: arr.map(String),
+        correctIndex
+      };
+    }
+
+    function genSubQuestion() {
+      let a = randInt(0, 13);
+      let b = randInt(0, a);
+      const result = a - b;
+      let choices = new Set([result]);
+      while (choices.size < 3) {
+        const delta = randInt(-2, 2);
+        const c = result + delta;
+        if (c < 0 || c > 13 || c === result) continue;
+        choices.add(c);
+      }
+      const arr = shuffle(Array.from(choices));
+      const correctIndex = arr.indexOf(result);
+      return {
+        type: "sub",
+        text: `Tính:  ${a}  -  ${b}  =  ?`,
+        choices: arr.map(String),
+        correctIndex
+      };
+    }
+
+    // --- ANSWER ---
+    function handleAnswer(index, btn) {
+      if (questionAnswered) return;
+      questionAnswered = true;
+      stopTimer();
+
+      const buttons = Array.from(
+        answerButtonsContainer.querySelectorAll(".answer-btn")
+      );
+      const isCorrect = index === currentQuestion.correctIndex;
+
+      buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === currentQuestion.correctIndex) b.classList.add("correct");
+        if (i === index && !isCorrect) b.classList.add("wrong");
+      });
+
+      if (isCorrect) {
+        playBeep("correct");
+        correctCount++;
+        correctCountSpan.textContent = correctCount;
+        gainXp(baseXpPerCorrect);
+        statusText.textContent = `✅ Đúng rồi! Bạn nhận ${baseXpPerCorrect} XP.`;
+      } else {
+        playBeep("wrong");
+        statusText.textContent = "❌ Chưa đúng. Không sao, thử câu tiếp nhé!";
+      }
+
+      nextBtn.disabled = false;
+    }
+
+    // --- EVENTS ---
+    startBtn.addEventListener("click", async () => {
+      // unlock audio trên Safari/iOS
+      try {
+        await audioCtx.resume();
+      } catch (e) {}
+      startBtn.disabled = true;
+      modeText.textContent = "Luyện tập";
+      modeTag.textContent = "Practice";
+      statusText.textContent =
+        "Bắt đầu luyện tập! Mỗi câu có 20 giây, hãy trả lời thật nhanh nhé!";
+      generateQuestion();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!questionAnswered) return;
+      generateQuestion();
+    });
+
+    // --- INIT ---
+    updateLevelAndHero();
+    updateXpUi();
+    statusText.textContent = "Sẵn sàng vào Học viện Anh Hùng V2 chưa?";
+    updateTimerUi();
+  </script>
+</body>
+</html>
