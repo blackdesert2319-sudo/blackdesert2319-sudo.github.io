@@ -2,911 +2,1713 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Chiếc nón kỳ diệu – Phiên bản học tập</title>
+  <title>Chiếc nón kỳ diệu - Toán 11 - Quan hệ song song trong không gian</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    /* ==========================
+       RESET + CƠ BẢN
+       ========================== */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #2b1f5b, #050816);
-      color: #fff;
+      background: radial-gradient(circle at top, #243b6b 0, #0b1021 55%, #050712 100%);
+      color: #f9f9ff;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: stretch;
     }
-    .game-container {
-      max-width: 1200px;
+
+    .game-wrapper {
       width: 100%;
+      max-width: 1280px;
       padding: 16px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 8px;
-      font-size: 32px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #ffd84a;
-      text-shadow: 0 0 12px rgba(255, 216, 74, 0.8);
-    }
-    h2 {
-      text-align: center;
-      font-size: 18px;
-      color: #b8b8ff;
-      margin-bottom: 12px;
-    }
-
-    .top-row {
-      display: grid;
-      grid-template-columns: 2.2fr 1.4fr;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
-      margin-bottom: 12px;
     }
 
-    .card {
-      background: rgba(12, 12, 40, 0.95);
-      border-radius: 16px;
-      border: 1px solid rgba(135, 206, 250, 0.4);
-      padding: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    header {
+      text-align: center;
     }
-    .card-title {
-      font-weight: 600;
-      margin-bottom: 8px;
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffeaa7;
+      text-shadow: 0 0 8px rgba(255, 234, 167, 0.7);
+      margin-bottom: 4px;
+    }
+
+    header h2 {
       font-size: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #f0f4ff;
+      font-weight: 500;
+      color: #a5b4fc;
     }
 
-    /* Ô chữ bí mật */
-    .secret-phrase {
+    /* ==========================
+       SCOREBOARD – BẢNG ĐIỂM
+       ========================== */
+    .top-row {
       display: flex;
+      justify-content: center;
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .secret-letter {
-      width: 32px;
-      height: 42px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 20px;
-      font-weight: 600;
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-    }
-    .secret-letter.space {
-      border: none;
-      box-shadow: none;
-      background: transparent;
-      width: 18px;
-    }
-    .secret-letter.revealed {
-      background: linear-gradient(135deg, #ffd84a, #ff9f1c);
-      color: #1f2933;
-      border-color: #ffed9a;
-      text-shadow: none;
     }
 
-    .hint-text {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #cbd5ff;
+    .team-card {
+      min-width: 140px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.45));
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    /* Vùng nón + điều khiển */
-    .wheel-area {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 4px;
-      flex-wrap: wrap;
+    .team-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
     }
-    .wheel {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: conic-gradient(
-        #ff7a7a 0deg 60deg,
-        #ffd84a 60deg 120deg,
-        #7bf5ff 120deg 180deg,
-        #8cff7a 180deg 240deg,
-        #b88cff 240deg 300deg,
-        #ff9ff3 300deg 360deg
-      );
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    }
-    .wheel-inner {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(5, 6, 23, 0.95);
-      border: 3px solid rgba(255, 255, 255, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    .team-name {
+      font-size: 16px;
       font-weight: 700;
-      font-size: 20px;
-      color: #ffd84a;
+      margin-bottom: 4px;
+    }
+
+    .team-score {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .turn-indicator {
+      margin-top: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hiệu ứng highlight khi đội được cộng điểm */
+    @keyframes scorePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+      }
+      50% {
+        transform: scale(1.07);
+        box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+      }
+    }
+
+    .score-highlight {
+      animation: scorePulse 0.6s ease-out;
+    }
+
+    /* ==========================
+       LAYOUT GIỮA – VÒNG QUAY + CÂU HỎI
+       ========================== */
+    .middle-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .wheel-section,
+    .question-section {
+      flex: 1 1 320px;
+      min-width: 0;
+    }
+
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .question-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ==========================
+       VÒNG QUAY CHIẾC NÓN
+       ========================== */
+    .wheel-container {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.6);
+      /* 10 phần conic gradient cho đẹp mắt */
+      background: conic-gradient(
+        #ffeaa7 0deg 36deg,
+        #fab1a0 36deg 72deg,
+        #74b9ff 72deg 108deg,
+        #55efc4 108deg 144deg,
+        #fd79a8 144deg 180deg,
+        #ffeaa7 180deg 216deg,
+        #fab1a0 216deg 252deg,
+        #74b9ff 252deg 288deg,
+        #55efc4 288deg 324deg,
+        #fd79a8 324deg 360deg
+      );
+      position: relative;
+      transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .wheel-inner {
+      width: 40%;
+      height: 40%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #0b1021 0, #111827 60%, #020617 100%);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      font-size: 16px;
+      color: #ffeaa7;
       text-align: center;
       padding: 4px;
     }
+
+    /* Nhãn trên bánh xe */
+    .wheel-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
+      pointer-events: none;
+    }
+
+    /* Con trỏ ở phía trên để chỉ ô kết quả (chỉ mang tính minh họa) */
     .wheel-pointer {
       position: absolute;
-      top: -10px;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-bottom: 18px solid #fffb;
-    }
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 22px solid #ffeaa7;
+      filter: drop-shadow(0 0 4px rgba(255, 234, 167, 0.7));
     }
 
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 14px;
+    .spin-result {
       font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      color: #f9fafb;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.7);
-    }
-    button:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-    button.secondary {
-      background: linear-gradient(135deg, #6b7280, #4b5563);
-      box-shadow: 0 3px 10px rgba(31, 41, 55, 0.6);
-    }
-    button.danger {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      box-shadow: 0 3px 10px rgba(239, 68, 68, 0.6);
-    }
-    .label {
-      font-size: 13px;
-      color: #e5e7eb;
-    }
-    .points-display {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ffed9a;
+      margin-top: 5px;
+      min-height: 20px;
+      color: #d1fae5;
     }
 
-    /* Bảng điểm */
-    .teams-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .team-card {
-      border-radius: 14px;
-      padding: 8px;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(129, 140, 248, 0.1));
-      border: 1px solid rgba(129, 140, 248, 0.6);
-      cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
-    }
-    .team-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.9);
-    }
-    .team-card.active {
-      border-color: #facc15;
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
-      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(129, 140, 248, 0.15));
-    }
-    .team-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-      font-size: 14px;
-      color: #e5e7eb;
-    }
-    .team-name[contenteditable="true"] {
-      outline: none;
-      border-bottom: 1px dashed rgba(148, 163, 184, 0.6);
-      padding-bottom: 2px;
-    }
-    .team-score {
-      font-size: 20px;
-      font-weight: 700;
-      color: #facc15;
-    }
-    .team-label {
-      font-size: 11px;
-      color: #9ca3af;
-    }
-
-    /* Câu hỏi */
-    .bottom-row {
-      display: grid;
-      grid-template-columns: 2.2fr 1.2fr;
-      gap: 12px;
-    }
-    .question-text {
+    /* ==========================
+       CÂU HỎI – Ô CHỮ
+       ========================== */
+    .question-title {
       font-size: 16px;
-      margin-bottom: 8px;
-      line-height: 1.5;
-      min-height: 40px;
+      font-weight: 600;
+      color: #a5b4fc;
     }
-    .question-meta {
-      font-size: 13px;
-      color: #9ca3ff;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .answers {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-    .answer-btn {
-      text-align: left;
-      font-size: 14px;
-      padding: 8px 10px;
-      border-radius: 10px;
+
+    .question-board {
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 12px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.5);
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.8);
+      min-height: 80px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
     }
-    .answer-btn.correct {
+
+    .letter-box {
+      width: 28px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.9);
+      color: #f9fafb;
+      text-transform: uppercase;
+    }
+
+    .letter-box.hidden-letter {
+      color: transparent;
+    }
+
+    .letter-box.space-box {
+      border: none;
+      background: transparent;
+      width: 10px;
+    }
+
+    .letter-box.revealed {
+      animation: letterFadeIn 0.35s ease-out;
+    }
+
+    @keyframes letterFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.6);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .current-team-label {
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fef9c3;
+    }
+
+    /* ==========================
+       BÀN PHÍM CHỮ CÁI
+       ========================== */
+    .keyboard {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .key-button {
+      min-width: 32px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .key-button:hover {
+      transform: translateY(-1px) scale(1.05);
+      background: #1d4ed8;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+    }
+
+    .key-button:disabled {
+      cursor: default;
+      opacity: 0.4;
+      transform: none;
+      box-shadow: none;
+      background: rgba(30, 64, 175, 0.3);
+    }
+
+    /* ==========================
+       NÚT CHUNG
+       ========================== */
+    .btn-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .btn.primary {
       background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: #bbf7d0;
-      color: #ecfdf5;
+      border-color: rgba(74, 222, 128, 0.8);
+      color: #052e16;
+      font-weight: 700;
     }
-    .answer-btn.wrong {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      border-color: #fecaca;
-      color: #fee2e2;
+
+    .btn.warn {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border-color: rgba(251, 146, 60, 0.8);
+      color: #111827;
+      font-weight: 700;
     }
-    .question-footer {
+
+    .btn.settings {
+      background: rgba(30, 64, 175, 0.9);
+      border-color: rgba(129, 140, 248, 0.85);
+      color: #e5e7eb;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+    }
+
+    .btn:disabled {
+      cursor: default;
+      opacity: 0.45;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ==========================
+       GỢI Ý + GIẢI THÍCH + THÔNG BÁO
+       ========================== */
+    .bottom-row {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .panel {
+      flex: 1 1 240px;
+      min-width: 0;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 13px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #7dd3fc;
+    }
+
+    .panel-body {
+      font-size: 13px;
+      line-height: 1.4;
+      min-height: 36px;
+    }
+
+    .message-area {
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      min-height: 30px;
+      text-align: center;
+    }
+
+    /* ==========================
+       MODAL CÀI ĐẶT
+       ========================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 480px;
+      background: #020617;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+      padding: 14px 16px 12px;
+      color: #e5e7eb;
+    }
+
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      color: #9ca3af;
-      gap: 6px;
-      flex-wrap: wrap;
+      margin-bottom: 8px;
     }
 
-    .question-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #bfdbfe;
     }
-    .q-chip {
-      min-width: 28px;
-      padding: 4px 8px;
-      font-size: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      text-align: center;
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: #fca5a5;
+      font-size: 18px;
       cursor: pointer;
-      background: rgba(15, 23, 42, 0.9);
-      transition: background 0.1s, transform 0.1s;
-    }
-    .q-chip:hover {
-      transform: translateY(-1px);
-      background: rgba(55, 65, 81, 0.9);
-    }
-    .q-chip.used {
-      background: rgba(31, 41, 55, 0.9);
-      color: #9ca3af;
-      border-style: dashed;
-    }
-    .q-chip.active {
-      border-color: #facc15;
-      box-shadow: 0 0 8px rgba(250, 204, 21, 0.8);
     }
 
-    .small {
-      font-size: 12px;
-      color: #9ca3af;
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 60vh;
+      overflow-y: auto;
     }
 
-    @media (max-width: 900px) {
-      .top-row,
-      .bottom-row {
-        grid-template-columns: 1fr;
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .form-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 4px 8px;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.6);
+    }
+
+    .team-name-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .radio-row label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* ==========================
+       MODAL ĐOÁN ĐÁP ÁN
+       ========================== */
+    .answer-modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .answer-modal-body input {
+      width: 100%;
+    }
+
+    /* ==========================
+       RESPONSIVE
+       ========================== */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 20px;
       }
-      .teams-row {
-        grid-template-columns: repeat(2, 1fr);
+
+      .wheel-container {
+        width: 220px;
+        height: 220px;
       }
-      h1 {
-        font-size: 24px;
-      }
-      .wheel {
-        margin: 0 auto;
+
+      .letter-box {
+        width: 24px;
+        height: 32px;
+        font-size: 16px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <h1>Chiếc nón kỳ diệu – Phiên bản học tập</h1>
-    <h2>Toán 11 – Hình học không gian: Quan hệ song song</h2>
+  <div class="game-wrapper">
+    <header>
+      <h1>CHIẾC NÓN KỲ DIỆU – TOÁN 11</h1>
+      <h2>Chủ đề: Quan hệ song song trong không gian</h2>
+    </header>
 
-    <!-- HÀNG TRÊN: Ô CHỮ + NÓN + ĐIỀU KHIỂN + ĐỘI -->
+    <!-- Bảng điểm các đội -->
     <div class="top-row">
-      <div class="card">
-        <div class="card-title">
-          <span>Ô chữ bí mật</span>
-          <span class="small">Mỗi câu đúng → mở 2 chữ cái</span>
-        </div>
-        <div id="secretPhrase" class="secret-phrase"></div>
-        <div class="hint-text">
-          Gợi ý: Cụm từ liên quan đến <b>quan hệ song song trong không gian</b>.
-        </div>
+      <div id="scoreboard" class="scoreboard"></div>
+    </div>
 
-        <div class="wheel-area">
-          <div class="wheel" id="wheel">
-            <div class="wheel-pointer"></div>
-            <div class="wheel-inner" id="wheelPoints">
-              0<br /><span style="font-size:11px;">điểm</span>
-            </div>
-          </div>
-          <div class="controls">
-            <div class="label">Bước 1: Quay nón để lấy số điểm cho câu hỏi</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button id="spinBtn">🎡 Quay nón</button>
-              <button id="resetSpinBtn" class="secondary">↺ Về 0 điểm</button>
-              <button id="revealAllBtn" class="secondary">✨ Mở hết ô chữ</button>
-            </div>
-            <div class="label">
-              Điểm hiện tại của nón:
-              <span class="points-display" id="currentPointsText">0</span>
-            </div>
-            <div class="small">
-              Gợi ý sử dụng: Quay nón → chọn đội → chọn câu → học sinh trả lời → bấm vào đáp án.
-            </div>
+    <!-- Khu vực giữa: Vòng quay + Câu hỏi -->
+    <div class="middle-row">
+      <!-- VÒNG QUAY -->
+      <div class="wheel-section">
+        <div class="wheel-container">
+          <div class="wheel-pointer"></div>
+          <div id="wheel" class="wheel">
+            <div class="wheel-inner">CHIẾC<br />NÓN<br />KỲ DIỆU</div>
           </div>
         </div>
+        <div id="spinResult" class="spin-result"></div>
+        <button id="spinButton" class="btn primary">Quay nón</button>
       </div>
 
-      <div class="card">
-        <div class="card-title">
-          <span>Bảng điểm các đội</span>
-          <span class="small">Bấm vào thẻ đội để chọn đội đang trả lời</span>
+      <!-- CÂU HỎI + BÀN PHÍM -->
+      <div class="question-section">
+        <div class="question-title">
+          Câu hỏi thuộc chủ đề: <span id="questionTopic">Quan hệ song song trong không gian</span>
         </div>
-        <div class="teams-row" id="teams">
-          <div class="team-card" data-team="0">
-            <div class="team-name" contenteditable="true">Đội 1</div>
-            <div class="team-score" data-score>0</div>
-            <div class="team-label">Nhấn để chọn</div>
-          </div>
-          <div class="team-card" data-team="1">
-            <div class="team-name" contenteditable="true">Đội 2</div>
-            <div class="team-score" data-score>0</div>
-            <div class="team-label">Nhấn để chọn</div>
-          </div>
-          <div class="team-card" data-team="2">
-            <div class="team-name" contenteditable="true">Đội 3</div>
-            <div class="team-score" data-score>0</div>
-            <div class="team-label">Nhấn để chọn</div>
-          </div>
-          <div class="team-card" data-team="3">
-            <div class="team-name" contenteditable="true">Đội 4</div>
-            <div class="team-score" data-score>0</div>
-            <div class="team-label">Nhấn để chọn</div>
-          </div>
-        </div>
+        <div id="questionBoard" class="question-board"></div>
+        <div id="currentTeamLabel" class="current-team-label"></div>
+        <div id="keyboard" class="keyboard"></div>
       </div>
     </div>
 
-    <!-- HÀNG DƯỚI: CÂU HỎI + DANH SÁCH CÂU -->
-    <div class="bottom-row" style="margin-top:12px;">
-      <div class="card">
-        <div class="card-title">
-          <span>Khu vực câu hỏi</span>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button id="nextRandomQBtn" class="secondary">🎲 Câu ngẫu nhiên</button>
-            <button id="resetGameBtn" class="danger">🧹 Reset trò chơi</button>
-          </div>
+    <!-- HÀNG DƯỚI: NÚT + GỢI Ý + GIẢI THÍCH + THÔNG BÁO -->
+    <div class="bottom-row">
+      <div class="btn-row">
+        <button id="guessButton" class="btn warn">Đoán đáp án</button>
+        <button id="hintButton" class="btn">Hiện gợi ý</button>
+        <button id="newQuestionButton" class="btn">Câu mới</button>
+        <button id="resetScoresButton" class="btn">Đặt lại điểm</button>
+        <button id="settingsButton" class="btn settings">Cài đặt</button>
+      </div>
+
+      <div class="info-panels">
+        <div class="panel">
+          <div class="panel-title">Gợi ý</div>
+          <div id="hintText" class="panel-body"></div>
         </div>
-        <div class="question-meta">
-          <span id="questionInfo">Chưa chọn câu hỏi</span>
-          <span id="questionPoints">Điểm câu này: theo nón quay</span>
-        </div>
-        <div class="question-text" id="questionText">
-          Bấm vào một số câu hỏi ở khung bên phải hoặc chọn <b>Câu ngẫu nhiên</b> để bắt đầu.
-        </div>
-        <div class="answers" id="answersArea"></div>
-        <div class="question-footer">
-          <span id="answerStatus">Trạng thái: Chưa trả lời</span>
-          <span class="small">Đáp án đúng sẽ tự tô xanh, sai sẽ tô đỏ.</span>
+        <div class="panel">
+          <div class="panel-title">Giải thích kiến thức</div>
+          <div id="explanationText" class="panel-body"></div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">
-          <span>Danh sách câu hỏi</span>
-          <span class="small">Bấm số để chuyển tới câu tương ứng</span>
+      <div id="messageArea" class="message-area"></div>
+    </div>
+  </div>
+
+  <!-- MODAL CÀI ĐẶT GIÁO VIÊN -->
+  <div id="settingsModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Cài đặt trò chơi</h3>
+        <button class="modal-close" id="closeSettings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="teamCountSelect">Số đội chơi:</label>
+          <select id="teamCountSelect">
+            <option value="2">2 đội</option>
+            <option value="3" selected>3 đội</option>
+            <option value="4">4 đội</option>
+          </select>
         </div>
-        <div class="question-list" id="questionList"></div>
-        <div class="hint-text" style="margin-top:8px;">
-          Gợi ý tổ chức:
-          <ul style="margin-left:16px; margin-top:4px; font-size:12px; color:#cbd5ff; line-height:1.4;">
-            <li>Bước 1: Chọn đội đang trả lời.</li>
-            <li>Bước 2: Quay nón để lấy điểm.</li>
-            <li>Bước 3: Chọn câu hỏi → học sinh trả lời.</li>
-            <li>Bước 4: Giáo viên bấm vào đáp án mà đội chọn.</li>
-          </ul>
+
+        <div class="form-group">
+          <label>Tên các đội:</label>
+          <div id="teamNameInputs" class="team-name-inputs">
+            <!-- Sẽ được JS render input cho từng đội -->
+          </div>
         </div>
+
+        <div class="form-group">
+          <label>Chế độ chọn câu hỏi:</label>
+          <div class="radio-row">
+            <label>
+              <input type="radio" name="questionMode" value="ordered" checked />
+              Theo thứ tự danh sách
+            </label>
+            <label>
+              <input type="radio" name="questionMode" value="random" />
+              Ngẫu nhiên (trộn câu)
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Ghi chú cho giáo viên:</label>
+          <div style="font-size: 12px; color: #9ca3af;">
+            - Sau khi nhấn "Áp dụng", điểm vẫn giữ nguyên (trừ khi bạn bấm "Đặt lại điểm").<br />
+            - Bạn có thể thay tên đội để dùng cho các lớp khác nhau.<br />
+            - Câu hỏi sẽ tự động xoay vòng khi hết, vẫn cùng chủ đề "song song trong không gian".
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="applySettings" class="btn primary">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ĐOÁN ĐÁP ÁN -->
+  <div id="answerModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Đoán đáp án đầy đủ</h3>
+        <button class="modal-close" id="closeAnswerModal">&times;</button>
+      </div>
+      <div class="modal-body answer-modal-body">
+        <div class="form-group">
+          <label for="fullAnswerInput">Nhập đáp án (không phân biệt dấu, hoa/thường):</label>
+          <input id="fullAnswerInput" type="text" placeholder="Ví dụ: Hai mặt phẳng song song" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelAnswerBtn" class="btn">Hủy</button>
+        <button id="submitAnswerBtn" class="btn primary">Xác nhận</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ================= CẤU HÌNH Ô CHỮ BÍ MẬT =================
-    const SECRET_PHRASE = "SONG SONG TRONG KHÔNG GIAN"; // Bạn có thể đổi cụm này nếu muốn
-    const REVEAL_PER_CORRECT = 2;
-
-    // ================= NGÂN HÀNG CÂU HỎI =================
-    // Chủ đề: Quan hệ song song trong không gian – Toán 11
+    // ============================================================
+    // 1. NGÂN HÀNG CÂU HỎI – CHỦ ĐỀ QUAN HỆ SONG SONG TRONG KHÔNG GIAN
+    //  - dapAn: Dùng chữ HOA, không dấu để dễ xử lý logic.
+    //  - display: Cách viết đẹp có dấu để hiện trong phần giải thích (nếu cần).
+    // ============================================================
     const questions = [
       {
-        id: 1,
-        text: "Trong không gian, hai đường thẳng a và b được gọi là song song khi nào?",
-        choices: [
-          "a và b không có điểm chung nào.",
-          "a và b cùng nằm trong một mặt phẳng và không cắt nhau.",
-          "a và b vuông góc với cùng một đường thẳng.",
-          "a và b chéo nhau."
-        ],
-        correctIndex: 1
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hai đường thẳng song song",
+        dapAn: "HAI DUONG THANG SONG SONG",
+        goiY: "Hai đường không đồng phẳng và có cùng hướng chiếu song song.",
+        giaiThich:
+          "Hai đường thẳng song song trong không gian là hai đường thẳng cùng nằm trong một mặt phẳng và không có điểm chung."
       },
       {
-        id: 2,
-        text: "Mệnh đề nào sau đây đúng?",
-        choices: [
-          "Nếu hai đường thẳng song song thì chúng luôn nằm trong hai mặt phẳng song song.",
-          "Nếu hai đường thẳng cùng song song với một đường thẳng thứ ba thì chúng song song với nhau.",
-          "Nếu hai đường thẳng không có điểm chung thì luôn song song.",
-          "Nếu hai đường thẳng cùng vuông góc với một đường thẳng thứ ba thì chúng song song."
-        ],
-        correctIndex: 1
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hai mặt phẳng song song",
+        dapAn: "HAI MAT PHANG SONG SONG",
+        goiY: "Hai mặt phẳng không có điểm chung và không cắt nhau.",
+        giaiThich:
+          "Hai mặt phẳng được gọi là song song nếu chúng không có điểm chung nào hoặc trùng nhau. Trong không gian, ta thường xét hai mặt phẳng phân biệt không có điểm chung."
       },
       {
-        id: 3,
-        text: "Cho hình hộp chữ nhật ABCD.A'B'C'D'. Khẳng định nào sau đây đúng?",
-        choices: [
-          "AB ∥ BC",
-          "AB ∥ A'D'",
-          "(ABCD) ∥ (A'B'C'D')",
-          "AC ∥ B'D"
-        ],
-        correctIndex: 2
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Đường thẳng song song với mặt phẳng",
+        dapAn: "DUONG THANG SONG SONG VOI MAT PHANG",
+        goiY: "Đường thẳng không nằm trong mặt phẳng nhưng không có điểm chung với mặt phẳng.",
+        giaiThich:
+          "Đường thẳng d song song với mặt phẳng (P) nếu d không nằm trong (P) và không cắt (P). Lúc đó, mọi điểm trên d đều cách (P) một khoảng không đổi."
       },
       {
-        id: 4,
-        text: "Cho hình hộp chữ nhật ABCD.A'B'C'D'. Khi đó đường thẳng AB song song với đường thẳng nào sau đây?",
-        choices: [
-          "AD",
-          "A'B'",
-          "AA'",
-          "AC"
-        ],
-        correctIndex: 1
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Tiên đề về hai đường thẳng song song",
+        dapAn: "TIEN DE VE HAI DUONG THANG SONG SONG",
+        goiY: "Trong một mặt phẳng, qua một điểm ngoài một đường thẳng chỉ có duy nhất một đường thẳng song song.",
+        giaiThich:
+          "Tiên đề Ơ-clit về song song: Trong một mặt phẳng, qua một điểm nằm ngoài một đường thẳng cho trước chỉ có duy nhất một đường thẳng song song với đường thẳng đó."
       },
       {
-        id: 5,
-        text: "Trong không gian, dấu hiệu nào sau đây là đúng để (α) ∥ (β)?",
-        choices: [
-          "Có một đường thẳng thuộc (α) song song với một đường thẳng thuộc (β).",
-          "Có một điểm chung giữa (α) và (β).",
-          "Có một đường thẳng thuộc (α) vuông góc với một đường thẳng thuộc (β).",
-          "Có hai điểm bất kỳ của (α) nằm trên (β)."
-        ],
-        correctIndex: 0
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Dấu hiệu nhận biết hai mặt phẳng song song",
+        dapAn: "DAU HIEU NHAN BIET HAI MAT PHANG SONG SONG",
+        goiY: "Dựa vào các cặp đường thẳng tương ứng song song nằm trên hai mặt phẳng.",
+        giaiThich:
+          "Nếu hai mặt phẳng chứa hai cặp đường thẳng lần lượt song song với nhau, và các đường thẳng đó không song song cùng một lúc, thì hai mặt phẳng song song với nhau."
       },
       {
-        id: 6,
-        text: "Cho (α) ∥ (β) và d ⊂ (α). Khẳng định nào sau đây đúng?",
-        choices: [
-          "d song song với (β).",
-          "d vuông góc với (β).",
-          "d nằm trong (β).",
-          "d chéo với (β)."
-        ],
-        correctIndex: 0
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Tứ diện",
+        dapAn: "TU DIEN",
+        goiY: "Khối đa diện có bốn đỉnh và bốn mặt là các tam giác.",
+        giaiThich:
+          "Tứ diện là khối đa diện được tạo bởi bốn điểm không cùng nằm trong một mặt phẳng. Mỗi mặt là một tam giác, và không có cặp mặt nào song song."
       },
       {
-        id: 7,
-        text: "Cho hai mặt phẳng (α) và (β) cùng song song với một mặt phẳng (γ). Khi đó:",
-        choices: [
-          "(α) ∥ (β).",
-          "(α) trùng (β).",
-          "(α) cắt (β).",
-          "Không kết luận được gì."
-        ],
-        correctIndex: 0
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hình lăng trụ",
+        dapAn: "HINH LANG TRU",
+        goiY: "Hai đáy song song và bằng nhau, các cạnh bên song song.",
+        giaiThich:
+          "Hình lăng trụ là khối đa diện có hai đáy là hai đa giác bằng nhau và nằm trong hai mặt phẳng song song, các cạnh bên song song và bằng nhau."
       },
       {
-        id: 8,
-        text: "Cho hình chóp S.ABCD có đáy ABCD là hình bình hành. Khẳng định nào đúng?",
-        choices: [
-          "AB ∥ CD và AD ∥ BC.",
-          "AB ∥ BC và CD ∥ AD.",
-          "AB ∥ AC và CD ∥ BD.",
-          "Tất cả các cạnh bên đều song song nhau."
-        ],
-        correctIndex: 0
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hình hộp chữ nhật",
+        dapAn: "HINH HOP CHU NHAT",
+        goiY: "Mỗi mặt là một hình chữ nhật, các cạnh song song từng cặp.",
+        giaiThich:
+          "Hình hộp chữ nhật là hình lăng trụ có đáy là hình chữ nhật, các mặt bên cũng là hình chữ nhật. Các cặp cạnh đối diện song song và bằng nhau."
       },
       {
-        id: 9,
-        text: "Cho hình hộp ABCD.A'B'C'D'. Khẳng định nào sau đây sai?",
-        choices: [
-          "AB ∥ CD.",
-          "AD ∥ BC.",
-          "AB ∥ A'B'.",
-          "AB ∥ AC."
-        ],
-        correctIndex: 3
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Các cặp cạnh song song trong hình lập phương",
+        dapAn: "CAC CAP CANH SONG SONG TRONG HINH LAP PHUONG",
+        goiY: "Mỗi cạnh có ba cạnh song song với nó.",
+        giaiThich:
+          "Trong hình lập phương, mỗi cạnh song song với ba cạnh khác. Các cạnh được chia thành bốn nhóm song song, mỗi nhóm gồm ba cạnh."
       },
       {
-        id: 10,
-        text: "Trong không gian, khẳng định nào sau đây đúng?",
-        choices: [
-          "Có thể có ba đường thẳng đôi một song song nhưng không cùng nằm trong một mặt phẳng.",
-          "Nếu hai đường thẳng song song thì chỉ có một mặt phẳng chứa cả hai.",
-          "Nếu hai đường thẳng chéo nhau thì luôn có một mặt phẳng chứa chúng.",
-          "Hai mặt phẳng phân biệt luôn cắt nhau."
-        ],
-        correctIndex: 1
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Góc giữa hai đường thẳng",
+        dapAn: "GOC GIUA HAI DUONG THANG",
+        goiY: "Được đo bởi góc tạo bởi các véc tơ chỉ phương.",
+        giaiThich:
+          "Góc giữa hai đường thẳng trong không gian được định nghĩa là góc giữa hai véc tơ chỉ phương của chúng, nằm trong khoảng từ 0° đến 90°."
       },
       {
-        id: 11,
-        text: "Cho a ∥ b và b ∥ c. Mệnh đề nào đúng?",
-        choices: [
-          "a chéo c.",
-          "a ∥ c.",
-          "a vuông góc c.",
-          "Không kết luận được."
-        ],
-        correctIndex: 1
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Góc giữa đường thẳng và mặt phẳng",
+        dapAn: "GOC GIUA DUONG THANG VA MAT PHANG",
+        goiY: "Được đo bởi góc giữa đường thẳng và hình chiếu của nó.",
+        giaiThich:
+          "Góc giữa đường thẳng d và mặt phẳng (P) là góc giữa d và hình chiếu vuông góc của d lên (P), nằm trong khoảng từ 0° đến 90°."
       },
       {
-        id: 12,
-        text: "Để chứng minh đường thẳng d song song với mặt phẳng (P), ta thường dùng cách nào?",
-        choices: [
-          "Chứng minh d vuông góc với một đường thẳng trong (P).",
-          "Chứng minh d có một điểm chung với (P).",
-          "Chứng minh d song song với một đường thẳng nằm trong (P).",
-          "Chứng minh d nằm trong (P)."
-        ],
-        correctIndex: 2
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hình chiếu song song",
+        dapAn: "HINH CHIEU SONG SONG",
+        goiY: "Các tia chiếu song song với nhau.",
+        giaiThich:
+          "Hình chiếu song song của một hình lên một mặt phẳng được tạo bởi các tia chiếu song song với nhau, giúp bảo toàn tính song song của các đoạn thẳng."
+      },
+      {
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Phương trình mặt phẳng song song",
+        dapAn: "PHUONG TRINH MAT PHANG SONG SONG",
+        goiY: "Có véc tơ pháp tuyến cùng phương, chỉ khác hệ số tự do.",
+        giaiThich:
+          "Hai mặt phẳng song song có cùng véc tơ pháp tuyến. Nếu (P): ax + by + cz + d = 0, thì mặt phẳng song song với (P) có dạng: ax + by + cz + d' = 0, với d' ≠ d."
+      },
+      {
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Khối hộp chung đáy",
+        dapAn: "KHOI HOP CHUNG DAY",
+        goiY: "Hai hình hộp có đáy trùng nhau, các cạnh bên song song.",
+        giaiThich:
+          "Khối hộp chung đáy thường dùng trong bài toán thể tích, khi hai khối hộp có chung đáy và các cạnh bên song song, giúp ta so sánh thể tích theo chiều cao."
+      },
+      {
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Đường thẳng song song với một cạnh của tam giác",
+        dapAn: "DUONG THANG SONG SONG VOI MOT CANH CUA TAM GIAC",
+        goiY: "Giúp tạo ra tam giác đồng dạng trong mặt phẳng.",
+        giaiThich:
+          "Nếu một đường thẳng song song với một cạnh của tam giác và cắt hai cạnh còn lại, thì nó tạo ra một tam giác nhỏ đồng dạng với tam giác ban đầu."
+      },
+      {
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hình lăng trụ đứng",
+        dapAn: "HINH LANG TRU DUNG",
+        goiY: "Các cạnh bên vuông góc với hai đáy song song.",
+        giaiThich:
+          "Hình lăng trụ đứng là hình lăng trụ có các cạnh bên vuông góc với mặt phẳng đáy. Khi đó, diện tích xung quanh dễ tính bằng chu vi đáy nhân với chiều cao."
+      },
+      {
+        chuDe: "Quan hệ song song trong không gian",
+        display: "Hình hộp chữ nhật có đáy chung",
+        dapAn: "HINH HOP CHU NHAT CO DAY CHUNG",
+        goiY: "Dùng trong các bài toán chia thể tích theo tỉ lệ chiều cao.",
+        giaiThich:
+          "Khi nhiều hình hộp chữ nhật có chung đáy và chiều cao tỷ lệ nhau, thể tích của chúng tỷ lệ với chiều cao tương ứng theo tính chất V = Sđáy × h."
       }
     ];
 
-    // ================== BIẾN TRẠNG THÁI ==================
-    let revealed = [];
-    let currentSpinPoints = 0;
-    let currentQuestionIndex = null; // index trong mảng questions, không phải id
-    let usedQuestionIndices = new Set();
-    let currentTeam = null;
-    let isSpinAnimating = false;
+    // ============================================================
+    // 2. CẤU HÌNH VÒNG QUAY “CHIẾC NÓN KỲ DIỆU”
+    //  - Mỗi phần tử tương ứng một ô trên bánh xe.
+    // ============================================================
+    const wheelItems = [
+      "10",
+      "20",
+      "30",
+      "40",
+      "50",
+      "100",
+      "MẤT LƯỢT",
+      "NHÂN ĐÔI ĐIỂM",
+      "CHIA ĐIỂM CHO ĐỘI KHÁC",
+      "THÊM GỢI Ý"
+    ];
 
-    // ================== KHỞI TẠO Ô CHỮ ==================
-    const secretPhraseContainer = document.getElementById("secretPhrase");
+    // ============================================================
+    // 3. TRẠNG THÁI TRÒ CHƠI
+    // ============================================================
+    let teams = [];
+    let currentTeamIndex = 0;
+    let questionOrder = []; // Mảng lưu thứ tự câu hỏi
+    let questionPointer = 0; // Con trỏ trong questionOrder
+    let questionMode = "ordered"; // "ordered" hoặc "random"
 
-    function initSecretPhrase() {
-      revealed = [];
-      secretPhraseContainer.innerHTML = "";
-      for (let i = 0; i < SECRET_PHRASE.length; i++) {
-        const ch = SECRET_PHRASE[i];
-        const div = document.createElement("div");
-        if (ch === " ") {
-          div.className = "secret-letter space";
-          div.textContent = "";
-          revealed.push(true); // khoảng trắng coi như "đã hiện"
-        } else {
-          div.className = "secret-letter";
-          div.textContent = "_";
-          revealed.push(false);
-        }
-        secretPhraseContainer.appendChild(div);
-      }
+    let currentQuestion = null;
+    let revealedLetters = []; // Mảng boolean cho từng kí tự trong đáp án
+    let usedLetters = new Set();
+    let isRoundOver = false;
+    let isSpinning = false;
+    let canChooseLetter = false;
+    let currentSpinValue = 0; // Giá trị điểm số khi quay được ô điểm
+
+    let totalRotation = 0; // Dùng để xoay bánh xe đẹp mắt
+
+    // ============================================================
+    // 4. ÂM THANH
+    //  - Bạn có thể thay đổi đường dẫn file mp3/ogg bên dưới.
+    //  - Nếu không có file, trình duyệt chỉ không phát âm thanh, game vẫn chạy.
+    // ============================================================
+    const soundSpin = new Audio("spin.mp3"); // TODO: Thay bằng đường dẫn âm quay nón của bạn
+    soundSpin.loop = true;
+
+    const soundCorrect = new Audio("correct.mp3"); // TODO: Âm trả lời đúng
+    const soundWrong = new Audio("wrong.mp3");     // TODO: Âm trả lời sai
+    const soundWin = new Audio("win.mp3");         // TODO: Âm thắng câu / kết thúc
+
+    // ============================================================
+    // 5. HÀM TIỆN ÍCH – XỬ LÝ CHUỖI, LOẠI BỎ DẤU TIẾNG VIỆT
+    // ============================================================
+    function removeVietnameseTones(str) {
+      if (!str) return "";
+      str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      str = str.replace(/đ/g, "d").replace(/Đ/g, "D");
+      return str;
     }
 
-    function renderSecretPhrase() {
-      const letters = secretPhraseContainer.querySelectorAll(".secret-letter");
-      for (let i = 0; i < SECRET_PHRASE.length; i++) {
-        const ch = SECRET_PHRASE[i];
-        const el = letters[i];
-        if (!el) continue;
-        if (ch === " ") {
-          // khoảng trắng đã xử lý
-          continue;
-        }
-        if (revealed[i]) {
-          el.textContent = ch;
-          el.classList.add("revealed");
-        } else {
-          el.textContent = "_";
-          el.classList.remove("revealed");
-        }
-      }
+    function normalizeAnswer(str) {
+      return removeVietnameseTones(str)
+        .toUpperCase()
+        .replace(/[^A-Z ]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
     }
 
-    function revealRandomLetters(count) {
-      const indices = [];
-      for (let i = 0; i < SECRET_PHRASE.length; i++) {
-        if (SECRET_PHRASE[i] !== " " && !revealed[i]) {
-          indices.push(i);
-        }
-      }
-      if (indices.length === 0) return;
-      for (let c = 0; c < count && indices.length > 0; c++) {
-        const r = Math.floor(Math.random() * indices.length);
-        const idx = indices.splice(r, 1)[0];
-        revealed[idx] = true;
-      }
-      renderSecretPhrase();
-    }
-
-    function revealAllLetters() {
-      for (let i = 0; i < SECRET_PHRASE.length; i++) {
-        if (SECRET_PHRASE[i] !== " ") revealed[i] = true;
-      }
-      renderSecretPhrase();
-    }
-
-    // ================== BẢNG ĐIỂM ĐỘI ==================
-    const teamCards = document.querySelectorAll(".team-card");
-
-    function initTeams() {
-      teamCards.forEach((card, i) => {
-        card.classList.remove("active");
-        const scoreEl = card.querySelector("[data-score]");
-        scoreEl.textContent = "0";
-      });
-      currentTeam = null;
-    }
-
-    function selectTeam(index) {
-      currentTeam = index;
-      teamCards.forEach((card, i) => {
-        card.classList.toggle("active", i === index);
-      });
-    }
-
-    function addPointsToCurrentTeam(points) {
-      if (currentTeam === null) return;
-      const card = teamCards[currentTeam];
-      const scoreEl = card.querySelector("[data-score]");
-      const currentScore = parseInt(scoreEl.textContent || "0", 10);
-      scoreEl.textContent = currentScore + points;
-    }
-
-    // ================== NÓN QUAY ==================
-    const spinBtn = document.getElementById("spinBtn");
-    const resetSpinBtn = document.getElementById("resetSpinBtn");
-    const wheelPointsEl = document.getElementById("wheelPoints");
-    const currentPointsText = document.getElementById("currentPointsText");
-    const wheelEl = document.getElementById("wheel");
-
-    const pointValues = [10, 20, 30, 40, 50, 60, 80, 100];
-
-    function updateSpinPointsDisplay() {
-      wheelPointsEl.innerHTML = currentSpinPoints + "<br><span style='font-size:11px;'>điểm</span>";
-      currentPointsText.textContent = currentSpinPoints;
-    }
-
-    function spinWheel() {
-      if (isSpinAnimating) return;
-      isSpinAnimating = true;
-
-      const duration = 1000 + Math.random() * 1000;
-      const start = performance.now();
-      let lastAngle = 0;
-
-      function animate(now) {
-        const t = Math.min(1, (now - start) / duration);
-        const ease = 1 - Math.pow(1 - t, 3);
-        const angle = ease * 1440; // quay nhiều vòng
-        wheelEl.style.transform = `rotate(${angle}deg)`;
-        lastAngle = angle;
-
-        if (t < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // Chọn điểm ngẫu nhiên
-          const randomIndex = Math.floor(Math.random() * pointValues.length);
-          currentSpinPoints = pointValues[randomIndex];
-          updateSpinPointsDisplay();
-          isSpinAnimating = false;
-        }
+    // ============================================================
+    // 6. KHỞI TẠO THỨ TỰ CÂU HỎI
+    // ============================================================
+    function setupQuestionOrder() {
+      const n = questions.length;
+      questionOrder = [];
+      for (let i = 0; i < n; i++) {
+        questionOrder.push(i);
       }
 
-      requestAnimationFrame(animate);
-    }
-
-    spinBtn.addEventListener("click", spinWheel);
-    resetSpinBtn.addEventListener("click", () => {
-      currentSpinPoints = 0;
-      wheelEl.style.transform = "rotate(0deg)";
-      updateSpinPointsDisplay();
-    });
-
-    // ================== CÂU HỎI ==================
-    const questionListEl = document.getElementById("questionList");
-    const questionTextEl = document.getElementById("questionText");
-    const questionInfoEl = document.getElementById("questionInfo");
-    const questionPointsEl = document.getElementById("questionPoints");
-    const answersAreaEl = document.getElementById("answersArea");
-    const answerStatusEl = document.getElementById("answerStatus");
-    const nextRandomQBtn = document.getElementById("nextRandomQBtn");
-    const resetGameBtn = document.getElementById("resetGameBtn");
-    const revealAllBtn = document.getElementById("revealAllBtn");
-
-    function initQuestionList() {
-      questionListEl.innerHTML = "";
-      usedQuestionIndices = new Set();
-      questions.forEach((q, index) => {
-        const chip = document.createElement("div");
-        chip.className = "q-chip";
-        chip.textContent = q.id;
-        chip.dataset.index = index;
-        chip.addEventListener("click", () => {
-          loadQuestion(index);
-        });
-        questionListEl.appendChild(chip);
-      });
-    }
-
-    function markQuestionUsed(index) {
-      usedQuestionIndices.add(index);
-      const chips = questionListEl.querySelectorAll(".q-chip");
-      chips.forEach((chip) => {
-        if (parseInt(chip.dataset.index, 10) === index) {
-          chip.classList.add("used");
-        } else {
-          chip.classList.remove("active");
+      if (questionMode === "random") {
+        // Xáo trộn mảng (Fisher–Yates)
+        for (let i = n - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questionOrder[i], questionOrder[j]] = [questionOrder[j], questionOrder[i]];
         }
-      });
+      }
+      questionPointer = 0;
     }
 
-    function setActiveQuestionChip(index) {
-      const chips = questionListEl.querySelectorAll(".q-chip");
-      chips.forEach((chip) => {
-        if (parseInt(chip.dataset.index, 10) === index) {
-          chip.classList.add("active");
-        } else {
-          chip.classList.remove("active");
+    // ============================================================
+    // 7. KHỞI TẠO ĐỘI & BẢNG ĐIỂM
+    // ============================================================
+    const defaultColors = ["#f97373", "#60a5fa", "#4ade80", "#facc15"];
+
+    function initTeams(count = 3) {
+      if (!teams.length) {
+        // Lần đầu: tạo đội mới
+        teams = [];
+        for (let i = 0; i < count; i++) {
+          teams.push({
+            name: "Đội " + String.fromCharCode(65 + i),
+            score: 0,
+            color: defaultColors[i] || "#e5e7eb"
+          });
         }
-      });
-    }
-
-    function loadQuestion(index) {
-      currentQuestionIndex = index;
-      const q = questions[index];
-      setActiveQuestionChip(index);
-
-      questionInfoEl.textContent = `Câu số ${q.id}/${questions.length}`;
-      questionPointsEl.textContent = "Điểm câu này: theo số điểm nón quay (đang là " + currentSpinPoints + " điểm)";
-      questionTextEl.textContent = q.text;
-      answersAreaEl.innerHTML = "";
-      answerStatusEl.textContent = "Trạng thái: Chưa trả lời";
-
-      q.choices.forEach((choice, i) => {
-        const btn = document.createElement("button");
-        btn.className = "answer-btn";
-        btn.textContent = String.fromCharCode(65 + i) + ". " + choice;
-        btn.addEventListener("click", () => handleAnswerClick(btn, i));
-        answersAreaEl.appendChild(btn);
-      });
-    }
-
-    function handleAnswerClick(btn, chosenIndex) {
-      if (currentQuestionIndex === null) return;
-      const q = questions[currentQuestionIndex];
-
-      // nếu đã chấm rồi thì bỏ qua
-      const anyDone = Array.from(answersAreaEl.querySelectorAll(".answer-btn")).some(
-        (b) => b.classList.contains("correct") || b.classList.contains("wrong")
-      );
-      if (anyDone) return;
-
-      const isCorrect = chosenIndex === q.correctIndex;
-      const allButtons = answersAreaEl.querySelectorAll(".answer-btn");
-      allButtons.forEach((b, idx) => {
-        if (idx === q.correctIndex) {
-          b.classList.add("correct");
-        }
-      });
-
-      if (isCorrect) {
-        btn.classList.add("correct");
-        const pointsToAdd = currentSpinPoints || 10; // nếu chưa quay nón, mặc định 10 điểm
-        addPointsToCurrentTeam(pointsToAdd);
-        answerStatusEl.textContent = `Trạng thái: Đúng! (+${pointsToAdd} điểm cho đội đang chọn)`;
-        revealRandomLetters(REVEAL_PER_CORRECT);
-        markQuestionUsed(currentQuestionIndex);
       } else {
-        btn.classList.add("wrong");
-        answerStatusEl.textContent = "Trạng thái: Sai. Giáo viên quyết định có cho đội khác trả lời hay không.";
+        // Giữ lại điểm & tên nếu đã có, chỉ thay đổi số đội nếu cần
+        const oldTeams = teams;
+        teams = [];
+        for (let i = 0; i < count; i++) {
+          if (oldTeams[i]) {
+            teams.push(oldTeams[i]);
+          } else {
+            teams.push({
+              name: "Đội " + String.fromCharCode(65 + i),
+              score: 0,
+              color: defaultColors[i] || "#e5e7eb"
+            });
+          }
+        }
+      }
+      if (currentTeamIndex >= teams.length) currentTeamIndex = 0;
+      renderScoreboard();
+      renderTeamNameInputs();
+    }
+
+    function renderScoreboard() {
+      const sb = document.getElementById("scoreboard");
+      sb.innerHTML = "";
+      teams.forEach((team, index) => {
+        const card = document.createElement("div");
+        card.className = "team-card";
+        card.style.borderColor = team.color;
+        card.style.boxShadow = "0 0 10px " + team.color + "55";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "team-name";
+        nameEl.textContent = team.name;
+        nameEl.style.color = team.color;
+
+        const scoreEl = document.createElement("div");
+        scoreEl.className = "team-score";
+        scoreEl.textContent = team.score;
+
+        const turnEl = document.createElement("div");
+        turnEl.className = "turn-indicator";
+        if (index === currentTeamIndex) {
+          turnEl.textContent = "ĐANG LƯỢT";
+          turnEl.style.background = team.color + "33";
+          turnEl.style.color = "#f9fafb";
+        } else {
+          turnEl.textContent = "CHỜ";
+          turnEl.style.opacity = 0.6;
+        }
+
+        card.appendChild(nameEl);
+        card.appendChild(scoreEl);
+        card.appendChild(turnEl);
+        sb.appendChild(card);
+      });
+
+      // Cập nhật label "Lượt của..."
+      const currentTeamLabel = document.getElementById("currentTeamLabel");
+      const team = teams[currentTeamIndex];
+      currentTeamLabel.innerHTML =
+        'Lượt của: <strong style="color:' +
+        team.color +
+        ';">' +
+        team.name +
+        "</strong>";
+    }
+
+    function highlightTeamScore(index) {
+      const sb = document.getElementById("scoreboard");
+      const cards = sb.querySelectorAll(".team-card");
+      if (!cards[index]) return;
+      cards[index].classList.add("score-highlight");
+      setTimeout(() => {
+        cards[index].classList.remove("score-highlight");
+      }, 600);
+    }
+
+    function resetScores() {
+      teams.forEach((t) => (t.score = 0));
+      renderScoreboard();
+    }
+
+    // ============================================================
+    // 8. VẼ NHÃN BÁNH XE
+    // ============================================================
+    function renderWheelLabels() {
+      const wheel = document.getElementById("wheel");
+      // Xóa nhãn cũ (nếu có)
+      const oldLabels = wheel.querySelectorAll(".wheel-label");
+      oldLabels.forEach((e) => e.remove());
+
+      const count = wheelItems.length;
+      const angleStep = 360 / count;
+
+      wheelItems.forEach((item, i) => {
+        const label = document.createElement("div");
+        label.className = "wheel-label";
+        label.textContent = item;
+
+        const angle = angleStep * i + angleStep / 2; // Giữa mỗi cung
+        // Xoay nhãn quanh tâm và giữ chữ thẳng lại
+        label.style.transform =
+          "rotate(" + angle + "deg) translate(0, -42%) rotate(" + -angle + "deg)";
+        wheel.appendChild(label);
+      });
+    }
+
+    // ============================================================
+    // 9. KHỞI TẠO CÂU HỎI MỚI
+    // ============================================================
+    function startNewRound() {
+      if (!questionOrder.length) {
+        setupQuestionOrder();
+      }
+
+      if (questionPointer >= questionOrder.length) {
+        // Nếu hết câu, tạo lại thứ tự (theo chế độ)
+        setupQuestionOrder();
+      }
+
+      const questionIndex = questionOrder[questionPointer];
+      questionPointer++;
+
+      currentQuestion = questions[questionIndex];
+
+      // Chuẩn hóa dapAn theo đúng format xử lý
+      const normalized = normalizeAnswer(currentQuestion.dapAn);
+      currentQuestion.normalizedAnswer = normalized;
+
+      revealedLetters = [];
+      usedLetters = new Set();
+      isRoundOver = false;
+      canChooseLetter = false;
+      currentSpinValue = 0;
+
+      document.getElementById("spinResult").textContent = "";
+      document.getElementById("hintText").textContent = "";
+      document.getElementById("explanationText").textContent = "";
+      setMessage("Đã chuyển sang câu hỏi mới. Mời đội hiện tại quay nón!");
+
+      document.getElementById("questionTopic").textContent = currentQuestion.chuDe;
+
+      // Tạo mảng revealedLetters với độ dài bằng số ký tự trong normalizedAnswer
+      for (let i = 0; i < normalized.length; i++) {
+        revealedLetters.push(false);
+      }
+
+      renderQuestionBoard();
+      renderKeyboard();
+      renderScoreboard();
+    }
+
+    function renderQuestionBoard() {
+      const board = document.getElementById("questionBoard");
+      board.innerHTML = "";
+
+      if (!currentQuestion) return;
+
+      const answer = currentQuestion.normalizedAnswer; // Chuỗi không dấu, chữ hoa, chỉ gồm A-Z và ' '
+
+      for (let i = 0; i < answer.length; i++) {
+        const ch = answer[i];
+        if (ch === " ") {
+          const spaceBox = document.createElement("div");
+          spaceBox.className = "letter-box space-box";
+          board.appendChild(spaceBox);
+        } else {
+          const letterBox = document.createElement("div");
+          letterBox.className = "letter-box";
+          if (!revealedLetters[i]) {
+            letterBox.classList.add("hidden-letter");
+            letterBox.textContent = ch; // Ẩn màu chữ nhưng vẫn giữ layout
+          } else {
+            letterBox.classList.add("revealed");
+            letterBox.textContent = ch;
+          }
+          board.appendChild(letterBox);
+        }
       }
     }
 
-    function loadRandomUnusedQuestion() {
-      const unusedIndices = [];
-      questions.forEach((_, index) => {
-        if (!usedQuestionIndices.has(index)) {
-          unusedIndices.push(index);
+    // ============================================================
+    // 10. BÀN PHÍM CHỮ CÁI
+    // ============================================================
+    const LETTERS = "A B C D E G H I K L M N O P Q R S T U V X Y".split(" ");
+
+    function renderKeyboard() {
+      const keyboard = document.getElementById("keyboard");
+      keyboard.innerHTML = "";
+
+      LETTERS.forEach((letter) => {
+        const btn = document.createElement("button");
+        btn.className = "key-button";
+        btn.textContent = letter;
+
+        if (usedLetters.has(letter)) {
+          btn.disabled = true;
+        } else {
+          btn.disabled = !canChooseLetter || isRoundOver;
+          btn.addEventListener("click", () => chooseLetter(letter));
+        }
+
+        keyboard.appendChild(btn);
+      });
+    }
+
+    function updateKeyboardState() {
+      const keyboard = document.getElementById("keyboard");
+      const buttons = keyboard.querySelectorAll(".key-button");
+      buttons.forEach((btn) => {
+        const letter = btn.textContent.trim();
+        if (usedLetters.has(letter)) {
+          btn.disabled = true;
+        } else {
+          btn.disabled = !canChooseLetter || isRoundOver;
         }
       });
-      if (unusedIndices.length === 0) {
-        alert("Đã hết câu hỏi! Thầy/cô có thể cho HS đoán ô chữ hoặc bấm Reset trò chơi.");
-        return;
-      }
-      const r = Math.floor(Math.random() * unusedIndices.length);
-      const idx = unusedIndices[r];
-      loadQuestion(idx);
     }
 
-    // ================== RESET TRÒ CHƠI ==================
-    function resetGame() {
-      if (!confirm("Reset trò chơi? Bảng điểm, ô chữ và trạng thái câu hỏi sẽ về ban đầu.")) {
-        return;
+    // ============================================================
+    // 11. QUAY NÓN
+    // ============================================================
+    function spinWheel() {
+      if (isSpinning || isRoundOver) return;
+
+      // Sau khi quay nón xong, người chơi mới được chọn chữ => khóa bàn phím
+      canChooseLetter = false;
+      updateKeyboardState();
+
+      isSpinning = true;
+      setMessage("Đang quay nón...");
+
+      const wheel = document.getElementById("wheel");
+
+      // Tạo số độ quay ngẫu nhiên (nhiều vòng cho đẹp)
+      const extraRotation = 360 * 4 + Math.floor(Math.random() * 360);
+      totalRotation += extraRotation;
+      wheel.style.transform = "rotate(" + totalRotation + "deg)";
+
+      // Phát âm thanh quay
+      try {
+        soundSpin.currentTime = 0;
+        soundSpin.play();
+      } catch (e) {
+        // Nếu trình duyệt chặn auto-play, bỏ qua
       }
-      initSecretPhrase();
-      renderSecretPhrase();
-      initTeams();
-      initQuestionList();
-      currentSpinPoints = 0;
-      updateSpinPointsDisplay();
-      questionInfoEl.textContent = "Chưa chọn câu hỏi";
-      questionPointsEl.textContent = "Điểm câu này: theo nón quay";
-      questionTextEl.innerHTML =
-        'Bấm vào một số câu hỏi ở khung bên phải hoặc chọn <b>Câu ngẫu nhiên</b> để bắt đầu.';
-      answersAreaEl.innerHTML = "";
-      answerStatusEl.textContent = "Trạng thái: Chưa trả lời";
+
+      // Sau 3 giây (thiết lập bằng transition), dừng quay và chọn kết quả ngẫu nhiên
+      setTimeout(() => {
+        isSpinning = false;
+        soundSpin.pause();
+        soundSpin.currentTime = 0;
+
+        const index = Math.floor(Math.random() * wheelItems.length);
+        const result = wheelItems[index];
+
+        handleWheelResult(result);
+      }, 3100);
     }
 
-    // ================== GÁN SỰ KIỆN ==================
-    nextRandomQBtn.addEventListener("click", loadRandomUnusedQuestion);
-    resetGameBtn.addEventListener("click", resetGame);
-    revealAllBtn.addEventListener("click", revealAllLetters);
+    function handleWheelResult(result) {
+      const spinResultEl = document.getElementById("spinResult");
+      spinResultEl.textContent = "Kết quả: " + result;
 
-    teamCards.forEach((card, index) => {
-      card.addEventListener("click", () => selectTeam(index));
-    });
+      if (!currentQuestion || isRoundOver) {
+        setMessage("Đang không có câu hỏi nào. Hãy bấm Câu mới.");
+        return;
+      }
 
-    // ================== KHỞI TẠO BAN ĐẦU ==================
-    initSecretPhrase();
-    renderSecretPhrase();
-    initTeams();
-    initQuestionList();
-    updateSpinPointsDisplay();
+      if (/^\d+$/.test(result)) {
+        // Ô điểm số
+        currentSpinValue = parseInt(result, 10);
+        canChooseLetter = true;
+        updateKeyboardState();
+        setMessage(
+          "Đội " +
+            teams[currentTeamIndex].name +
+            " quay được " +
+            currentSpinValue +
+            " điểm. Hãy chọn một chữ cái!"
+        );
+      } else {
+        // Ô sự kiện đặc biệt
+        currentSpinValue = 0;
+        switch (result) {
+          case "MẤT LƯỢT":
+            setMessage(
+              "Ô đặc biệt: MẤT LƯỢT! Đội " +
+                teams[currentTeamIndex].name +
+                " bị mất lượt, chuyển sang đội tiếp theo."
+            );
+            playWrong();
+            nextTeamTurn();
+            break;
+          case "NHÂN ĐÔI ĐIỂM":
+            teams[currentTeamIndex].score *= 2;
+            renderScoreboard();
+            highlightTeamScore(currentTeamIndex);
+            setMessage(
+              "Ô đặc biệt: NHÂN ĐÔI ĐIỂM! Điểm của " +
+                teams[currentTeamIndex].name +
+                " đã được nhân đôi. Mời quay nón lại."
+            );
+            break;
+          case "CHIA ĐIỂM CHO ĐỘI KHÁC":
+            if (teams.length > 1 && teams[currentTeamIndex].score > 0) {
+              const donor = teams[currentTeamIndex];
+              const half = Math.floor(donor.score / 2);
+              if (half > 0) {
+                // Cho đội kế tiếp
+                const receiverIndex = (currentTeamIndex + 1) % teams.length;
+                donor.score -= half;
+                teams[receiverIndex].score += half;
+                renderScoreboard();
+                highlightTeamScore(receiverIndex);
+                setMessage(
+                  "Ô đặc biệt: CHIA ĐIỂM CHO ĐỘI KHÁC! " +
+                    donor.name +
+                    " chuyển " +
+                    half +
+                    " điểm cho " +
+                    teams[receiverIndex].name +
+                    "."
+                );
+              } else {
+                setMessage(
+                  "Ô CHIA ĐIỂM cho đội khác nhưng hiện tại đội này chưa có đủ điểm để chia."
+                );
+              }
+            } else {
+              setMessage("Ô CHIA ĐIỂM nhưng hiện chỉ có một đội hoặc chưa có điểm để chia.");
+            }
+            nextTeamTurn();
+            break;
+          case "THÊM GỢI Ý":
+            showHint(true); // true = hiển thị mà không cần bấm nút
+            setMessage(
+              "Ô đặc biệt: THÊM GỢI Ý! Giáo viên có thể cho thêm gợi ý rồi yêu cầu quay nón lại."
+            );
+            break;
+        }
+      }
+
+      playTing();
+    }
+
+    function playTing() {
+      // Có thể dùng chung soundCorrect hoặc tạo riêng
+      try {
+        soundCorrect.currentTime = 0;
+        soundCorrect.play();
+      } catch (e) {}
+    }
+
+    function playCorrect() {
+      try {
+        soundCorrect.currentTime = 0;
+        soundCorrect.play();
+      } catch (e) {}
+    }
+
+    function playWrong() {
+      try {
+        soundWrong.currentTime = 0;
+        soundWrong.play();
+      } catch (e) {}
+    }
+
+    function playWinSound() {
+      try {
+        soundWin.currentTime = 0;
+        soundWin.play();
+      } catch (e) {}
+    }
+
+    // ============================================================
+    // 12. CHỌN CHỮ CÁI
+    // ============================================================
+    function chooseLetter(letter) {
+      if (!currentQuestion || isRoundOver) return;
+      if (!canChooseLetter) {
+        setMessage("Hãy quay nón trước, sau đó mới được chọn chữ cái.");
+        return;
+      }
+      if (usedLetters.has(letter)) return;
+      usedLetters.add(letter);
+
+      const answer = currentQuestion.normalizedAnswer;
+      let count = 0;
+      for (let i = 0; i < answer.length; i++) {
+        if (answer[i] === letter) {
+          revealedLetters[i] = true;
+          count++;
+        }
+      }
+
+      if (count > 0) {
+        // Có chữ
+        renderQuestionBoard();
+        playCorrect();
+
+        if (currentSpinValue > 0) {
+          const added = currentSpinValue * count;
+          teams[currentTeamIndex].score += added;
+          renderScoreboard();
+          highlightTeamScore(currentTeamIndex);
+          setMessage(
+            "Tuyệt vời! Có " +
+              count +
+              " chữ '" +
+              letter +
+              "' trong đáp án. Đội " +
+              teams[currentTeamIndex].name +
+              " được cộng " +
+              added +
+              " điểm."
+          );
+        } else {
+          setMessage(
+            "Chữ '" +
+              letter +
+              "' đúng! (Ô quay vừa rồi không phải ô điểm nên không cộng điểm)."
+          );
+        }
+
+        // Kiểm tra đã lật hết chưa
+        if (isAllLettersRevealed()) {
+          finishRound(false);
+        } else {
+          // Vẫn còn chữ, đội được tiếp tục quyền chọn: quay nón lại hoặc đoán
+          canChooseLetter = false;
+          currentSpinValue = 0;
+          updateKeyboardState();
+        }
+      } else {
+        // Không có chữ
+        playWrong();
+        setMessage(
+          "Rất tiếc, không có chữ '" +
+            letter +
+            "' trong đáp án. Chuyển lượt sang đội kế tiếp!"
+        );
+        canChooseLetter = false;
+        currentSpinValue = 0;
+        updateKeyboardState();
+        nextTeamTurn();
+      }
+    }
+
+    function isAllLettersRevealed() {
+      if (!currentQuestion) return false;
+      const answer = currentQuestion.normalizedAnswer;
+      for (let i = 0; i < answer.length; i++) {
+        if (answer[i] !== " " && !revealedLetters[i]) return false;
+      }
+      return true;
+    }
+
+    function finishRound(byFullAnswer) {
+      isRoundOver = true;
+      canChooseLetter = false;
+      updateKeyboardState();
+      renderQuestionBoard();
+
+      const displayAnswer =
+        currentQuestion.display + " (" + currentQuestion.normalizedAnswer + ")";
+
+      let msg = "";
+      if (byFullAnswer) {
+        msg =
+          "Chúc mừng! Đội " +
+          teams[currentTeamIndex].name +
+          " đã đoán đúng đáp án đầy đủ: " +
+          displayAnswer;
+      } else {
+        msg =
+          "Tất cả các chữ đã được lật. Đáp án là: " + displayAnswer + ". Hết câu!";
+      }
+      setMessage(msg);
+      document.getElementById("explanationText").textContent =
+        currentQuestion.giaiThich || "";
+      playWinSound();
+    }
+
+    // ============================================================
+    // 13. LƯỢT CHƠI GIỮA CÁC ĐỘI
+    // ============================================================
+    function nextTeamTurn() {
+      currentTeamIndex = (currentTeamIndex + 1) % teams.length;
+      renderScoreboard();
+    }
+
+    // ============================================================
+    // 14. GỢI Ý & GIẢI THÍCH
+    // ============================================================
+    function showHint(fromSpecialWheel = false) {
+      if (!currentQuestion) return;
+      const hintEl = document.getElementById("hintText");
+      if (!currentQuestion.goiY) {
+        hintEl.textContent = "Câu này chưa có gợi ý chi tiết.";
+      } else {
+        hintEl.textContent = currentQuestion.goiY;
+      }
+
+      if (!fromSpecialWheel) {
+        setMessage(
+          "Giáo viên đã bật gợi ý cho câu hỏi. Hãy dùng gợi ý để định hướng chọn chữ hoặc đoán đáp án!"
+        );
+      }
+    }
+
+    // ============================================================
+    // 15. MODAL CÀI ĐẶT GIÁO VIÊN
+    // ============================================================
+    function openSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      modal.classList.add("active");
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      modal.classList.remove("active");
+    }
+
+    function renderTeamNameInputs() {
+      const container = document.getElementById("teamNameInputs");
+      container.innerHTML = "";
+
+      teams.forEach((team, index) => {
+        const row = document.createElement("div");
+        row.className = "form-inline";
+
+        const label = document.createElement("span");
+        label.textContent = "Đội " + (index + 1) + ":";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = team.name;
+        input.dataset.index = index;
+        input.addEventListener("change", (e) => {
+          const idx = parseInt(e.target.dataset.index, 10);
+          teams[idx].name = e.target.value.trim() || teams[idx].name;
+          renderScoreboard();
+        });
+
+        row.appendChild(label);
+        row.appendChild(input);
+        container.appendChild(row);
+      });
+    }
+
+    function applySettings() {
+      const teamCountSelect = document.getElementById("teamCountSelect");
+      const newCount = parseInt(teamCountSelect.value, 10);
+
+      // Cập nhật chế độ câu hỏi
+      const radios = document.querySelectorAll('input[name="questionMode"]');
+      radios.forEach((r) => {
+        if (r.checked) {
+          questionMode = r.value;
+        }
+      });
+
+      initTeams(newCount);
+      renderTeamNameInputs();
+
+      // Thiết lập lại thứ tự câu hỏi theo chế độ mới
+      setupQuestionOrder();
+
+      setMessage(
+        "Đã áp dụng cài đặt. Số đội: " +
+          newCount +
+          ", chế độ câu hỏi: " +
+          (questionMode === "ordered" ? "theo thứ tự" : "ngẫu nhiên") +
+          "."
+      );
+      closeSettingsModal();
+    }
+
+    // ============================================================
+    // 16. MODAL ĐOÁN ĐÁP ÁN ĐẦY ĐỦ
+    // ============================================================
+    function openAnswerModal() {
+      if (!currentQuestion || isRoundOver) {
+        setMessage("Hiện không có câu hỏi đang chơi. Hãy bấm Câu mới.");
+        return;
+      }
+      const modal = document.getElementById("answerModal");
+      const input = document.getElementById("fullAnswerInput");
+      input.value = "";
+      modal.classList.add("active");
+      input.focus();
+    }
+
+    function closeAnswerModal() {
+      const modal = document.getElementById("answerModal");
+      modal.classList.remove("active");
+    }
+
+    function submitFullAnswer() {
+      if (!currentQuestion || isRoundOver) {
+        closeAnswerModal();
+        return;
+      }
+      const input = document.getElementById("fullAnswerInput");
+      const userAnswer = normalizeAnswer(input.value);
+
+      if (!userAnswer) {
+        setMessage("Vui lòng nhập đáp án trước khi xác nhận.");
+        return;
+      }
+
+      const correct = currentQuestion.normalizedAnswer;
+
+      if (userAnswer === correct) {
+        // Đoán đúng đáp án
+        // Lật hết chữ
+        for (let i = 0; i < revealedLetters.length; i++) {
+          revealedLetters[i] = true;
+        }
+        finishRound(true);
+      } else {
+        // Sai
+        playWrong();
+        setMessage(
+          "Đáp án đầy đủ chưa chính xác. Đội " +
+            teams[currentTeamIndex].name +
+            " bị mất lượt, chuyển sang đội tiếp theo."
+        );
+        nextTeamTurn();
+      }
+
+      closeAnswerModal();
+    }
+
+    // ============================================================
+    // 17. THÔNG BÁO CHUNG
+    // ============================================================
+    function setMessage(text) {
+      const msg = document.getElementById("messageArea");
+      msg.textContent = text || "";
+    }
+
+    // ============================================================
+    // 18. GÁN SỰ KIỆN NÚT – KHỞI TẠO GAME
+    // ============================================================
+    function initGame() {
+      // Khởi tạo đội mặc định (3 đội)
+      initTeams(3);
+
+      // Vẽ nhãn trên bánh xe
+      renderWheelLabels();
+
+      // Cài đặt câu hỏi
+      setupQuestionOrder();
+      startNewRound();
+
+      // Gán sự kiện nút
+      document.getElementById("spinButton").addEventListener("click", spinWheel);
+      document.getElementById("hintButton").addEventListener("click", () =>
+        showHint(false)
+      );
+      document
+        .getElementById("newQuestionButton")
+        .addEventListener("click", startNewRound);
+      document
+        .getElementById("resetScoresButton")
+        .addEventListener("click", () => {
+          if (
+            confirm(
+              "Bạn có chắc muốn đặt lại toàn bộ điểm về 0 cho tất cả các đội?"
+            )
+          ) {
+            resetScores();
+            setMessage("Đã đặt lại điểm. Bạn có thể tiếp tục dùng cùng bộ câu hỏi.");
+          }
+        });
+
+      document
+        .getElementById("settingsButton")
+        .addEventListener("click", openSettingsModal);
+      document
+        .getElementById("closeSettings")
+        .addEventListener("click", closeSettingsModal);
+      document
+        .getElementById("applySettings")
+        .addEventListener("click", applySettings);
+
+      // Modal đoán đáp án
+      document
+        .getElementById("guessButton")
+        .addEventListener("click", openAnswerModal);
+      document
+        .getElementById("closeAnswerModal")
+        .addEventListener("click", closeAnswerModal);
+      document
+        .getElementById("cancelAnswerBtn")
+        .addEventListener("click", closeAnswerModal);
+      document
+        .getElementById("submitAnswerBtn")
+        .addEventListener("click", submitFullAnswer);
+
+      // Cho phép ấn Enter trong ô đoán đáp án để xác nhận nhanh
+      document
+        .getElementById("fullAnswerInput")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submitFullAnswer();
+          }
+        });
+
+      setMessage("Chào mừng đến với Chiếc nón kỳ diệu – Toán 11!");
+    }
+
+    document.addEventListener("DOMContentLoaded", initGame);
   </script>
 </body>
 </html>
