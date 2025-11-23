@@ -212,11 +212,6 @@ body {
   color: #e5e7eb;
 }
 
-.small-btn {
-  padding: 4px 10px;
-  font-size: 0.8rem;
-}
-
 /* Slider */
 .slider-row {
   display: flex;
@@ -346,7 +341,7 @@ body {
   box-shadow: 0 0 18px rgba(250, 204, 21, 0.8);
 }
 
-/* Ô đang được nhìn vào */
+/* Ô đang được con trỏ đầu trỏ tới */
 .cell.hovered {
   transform: scale(1.04);
   border-color: rgba(56, 189, 248, 0.95);
@@ -380,7 +375,7 @@ body {
   animation: board-flash 0.5s alternate 10;
 }
 
-/* Overlay chung */
+/* Overlay kết quả */
 .overlay {
   position: absolute;
   inset: 0;
@@ -396,7 +391,6 @@ body {
   display: none;
 }
 
-/* Overlay kết quả */
 .overlay-content {
   background: radial-gradient(circle at top, rgba(31, 41, 55, 0.98), rgba(15, 23, 42, 0.99));
   border-radius: 20px;
@@ -418,53 +412,7 @@ body {
   margin-bottom: 10px;
 }
 
-/* Overlay huấn luyện */
-#trainingOverlay {
-  z-index: 20;
-}
-
-.overlay-message {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  max-width: 360px;
-  margin: 0 auto;
-  background: rgba(15, 23, 42, 0.95);
-  border-radius: 16px;
-  padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.overlay-message h2 {
-  font-size: 1rem;
-  margin-bottom: 4px;
-}
-
-.overlay-message p {
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-}
-
-/* Chấm huấn luyện */
-.training-dot {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: #facc15;
-  box-shadow:
-    0 0 10px rgba(250, 204, 21, 0.9),
-    0 0 24px rgba(56, 189, 248, 0.8);
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  border: 2px solid rgba(56, 189, 248, 0.9);
-}
-
-/* Con trỏ ánh mắt */
+/* Con trỏ điều khiển bằng đầu */
 .gaze-cursor {
   position: absolute;
   width: 40px;
@@ -484,7 +432,7 @@ body {
   display: none;
 }
 
-/* Panel camera & tùy chọn */
+/* Panel camera & video */
 .camera-panel {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
   border-radius: 18px;
@@ -504,6 +452,21 @@ body {
   margin-bottom: 6px;
 }
 
+.video-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+  margin-bottom: 6px;
+}
+
+#headVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Switch hàng */
 .switch-row {
   display: flex;
   align-items: center;
@@ -514,23 +477,6 @@ body {
 
 .switch-row input {
   transform: scale(1.1);
-}
-
-/* Khung camera nhỏ của WebGazer – đặt ở góc dưới bên phải */
-#webgazerVideoContainer,
-#webgazerVideoFeed,
-#webgazerFaceOverlay,
-#webgazerFaceFeedbackBox {
-  position: fixed !important;
-  width: 140px !important;
-  height: 105px !important;
-  right: 10px !important;
-  bottom: 10px !important;
-  z-index: 9999 !important;
-  border-radius: 10px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(148, 163, 184, 0.6) !important;
-  background: #000 !important;
 }
 
 /* Animation */

@@ -2,17 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Caro Eye-Control – Điều khiển bằng ánh mắt</title>
+  <title>Caro Head-Control – Điều khiển bằng đầu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-  <!-- WebGazer.js (thư viện eye tracking) -->
-  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+
+  <!-- MediaPipe: camera utils + face mesh (head tracking) -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 </head>
 <body>
   <div class="app">
     <header class="app-header">
-      <h1>Caro Eye-Control</h1>
-      <p class="subtitle">Điều khiển bàn cờ bằng ánh mắt (Webcam)</p>
+      <h1>Caro Head-Control</h1>
+      <p class="subtitle">Điều khiển bàn cờ bằng chuyển động đầu (Webcam)</p>
     </header>
 
     <main class="app-main">
@@ -30,19 +32,15 @@
           </div>
 
           <div class="panel-row">
-            <label>Thời gian giữ mắt để chọn ô:</label>
+            <label>Thời gian giữ đầu trên 1 ô để chọn:</label>
             <div class="slider-row">
-              <input id="dwellSlider" type="range" min="600" max="1800" step="100" value="1000" />
-              <span id="dwellLabel">1.0s</span>
+              <input id="dwellSlider" type="range" min="500" max="2000" step="100" value="900" />
+              <span id="dwellLabel">0.9s</span>
             </div>
           </div>
 
           <div class="panel-row btn-row">
-            <button id="startGameBtn" class="btn primary">BẮT ĐẦU</button>
-            <button id="trainBtn" class="btn">Huấn luyện</button>
-          </div>
-
-          <div class="panel-row">
+            <button id="startGameBtn" class="btn primary">BẮT ĐẦU ĐIỀU KHIỂN</button>
             <button id="resetGameBtn" class="btn ghost">Chơi lại</button>
           </div>
         </div>
@@ -50,24 +48,24 @@
         <div class="panel-block">
           <h2>Trạng thái</h2>
           <p>Người chơi hiện tại: <span id="currentPlayerLabel" class="badge badge-x">X</span></p>
-          <p>Trạng thái trò chơi: <span id="gameStatusLabel">Đang chờ bắt đầu…</span></p>
-          <p>Eye tracking: <span id="trackingStatusLabel" class="badge badge-off">Chưa khởi động</span></p>
-          <p>Ô đang nhìn: <span id="gazeCellLabel">–</span></p>
+          <p>Trạng thái trò chơi: <span id="gameStatusLabel">Chưa khởi động camera…</span></p>
+          <p>Head tracking: <span id="trackingStatusLabel" class="badge badge-off">Tạm tắt</span></p>
+          <p>Ô đang trỏ tới: <span id="gazeCellLabel">–</span></p>
         </div>
 
         <div class="panel-block small">
           <h2>Hướng dẫn</h2>
           <ol>
-            <li>Bấm <strong>Huấn luyện</strong>, nhìn theo chấm và click vào chấm ở 9 vị trí.</li>
-            <li>Sau khi huấn luyện xong, bấm <strong>BẮT ĐẦU</strong>.</li>
-            <li>Ngồi thẳng, để mặt trong khung webcam ở góc phải dưới.</li>
-            <li>Nhìn vào ô bạn muốn đánh và giữ ~1 giây.</li>
+            <li>Ngồi thẳng, mặt hướng về màn hình, cách ~50–70cm.</li>
+            <li>Bấm <strong>BẮT ĐẦU ĐIỀU KHIỂN</strong> và cho phép trình duyệt dùng webcam.</li>
+            <li>Nhìn vào màn hình, hơi nghiêng đầu sang trái/phải, lên/xuống để con trỏ di chuyển trên bàn cờ.</li>
+            <li>Giữ đầu ổn định trên 1 ô ~1 giây → hệ thống tự đánh X/O vào ô đó.</li>
           </ol>
-          <p class="note">Gợi ý: hạn chế lắc đầu mạnh, ngồi cách màn hình ~50–70cm.</p>
+          <p class="note">Tip: di chuyển đầu nhẹ và chậm, không lắc mạnh để ô chọn ổn định hơn.</p>
         </div>
       </section>
 
-      <!-- Khu vực bàn cờ -->
+      <!-- Khu vực bàn cờ + camera -->
       <section class="board-section">
         <div class="board-wrapper">
           <div id="board" class="board size-3"></div>
@@ -81,29 +79,22 @@
             </div>
           </div>
 
-          <!-- Overlay HUẤN LUYỆN -->
-          <div id="trainingOverlay" class="overlay hidden">
-            <div class="overlay-message">
-              <h2>Chế độ huấn luyện mắt</h2>
-              <p id="trainingStepText">Bước 1/9: Nhìn vào chấm và click chuột vào chấm.</p>
-              <button id="finishTrainingBtn" class="btn ghost small-btn">Kết thúc huấn luyện</button>
-            </div>
-            <div id="trainingDot" class="training-dot"></div>
-          </div>
-
-          <!-- Con trỏ ánh mắt (chỉ để hiển thị vị trí nhìn) -->
-          <div id="gazeCursor" class="gaze-cursor hidden"></div>
+          <!-- Con trỏ điều khiển bằng đầu -->
+          <div id="headCursor" class="gaze-cursor hidden"></div>
         </div>
 
-        <!-- Khu webcam + tùy chọn -->
         <div class="camera-panel">
-          <h2>Webcam & tùy chọn</h2>
+          <h2>Webcam</h2>
           <p class="camera-note">
-            Khi bấm <strong>BẮT ĐẦU</strong> hoặc <strong>Huấn luyện</strong>, khung camera nhỏ sẽ xuất hiện ở góc dưới bên phải màn hình.
+            Khung webcam (ảnh live) để bạn canh vị trí mặt. Camera dùng cho việc nhận diện, không cần nhìn trực tiếp vào đây.
           </p>
+          <div class="video-wrapper">
+            <video id="headVideo" autoplay playsinline muted></video>
+          </div>
+
           <label class="switch-row">
             <input id="toggleCursorCheckbox" type="checkbox" checked />
-            <span>Hiện vòng tròn vị trí nhìn</span>
+            <span>Hiện vòng tròn con trỏ trên bàn cờ</span>
           </label>
           <label class="switch-row">
             <input id="toggleMouseCheckbox" type="checkbox" />
@@ -114,7 +105,7 @@
     </main>
 
     <footer class="app-footer">
-      <span>Dự án demo: điều khiển cờ caro bằng ánh mắt – sử dụng WebGazer.js &amp; WebCam</span>
+      <span>Caro Head-Control – Demo điều khiển trò chơi bằng chuyển động đầu với MediaPipe FaceMesh</span>
     </footer>
   </div>
 
