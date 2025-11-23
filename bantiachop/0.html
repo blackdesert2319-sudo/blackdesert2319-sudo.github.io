@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy V7.2</title>
+  <title>Học viện Anh Hùng – Hero Academy V7.6</title>
   <style>
     * {
       box-sizing: border-box;
@@ -268,7 +268,7 @@
 
     .map-panel {
       width:100%;
-      padding:6px 8px 7px;
+      padding:6px 8px 8px;
       border-radius:14px;
       background:linear-gradient(135deg, rgba(15,23,42,.96), rgba(30,64,175,.9));
       border:1px solid rgba(129,140,248,.9);
@@ -278,16 +278,26 @@
       font-weight:600;
       margin-bottom:4px;
     }
-    .map-floor {
+
+    .map-floor-row{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .map-floor{
       display:flex;
-      align-items:center;
-      gap:4px;
-      margin-bottom:3px;
       flex-wrap:wrap;
+      align-items:center;
+      gap:6px 8px;
+      padding:6px 8px;
+      background:rgba(15,23,42,0.45);
+      border-radius:10px;
     }
     .map-floor-label {
-      width:46px;
-      opacity:.85;
+      opacity:.9;
+      font-weight:500;
+      margin-right:2px;
     }
     .map-room {
       padding:3px 7px;
@@ -317,14 +327,20 @@
       background:linear-gradient(135deg, rgba(22,163,74,.22), rgba(15,23,42,.98));
       border:1px solid rgba(74,222,128,.9);
       font-size:11px;
+      margin-top:6px;
     }
-    .quest-title {
+    #questLine {
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+      align-items:center;
+    }
+    .quest-title-inline {
       font-weight:600;
-      margin-bottom:3px;
     }
     #questProgress {
-      margin-top:2px;
       color:#bbf7d0;
+      font-weight:600;
     }
 
     .chapter-row {
@@ -607,6 +623,7 @@
 
     .exam-row {
       display:flex;
+      flex-wrap:wrap;
       gap:8px;
       align-items:center;
       margin-top:2px;
@@ -783,27 +800,31 @@
           <div class="academy-panel">
             <div class="map-panel">
               <div class="map-title">🗺️ Sảnh Học viện</div>
-              <div class="map-floor">
-                <span class="map-floor-label">Tầng 1</span>
-                <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
-                <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
-              </div>
-              <div class="map-floor">
-                <span class="map-floor-label">Tầng 2</span>
-                <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
-                <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
-              </div>
-              <div class="map-floor">
-                <span class="map-floor-label">Tầng 3</span>
-                <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
-                <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
+              <div class="map-floor-row">
+                <div class="map-floor">
+                  <span class="map-floor-label">Tầng 1:</span>
+                  <button class="map-room active" data-room="lobby" data-floor="1">Sảnh chính</button>
+                  <button class="map-room" data-room="compare" data-floor="1">Phòng So sánh</button>
+                </div>
+                <div class="map-floor">
+                  <span class="map-floor-label">Tầng 2:</span>
+                  <button class="map-room" data-room="add" data-floor="2">Phòng Cộng</button>
+                  <button class="map-room" data-room="sub" data-floor="2">Phòng Trừ</button>
+                </div>
+                <div class="map-floor">
+                  <span class="map-floor-label">Tầng 3:</span>
+                  <button class="map-room" data-room="forge" data-floor="3">Phòng Rèn vũ khí</button>
+                  <button class="map-room" data-room="bossTower" data-floor="3">Tháp Boss</button>
+                </div>
               </div>
             </div>
 
             <div class="quest-panel">
-              <div class="quest-title">🎯 Nhiệm vụ hiện tại</div>
-              <div id="questText">Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.</div>
-              <div id="questProgress">0 / 5</div>
+              <div id="questLine">
+                <span class="quest-title-inline">🎯 Nhiệm vụ hiện tại:</span>
+                <span id="questText">Nhiệm vụ 1</span>
+                <span id="questProgress">0/5</span>
+              </div>
             </div>
 
             <div id="chapterRow" class="chapter-row">
@@ -833,6 +854,7 @@
           </div>
 
           <div class="exam-row">
+            <button id="musicBtn" class="btn btn-secondary">🔊 Nhạc nền: Tắt</button>
             <button id="examBtn" class="btn btn-secondary">📋 Chế độ kiểm tra: Tắt</button>
             <button id="endExamBtn" class="btn btn-secondary hidden">✅ Kết thúc kiểm tra</button>
           </div>
@@ -840,6 +862,9 @@
       </section>
     </div>
   </div>
+
+  <!-- Nhạc nền -->
+  <audio id="bgMusic" src="bg-music.mp3" loop></audio>
 
   <!-- Hộp thoại chọn chế độ nâng cấp -->
   <div id="setupBackdrop" class="backdrop">
@@ -925,9 +950,6 @@
     let bossUnlocked = false;
     let bossDefeated = false;
 
-    const skillCounts = { double: 0, hint: 0, skip: 0 };
-    let activeSkill = null;
-
     let examRunning = false;
     let examTotal = 0;
     let examCorrect = 0;
@@ -990,13 +1012,13 @@
     const questionTextEl = document.getElementById("questionText");
     const hintBox = document.getElementById("hintBox");
     const answersEl = document.getElementById("answers");
-    const questionCard = document.getElementById("questionCard");
 
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const bossBtn = document.getElementById("bossBtn");
     const examBtn = document.getElementById("examBtn");
     const endExamBtn = document.getElementById("endExamBtn");
+    const musicBtn = document.getElementById("musicBtn");
     const statusText = document.getElementById("statusText");
 
     const setupBackdrop = document.getElementById("setupBackdrop");
@@ -1018,6 +1040,9 @@
     const mapRoomButtons = Array.from(document.querySelectorAll(".map-room"));
     const questTextEl = document.getElementById("questText");
     const questProgressEl = document.getElementById("questProgress");
+
+    const bgMusic = document.getElementById("bgMusic");
+    let musicOn = false;
 
     const sndCorrect = new Audio("correct.mp3");
     const sndWrong   = new Audio("wrong.mp3");
@@ -1559,21 +1584,21 @@
 
     function updateQuestUi() {
       if (!questTextEl) return;
-      let desc = "", progText = "";
+      let title = "", progText = "";
       if (quest.id === 1) {
-        desc = "Nhiệm vụ 1: Hoàn thành 5 câu đúng bất kỳ.";
-        progText = `${quest.progress} / ${quest.target}`;
+        title = "Nhiệm vụ 1";
+        progText = `${quest.progress}/${quest.target}`;
       } else if (quest.id === 2) {
-        desc = "Nhiệm vụ 2: Đạt 3 câu đúng liên tiếp.";
-        progText = `${quest.progress} / ${quest.target}`;
+        title = "Nhiệm vụ 2";
+        progText = `${quest.progress}/${quest.target}`;
       } else if (quest.id === 3 && !quest.completed) {
-        desc = "Nhiệm vụ 3: Hạ gục Boss Cuối Kỳ 1 lần.";
-        progText = `${quest.progress} / ${quest.target}`;
+        title = "Nhiệm vụ 3";
+        progText = `${quest.progress}/${quest.target}`;
       } else {
-        desc = "Tạm hết nhiệm vụ, hãy tiếp tục luyện tập nhé!";
+        title = "Không còn nhiệm vụ";
         progText = "";
       }
-      questTextEl.textContent = desc;
+      questTextEl.textContent = title;
       questProgressEl.textContent = progText;
     }
 
@@ -1639,9 +1664,27 @@
       });
     }
 
+    function toggleMusic() {
+      if (!bgMusic) return;
+      if (!musicOn) {
+        try {
+          bgMusic.play();
+          musicOn = true;
+          musicBtn.textContent = "🔊 Nhạc nền: Bật";
+        } catch (e) {
+          statusText.textContent = "Trình duyệt đang chặn tự phát nhạc, hãy bấm lại nút Nhạc nền.";
+        }
+      } else {
+        bgMusic.pause();
+        musicOn = false;
+        musicBtn.textContent = "🔊 Nhạc nền: Tắt";
+      }
+    }
+
     startBtn.addEventListener("click", () => {
       startBtn.disabled = true;
       statusText.textContent = "Bắt đầu luyện tập! Hãy chinh phục các câu hỏi Toán nào.";
+      if (!musicOn) toggleMusic();
       generateQuestion();
     });
     nextBtn.addEventListener("click", () => {
@@ -1651,6 +1694,7 @@
     bossBtn.addEventListener("click", enterBossMode);
     examBtn.addEventListener("click", toggleExamMode);
     endExamBtn.addEventListener("click", endExam);
+    musicBtn.addEventListener("click", toggleMusic);
 
     versionSelect.addEventListener("change", applyVersionConfig);
 
