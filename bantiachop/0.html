@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Học viện Anh Hùng – Hero Academy V7.1</title>
+  <title>Học viện Anh Hùng – Hero Academy V7.2</title>
   <style>
     * {
       box-sizing: border-box;
@@ -135,7 +135,7 @@
 
     .left-hero {
       position: relative;
-      padding: 14px 12px 40px;
+      padding: 18px 12px 32px;
       border-radius: 20px;
       background: radial-gradient(circle at top left, rgba(96,165,250,.35), rgba(15,23,42,.98));
       box-shadow: inset 0 0 40px rgba(15,23,42,.9);
@@ -161,26 +161,13 @@
       width:340px;
       height:260px;
       display:flex;
-      align-items:flex-end;
+      align-items:center;
       justify-content:center;
       font-size:190px;
       position:relative;
       overflow:visible;
       background:transparent;
       box-shadow:none;
-    }
-    /* Vòng tròn đen dưới vũ khí */
-    .hero-base-circle{
-      position:absolute;
-      bottom:-60px;
-      left:50%;
-      transform:translateX(-50%);
-      width:230px;
-      height:230px;
-      border-radius:999px;
-      background:#020617;
-      box-shadow:0 0 40px rgba(15,23,42,1);
-      z-index:1;
     }
     #heroEmoji {
       position:relative;
@@ -195,12 +182,13 @@
     .hero-name {
       font-size:20px;
       font-weight:700;
-      margin-top:26px;
+      margin-top:4px;
+      margin-bottom:0;
     }
 
     .hero-footer{
       position:absolute;
-      bottom:10px;
+      bottom:8px;
       left:50%;
       transform:translateX(-50%);
       display:flex;
@@ -223,7 +211,7 @@
     .orbit-wrapper{
       position:absolute;
       left:50%;
-      top:65%;
+      top:50%;
       width:0;
       height:0;
       animation:orbit-spin 18s linear infinite;
@@ -754,7 +742,6 @@
       <section class="left-hero">
         <div class="hero-main-row">
           <div id="heroAvatar" class="hero-avatar">
-            <div class="hero-base-circle"></div>
             <span id="heroEmoji">🗡️</span>
           </div>
           <div id="heroName" class="hero-name">Kiếm gỗ</div>
@@ -854,6 +841,7 @@
     </div>
   </div>
 
+  <!-- Hộp thoại chọn chế độ nâng cấp -->
   <div id="setupBackdrop" class="backdrop">
     <div class="modal">
       <h2>Chọn kiểu nâng cấp</h2>
@@ -895,6 +883,7 @@
     </div>
   </div>
 
+  <!-- Hộp thoại tổng kết -->
   <div id="summaryBackdrop" class="backdrop hidden">
     <div class="modal">
       <h2 id="modalTitle">Kết quả</h2>
@@ -1003,14 +992,6 @@
     const answersEl = document.getElementById("answers");
     const questionCard = document.getElementById("questionCard");
 
-    const skillDoubleBtn = document.getElementById("skillDouble");
-    const skillHintBtn = document.getElementById("skillHint");
-    const skillSkipBtn = document.getElementById("skillSkip");
-    const skillDoubleCountEl = document.getElementById("skillDoubleCount");
-    const skillHintCountEl = document.getElementById("skillHintCount");
-    const skillSkipCountEl = document.getElementById("skillSkipCount");
-    const activeSkillInfo = document.getElementById("activeSkillInfo");
-
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const bossBtn = document.getElementById("bossBtn");
@@ -1110,39 +1091,6 @@
     function onLevelUp() {
       statusText.textContent = `🎉 Bạn đã lên cấp ${level}!`;
       playSound(sndLevelUp);
-      if (level === 2) addSkill("hint", 1);
-      else if (level === 3) addSkill("double", 1);
-      else if (level === 4) addSkill("skip", 1);
-      else if (level >= 5) {
-        addSkill("double", 1);
-        addSkill("hint", 1);
-      }
-    }
-
-    function addSkill(type, count) {
-      skillCounts[type] = (skillCounts[type] || 0) + count;
-      updateSkillUi();
-      statusText.textContent = `🎴 Nhận được thẻ: ${skillLabel(type)} (x${count}).`;
-    }
-    function skillLabel(type) {
-      if (type === "double") return "Nhân đôi XP";
-      if (type === "hint")   return "Gợi ý";
-      if (type === "skip")   return "Bỏ qua";
-      return "Skill";
-    }
-    function updateSkillUi() {
-      if (!skillDoubleCountEl || !skillHintCountEl || !skillSkipCountEl) return;
-      skillDoubleCountEl.textContent = "x" + (skillCounts.double || 0);
-      skillHintCountEl.textContent   = "x" + (skillCounts.hint || 0);
-      skillSkipCountEl.textContent   = "x" + (skillCounts.skip || 0);
-      toggleSkillBtn(skillDoubleBtn, skillCounts.double > 0);
-      toggleSkillBtn(skillHintBtn,   skillCounts.hint > 0);
-      toggleSkillBtn(skillSkipBtn,   skillCounts.skip > 0);
-    }
-    function toggleSkillBtn(btn, enabled) {
-      if (!btn) return;
-      if (enabled) btn.classList.remove("disabled");
-      else btn.classList.add("disabled");
     }
 
     function resetBoss() {
@@ -1427,12 +1375,6 @@
       hintBox.classList.add("hidden");
       hintBox.textContent = "";
       answersEl.innerHTML = "";
-      if (activeSkillInfo) {
-        activeSkillInfo.textContent =
-          activeSkill === "double"
-            ? "🟦 Nhân đôi XP đang chờ câu trả lời đúng!"
-            : "";
-      }
 
       let type;
       if (chapterMode === "compare") type = "compare";
@@ -1709,10 +1651,6 @@
     bossBtn.addEventListener("click", enterBossMode);
     examBtn.addEventListener("click", toggleExamMode);
     endExamBtn.addEventListener("click", endExam);
-
-    if (skillDoubleBtn) skillDoubleBtn.addEventListener("click", () => useSkill("double"));
-    if (skillHintBtn)   skillHintBtn.addEventListener("click", () => useSkill("hint"));
-    if (skillSkipBtn)   skillSkipBtn.addEventListener("click", () => useSkill("skip"));
 
     versionSelect.addEventListener("change", applyVersionConfig);
 
