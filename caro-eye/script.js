@@ -62,6 +62,13 @@ const trainingPoints = [
 let trainingIndex = 0;
 
 // -------------------------------
+// Làm mượt tọa độ nhìn (smoothing)
+// -------------------------------
+let smoothX = null;
+let smoothY = null;
+const SMOOTH_ALPHA = 0.75; // càng gần 1 càng mượt (nhưng chậm phản ứng)
+
+// -------------------------------
 // Khởi tạo
 // -------------------------------
 function init() {
@@ -349,10 +356,19 @@ function onGazeData(data, timestamp) {
     return;
   }
 
-  const x = data.x;
-  const y = data.y;
+  const rawX = data.x;
+  const rawY = data.y;
 
-  updateGazeCursorPosition(x, y);
+  // Làm mượt tọa độ
+  if (smoothX === null || smoothY === null) {
+    smoothX = rawX;
+    smoothY = rawY;
+  } else {
+    smoothX = SMOOTH_ALPHA * smoothX + (1 - SMOOTH_ALPHA) * rawX;
+    smoothY = SMOOTH_ALPHA * smoothY + (1 - SMOOTH_ALPHA) * rawY;
+  }
+
+  updateGazeCursorPosition(smoothX, smoothY);
 
   // Nếu đang huấn luyện → chỉ hiển thị cursor, không xử lý chọn ô
   if (isTraining) {
@@ -361,6 +377,9 @@ function onGazeData(data, timestamp) {
   }
 
   const rect = boardEl.getBoundingClientRect();
+  const x = smoothX;
+  const y = smoothY;
+
   if (
     x < rect.left ||
     x > rect.right ||
@@ -460,7 +479,6 @@ function moveTrainingDot() {
   const p = trainingPoints[trainingIndex];
   trainingDot.style.display = "block";
 
-  // Đặt chấm theo phần trăm trong vùng overlay (trùng với vùng bàn cờ)
   trainingDot.style.left = (p.x * 100) + "%";
   trainingDot.style.top = (p.y * 100) + "%";
 
