@@ -19,7 +19,7 @@
       background: radial-gradient(circle at top, #1f2933 0, #020617 55%, #000 100%);
       color: #e5e7eb;
       transition: background 0.4s ease;
-      overflow-x: hidden;
+      overflow: hidden; /* khóa cuộn để không bị xê dịch */
     }
 
     body.winner-x {
@@ -29,9 +29,9 @@
       background: radial-gradient(circle at top, #3b1637 0, #020617 50%, #020617 100%);
     }
 
-    /* phóng to game ~130% trên màn hình rộng */
+    /* phóng to game ~120% trên màn hình rộng */
     .scale-wrap {
-      transform: scale(1.3);
+      transform: scale(1.2);
       transform-origin: center top;
     }
     @media (max-width: 900px) {
@@ -79,19 +79,12 @@
       z-index: 1;
     }
 
-    .subtitle { display: false; }
-
     /* Panel chọn bàn & nút reset – ẩn khỏi UI, vẫn để JS dùng */
     .control-row { display: none; }
 
-    #voiceStatus {
-      font-size: 12px;
-      color: #9ca3af;
-      max-width: 360px;
-      text-align: center;
-      margin: 2px auto 10px;
-      position: relative;
-      z-index: 1;
+    /* Ẩn hoàn toàn text trạng thái & lượt chơi để đỡ rối mắt, không làm giật layout */
+    #voiceStatus, #message {
+      display: none;
     }
 
     .arena {
@@ -101,7 +94,7 @@
       align-items: center;
       justify-content: center;
       gap: 24px;
-      margin-bottom: 14px;
+      margin-top: 6px;
     }
 
     .player {
@@ -517,26 +510,8 @@
       }
     }
 
-    .board.shake { animation: shakeDraw 0.4s ease-in-out; }
-
-    @keyframes shakeDraw {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-6px); }
-      40% { transform: translateX(6px); }
-      60% { transform: translateX(-4px); }
-      80% { transform: translateX(4px); }
-    }
-
-    #message {
-      position: relative;
-      z-index: 1;
-      margin-top: 4px;
-      min-height: 22px;
-      font-size: 14px;
-      text-align: center;
-      color: #e5e7eb;
-      text-shadow: 0 0 10px rgba(148, 163, 184, 0.8);
-    }
+    /* bỏ hiệu ứng lắc bàn cho đỡ khó chịu */
+    .board.shake { }
 
     @media (max-width: 860px) {
       .arena {
@@ -556,6 +531,12 @@
   </style>
 </head>
 <body>
+  <!-- NHẠC NỀN & HIỆU ỨNG ÂM THANH (file mp3 để chung thư mục) -->
+  <audio id="bgMusic" src="bg-music.mp3" autoplay loop></audio>
+  <audio id="clickSound" src="click.mp3"></audio>
+  <audio id="winSound" src="win.mp3"></audio>
+  <audio id="drawSound" src="draw.mp3"></audio>
+
   <div class="scale-wrap">
     <div class="game-container">
       <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
@@ -577,9 +558,7 @@
         </div>
       </div>
 
-      <div id="voiceStatus">
-        Hệ thống đang lắng nghe. Hãy đọc tọa độ ô cờ hoặc nói "chơi lại", "bàn cờ 5x5", "bàn cờ 7x7"...
-      </div>
+      <div id="voiceStatus"></div>
 
       <div class="arena">
         <div class="player" id="playerX">
@@ -631,87 +610,61 @@
     const boardEl = document.getElementById("board");
     const sizeSelect = document.getElementById("boardSize");
     const resetBtn = document.getElementById("resetMatch");
-    const msgEl = document.getElementById("message");
     const playerXEl = document.getElementById("playerX");
     const playerOEl = document.getElementById("playerO");
     const scoreXEl = document.getElementById("scoreX");
     const scoreOEl = document.getElementById("scoreO");
     const rowLabelsEl = document.getElementById("rowLabels");
     const colLabelsEl = document.getElementById("colLabels");
-    const voiceStatusEl = document.getElementById("voiceStatus");
 
-    let audioCtx = null;
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const bgMusic = document.getElementById("bgMusic");
+    const clickSound = document.getElementById("clickSound");
+    const winSound = document.getElementById("winSound");
+    const drawSound = document.getElementById("drawSound");
+
+    // cố gắng phát nhạc nền ngay khi load (trình duyệt có thể chặn, nhưng không cần click trong code)
+    window.addEventListener("load", function () {
+      if (bgMusic) {
+        bgMusic.volume = 0.35;
+        const p = bgMusic.play();
+        if (p && typeof p.catch === "function") {
+          p.catch(function () {
+            // nếu bị chặn autoplay thì thôi, không thông báo gì trên giao diện
+          });
+        }
       }
-    }
+    });
 
-    function playTone(freq, duration, type, volume, startOffset) {
-      if (!audioCtx) return;
-      if (freq === undefined) freq = 440;
-      if (duration === undefined) duration = 120;
-      if (type === undefined) type = "square";
-      if (volume === undefined) volume = 0.12;
-      if (startOffset === undefined) startOffset = 0;
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.value = volume;
-      osc.connect(gain).connect(audioCtx.destination);
-      const now = audioCtx.currentTime + startOffset;
-      osc.start(now);
-      osc.stop(now + duration / 1000);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration / 1000);
+    function playAudioSafe(audioEl) {
+      if (!audioEl) return;
+      try {
+        audioEl.currentTime = 0;
+        const p = audioEl.play();
+        if (p && typeof p.catch === "function") {
+          p.catch(function () {});
+        }
+      } catch (e) {}
     }
 
     function playClickSound() {
-      playTone(620, 90, "square", 0.16);
+      if (clickSound) {
+        clickSound.volume = 0.6;
+      }
+      playAudioSafe(clickSound);
     }
 
     function playVictoryMusic() {
-      if (!audioCtx) return;
-      const notes = [
-        { f: 523, d: 160 },
-        { f: 659, d: 160 },
-        { f: 784, d: 180 },
-        { f: 988, d: 220 },
-        { f: 1047, d: 260 }
-      ];
-      let offset = 0;
-      notes.forEach(function (n) {
-        playTone(n.f, n.d, "triangle", 0.22, offset / 1000);
-        offset += n.d - 40;
-      });
-      playTone(1319, 260, "sawtooth", 0.16, 0.8);
+      if (winSound) {
+        winSound.volume = 0.9;
+      }
+      playAudioSafe(winSound);
     }
 
     function playDrawSound() {
-      playTone(320, 130, "triangle", 0.16);
-      setTimeout(function () {
-        playTone(260, 110, "triangle", 0.13);
-      }, 120);
-    }
-
-    /* ====== NHẠC NỀN (loop nhẹ) ====== */
-    let bgMusicInterval = null;
-    function startBackgroundMusic() {
-      initAudio();
-      if (bgMusicInterval) return;
-      const pattern = [
-        { f: 261.6, d: 420 }, // C4
-        { f: 329.6, d: 420 }, // E4
-        { f: 392.0, d: 420 }, // G4
-        { f: 329.6, d: 420 }  // E4
-      ];
-      let idx = 0;
-      bgMusicInterval = setInterval(function () {
-        const n = pattern[idx];
-        playTone(n.f, n.d, "sine", 0.035);
-        idx = (idx + 1) % pattern.length;
-      }, 650);
+      if (drawSound) {
+        drawSound.volume = 0.7;
+      }
+      playAudioSafe(drawSound);
     }
 
     function updateLabels() {
@@ -746,13 +699,11 @@
       updateLabels();
 
       gameOver = false;
-      boardEl.classList.remove("shake");
       playerXEl.classList.remove("win-celebrate");
       playerOEl.classList.remove("win-celebrate");
       document.body.classList.remove("winner-x", "winner-o");
 
       updateActivePlayerUI();
-      updateMessage();
     }
 
     function indexToRC(index) {
@@ -767,8 +718,6 @@
 
     function onCellClick(e) {
       if (gameOver) return;
-      initAudio();
-      startBackgroundMusic(); // bật nhạc nền khi có nước đi đầu tiên
 
       const cell = e.currentTarget;
       const index = parseInt(cell.dataset.index, 10);
@@ -797,7 +746,6 @@
 
       currentPlayer = currentPlayer === PLAYER_X.symbol ? PLAYER_O.symbol : PLAYER_X.symbol;
       updateActivePlayerUI();
-      updateMessage();
     }
 
     function currentWinLength() {
@@ -875,10 +823,6 @@
       scoreXEl.textContent = String(scores.X);
       scoreOEl.textContent = String(scores.O);
 
-      const needed = currentWinLength();
-      const winnerName = winnerSymbol === PLAYER_X.symbol ? PLAYER_X.name : PLAYER_O.name;
-      msgEl.textContent = winnerName + " thắng ván này với chuỗi " + needed + " ô liên tiếp!";
-
       if (winnerSymbol === PLAYER_X.symbol) {
         document.body.classList.add("winner-x");
         playerXEl.classList.add("win-celebrate");
@@ -929,14 +873,12 @@
 
     function handleDraw() {
       gameOver = true;
-      msgEl.textContent = "Hòa! Bàn cờ đã kín mà không ai đạt đủ chuỗi thắng.";
       playDrawSound();
 
-      boardEl.classList.add("shake");
-      disableBoard();
+      const cells = boardEl.querySelectorAll(".cell");
+      cells.forEach(function (c) { c.classList.add("disabled"); });
 
       setTimeout(function () {
-        boardEl.classList.remove("shake");
         startingPlayer = startingPlayer === PLAYER_X.symbol ? PLAYER_O.symbol : PLAYER_X.symbol;
         currentPlayer = startingPlayer;
         createBoard();
@@ -953,18 +895,12 @@
       }
     }
 
-    function updateMessage() {
-      const playerName = currentPlayer === PLAYER_X.symbol ? PLAYER_X.name : PLAYER_O.name;
-      msgEl.textContent = "Đến lượt: " + playerName + " (" + currentPlayer + ") – hãy chọn 1 ô trống.";
-    }
-
     function setBoardSize(size) {
       boardSize = size;
       if (sizeSelect) sizeSelect.value = String(size);
       startingPlayer = PLAYER_X.symbol;
       currentPlayer = startingPlayer;
       createBoard();
-      msgEl.textContent = "Đã đổi sang bàn " + size + "×" + size + ". ĐỨC QUANG (X) đi trước.";
     }
 
     if (sizeSelect) {
@@ -979,7 +915,6 @@
         startingPlayer = PLAYER_X.symbol;
         currentPlayer = startingPlayer;
         createBoard();
-        msgEl.textContent = "Đã bắt đầu ván mới. ĐỨC QUANG (X) đi trước.";
       });
     }
 
@@ -989,7 +924,6 @@
 
     function setupSpeechRecognition() {
       if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
-        voiceStatusEl.textContent = "Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng Chrome trên máy tính.";
         return;
       }
 
@@ -999,27 +933,15 @@
       recognition.continuous = false;
       recognition.interimResults = false;
 
-      recognition.onstart = function () {
-        voiceStatusEl.textContent = "Đang lắng nghe... Hãy đọc tọa độ ô cờ hoặc nói 'chơi lại', 'bàn cờ 7x7'.";
-      };
-
       recognition.onend = function () {
         if (!listeningActive) return;
         if (!gameOver) {
           setTimeout(function () {
             try {
               recognition.start();
-            } catch (e) {
-              console.error(e);
-            }
+            } catch (e) {}
           }, 200);
-        } else {
-          voiceStatusEl.textContent = "Ván đã kết thúc. Nói 'chơi lại' để bắt đầu ván mới.";
         }
-      };
-
-      recognition.onerror = function (event) {
-        voiceStatusEl.textContent = "Lỗi giọng nói: " + event.error;
       };
 
       recognition.onresult = function (event) {
@@ -1064,7 +986,6 @@
 
     function setBoardSizeFromVoice(size) {
       setBoardSize(size);
-      voiceStatusEl.textContent = "Đã chuyển sang bàn " + size + "×" + size + ". ĐỨC QUANG (X) đi trước.";
     }
 
     function handleVoiceCommand(rawText) {
@@ -1077,7 +998,6 @@
           currentPlayer = startingPlayer;
           createBoard();
         }
-        voiceStatusEl.textContent = "Đã chơi lại ván mới.";
         return;
       }
 
@@ -1088,7 +1008,6 @@
       if (text.match(/3x3|3 x 3|bàn 3|bàn cờ 3/)) { setBoardSizeFromVoice(3); return; }
 
       if (gameOver) {
-        voiceStatusEl.textContent = "Ván đã kết thúc. Nói 'chơi lại' để bắt đầu ván mới.";
         return;
       }
 
@@ -1142,12 +1061,10 @@
       }
 
       if (row === null || col === null) {
-        voiceStatusEl.textContent = "Không hiểu tọa độ. Hãy đọc rõ: '1 2', '12', 'A 1', 'A1', hoặc 'bờ 2'.";
         return;
       }
 
       if (row < 1 || row > boardSize || col < 1 || col > boardSize) {
-        voiceStatusEl.textContent = "Tọa độ ngoài bàn cờ. Với bàn " + boardSize + "×" + boardSize + " hãy đọc trong phạm vi.";
         return;
       }
 
@@ -1157,32 +1074,23 @@
       const cellEl = boardEl.querySelector('.cell[data-index="' + cellIndex + '"]');
 
       if (!cellEl) {
-        voiceStatusEl.textContent = "Không tìm được ô tương ứng, hãy thử lại.";
         return;
       }
 
       if (boardState[cellIndex] !== "") {
-        voiceStatusEl.textContent = "Ô hàng " + row + " cột " + col + " đã có quân. Hãy đọc ô khác.";
         return;
       }
 
-      // đánh bằng giọng nói cũng coi như thao tác người dùng -> bật nhạc nền
-      initAudio();
-      startBackgroundMusic();
       cellEl.click();
-      voiceStatusEl.textContent = "Đã đánh vào ô hàng " + row + ", cột " + col + ".";
     }
 
     (function init() {
       createBoard();
-      msgEl.textContent = "ĐỨC QUANG (X) đi trước. Hãy chọn 1 ô để bắt đầu!";
       setupSpeechRecognition();
       if (recognition) {
         try {
           recognition.start();
-        } catch (e) {
-          console.error(e);
-        }
+        } catch (e) {}
       }
     })();
   </script>
