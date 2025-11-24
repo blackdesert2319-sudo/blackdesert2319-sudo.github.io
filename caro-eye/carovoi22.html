@@ -1047,11 +1047,16 @@
     }
 
     function letterToRow(letter) {
-      const l = letter.toLowerCase();
-      const map = { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 };
-      if (map.hasOwnProperty(l)) return map[l];
-      return null;
-    }
+  // Chuẩn hóa, bỏ dấu nếu có (á, à, ... -> a)
+  let base = letter.toLowerCase();
+  if (base.normalize) {
+    base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  const map = { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 };
+  if (map.hasOwnProperty(base)) return map[base];
+  return null;
+}
+
 
     function setBoardSizeFromVoice(size) {
       setBoardSize(size);
