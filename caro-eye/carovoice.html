@@ -79,15 +79,10 @@
       z-index: 1;
     }
 
-    /* Ẩn hoàn toàn subtitle hướng dẫn luật */
-    .subtitle {
-      display: none;
-    }
+    .subtitle { display: none; }
 
     /* Panel chọn bàn & nút reset – ẩn khỏi UI, vẫn để để JS dùng */
-    .control-row {
-      display: none;
-    }
+    .control-row { display: none; }
 
     #voiceStatus {
       font-size: 12px;
@@ -140,7 +135,6 @@
       opacity: 0.9;
     }
 
-    /* Khối tên 2 dòng + gạch chân */
     .name-block {
       position: relative;
       margin-bottom: 10px;
@@ -172,7 +166,6 @@
       box-shadow: 0 0 10px rgba(248, 250, 252, 0.85);
     }
 
-    /* dòng tên nhấp nháy khi đến lượt – dùng cho cả 2 dòng */
     .player.active .name-line {
       animation: nameBlink 0.9s linear infinite;
     }
@@ -279,12 +272,11 @@
       justify-content: center;
     }
 
-    /* container bao gồm cả nhãn + bàn cờ */
     .board-container {
       position: relative;
       display: inline-block;
-      padding-top: 30px;  /* chừa chỗ cho nhãn cột */
-      padding-left: 34px; /* chừa chỗ cho nhãn hàng */
+      padding-top: 30px;
+      padding-left: 34px;
     }
 
     .board {
@@ -323,7 +315,6 @@
       }
     }
 
-    /* nhãn hàng A,B,C... bên trái */
     .row-labels {
       position: absolute;
       left: 0;
@@ -345,7 +336,6 @@
         0 0 24px rgba(37, 99, 235, 0.95);
     }
 
-    /* nhãn cột 1,2,3... phía trên */
     .col-labels {
       position: absolute;
       left: 34px;
@@ -408,9 +398,7 @@
         0 0 20px rgba(56, 189, 248, 0.4);
     }
 
-    .cell:hover::before {
-      opacity: 1;
-    }
+    .cell:hover::before { opacity: 1; }
 
     .cell:active {
       transform: translateY(0);
@@ -501,9 +489,7 @@
       }
     }
 
-    .board.shake {
-      animation: shakeDraw 0.4s ease-in-out;
-    }
+    .board.shake { animation: shakeDraw 0.4s ease-in-out; }
 
     @keyframes shakeDraw {
       0%, 100% { transform: translateX(0); }
@@ -533,15 +519,11 @@
         width: 100%;
         max-width: 420px;
       }
-      #playerO .name-line {
-        text-align: left;
-      }
+      #playerO .name-line { text-align: left; }
     }
 
     @media (max-width: 640px) {
-      .player {
-        flex: 1 1 auto;
-      }
+      .player { flex: 1 1 auto; }
     }
   </style>
 </head>
@@ -551,7 +533,6 @@
       <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
       <div class="subtitle"></div>
 
-      <!-- Panel ẩn – vẫn giữ để JS thao tác -->
       <div class="control-row">
         <div class="control-panel">
           <label for="boardSize">
@@ -661,7 +642,7 @@
     }
 
     function playClickSound() {
-      playTone(620, 90, "square", 0.14);
+      playTone(620, 90, "square", 0.16);
     }
 
     function playVictoryMusic() {
@@ -675,17 +656,37 @@
       ];
       let offset = 0;
       notes.forEach(function (n) {
-        playTone(n.f, n.d, "triangle", 0.18, offset / 1000);
+        playTone(n.f, n.d, "triangle", 0.22, offset / 1000);
         offset += n.d - 40;
       });
-      playTone(1319, 260, "sawtooth", 0.11, 0.8);
+      playTone(1319, 260, "sawtooth", 0.16, 0.8);
     }
 
     function playDrawSound() {
-      playTone(320, 130, "triangle", 0.13);
+      playTone(320, 130, "triangle", 0.16);
       setTimeout(function () {
-        playTone(260, 110, "triangle", 0.11);
+        playTone(260, 110, "triangle", 0.13);
       }, 120);
+    }
+
+    /* ====== NHẠC NỀN (loop nhẹ nhàng) ====== */
+    let bgMusicInterval = null;
+    function startBackgroundMusic() {
+      initAudio();
+      if (bgMusicInterval) return;
+      const pattern = [
+        { f: 261.6, d: 420 }, // C4
+        { f: 329.6, d: 420 }, // E4
+        { f: 392.0, d: 420 }, // G4
+        { f: 329.6, d: 420 }  // E4
+      ];
+      let idx = 0;
+      bgMusicInterval = setInterval(function () {
+        const n = pattern[idx];
+        // nền rất nhỏ, không át tiếng click/thắng
+        playTone(n.f, n.d, "sine", 0.035);
+        idx = (idx + 1) % pattern.length;
+      }, 650);
     }
 
     function updateLabels() {
@@ -742,6 +743,7 @@
     function onCellClick(e) {
       if (gameOver) return;
       initAudio();
+      startBackgroundMusic(); // bật nhạc nền khi có nước đi đầu tiên
 
       const cell = e.currentTarget;
       const index = parseInt(cell.dataset.index, 10);
@@ -1015,7 +1017,6 @@
       return null;
     }
 
-    // A/B/C/D/E/F/G đọc là a, bê, bờ, cờ, xê, dờ, đê, ép, giê...
     function letterToRow(letter) {
       let base = letter.toLowerCase();
       if (base.normalize) {
@@ -1024,17 +1025,11 @@
 
       const map = {
         "a": 1,
-
         "b": 2, "be": 2, "bo": 2,
-
         "c": 3, "ce": 3, "co": 3,
-
         "d": 4, "de": 4, "do": 4,
-
         "e": 5,
-
         "f": 6, "ep": 6,
-
         "g": 7, "ge": 7
       };
 
@@ -1050,7 +1045,6 @@
     function handleVoiceCommand(rawText) {
       const text = rawText.toLowerCase().trim();
 
-      // lệnh chơi lại
       if (text.indexOf("chơi lại") !== -1 || text.indexOf("reset") !== -1 || text.indexOf("chơi ván mới") !== -1) {
         if (resetBtn) resetBtn.click();
         else {
@@ -1062,34 +1056,17 @@
         return;
       }
 
-      // lệnh đổi bàn cờ
-      if (text.match(/7x7|7 x 7|bàn 7|bàn cờ 7/)) {
-        setBoardSizeFromVoice(7);
-        return;
-      }
-      if (text.match(/6x6|6 x 6|bàn 6|bàn cờ 6/)) {
-        setBoardSizeFromVoice(6);
-        return;
-      }
-      if (text.match(/5x5|5 x 5|bàn 5|bàn cờ 5/)) {
-        setBoardSizeFromVoice(5);
-        return;
-      }
-      if (text.match(/4x4|4 x 4|bàn 4|bàn cờ 4/)) {
-        setBoardSizeFromVoice(4);
-        return;
-      }
-      if (text.match(/3x3|3 x 3|bàn 3|bàn cờ 3/)) {
-        setBoardSizeFromVoice(3);
-        return;
-      }
+      if (text.match(/7x7|7 x 7|bàn 7|bàn cờ 7/)) { setBoardSizeFromVoice(7); return; }
+      if (text.match(/6x6|6 x 6|bàn 6|bàn cờ 6/)) { setBoardSizeFromVoice(6); return; }
+      if (text.match(/5x5|5 x 5|bàn 5|bàn cờ 5/)) { setBoardSizeFromVoice(5); return; }
+      if (text.match(/4x4|4 x 4|bàn 4|bàn cờ 4/)) { setBoardSizeFromVoice(4); return; }
+      if (text.match(/3x3|3 x 3|bàn 3|bàn cờ 3/)) { setBoardSizeFromVoice(3); return; }
 
       if (gameOver) {
         voiceStatusEl.textContent = "Ván đã kết thúc. Nói 'chơi lại' để bắt đầu ván mới.";
         return;
       }
 
-      // xử lý tọa độ
       let row = null;
       let col = null;
 
@@ -1102,7 +1079,6 @@
       const letters = [];
 
       tokens.forEach(function (tok) {
-        // dạng dính liền: "a2", "B3"...
         let m = tok.match(/^([a-gA-G])(\d)$/);
         if (m) {
           letters.push(m[1]);
@@ -1110,14 +1086,12 @@
           return;
         }
 
-        // token là chữ cái / cách đọc chữ cái
         const rowFromLetter = letterToRow(tok);
         if (rowFromLetter !== null) {
           letters.push(tok);
           return;
         }
 
-        // chuỗi số liền nhau "12" -> 1,2
         if (/^\d+$/.test(tok) && tok.length >= 2) {
           tok.split("").forEach(function (ch) {
             const n = parseInt(ch, 10);
@@ -1134,7 +1108,6 @@
         }
       });
 
-      // ưu tiên: chữ cái + số
       if (letters.length >= 1 && numbers.length >= 1) {
         row = letterToRow(letters[0]);
         col = numbers[0];
@@ -1168,6 +1141,9 @@
         return;
       }
 
+      // đánh bằng giọng nói cũng coi như thao tác người dùng -> bắt đầu nhạc nền
+      initAudio();
+      startBackgroundMusic();
       cellEl.click();
       voiceStatusEl.textContent = "Đã đánh vào ô hàng " + row + ", cột " + col + ".";
     }
