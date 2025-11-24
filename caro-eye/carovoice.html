@@ -531,12 +531,6 @@
   </style>
 </head>
 <body>
-  <!-- NHẠC NỀN & HIỆU ỨNG ÂM THANH (file mp3 để chung thư mục) -->
-  <audio id="bgMusic" src="bg-music.mp3" autoplay loop></audio>
-  <audio id="clickSound" src="click.mp3"></audio>
-  <audio id="winSound" src="win.mp3"></audio>
-  <audio id="drawSound" src="draw.mp3"></audio>
-
   <div class="scale-wrap">
     <div class="game-container">
       <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
@@ -617,54 +611,30 @@
     const rowLabelsEl = document.getElementById("rowLabels");
     const colLabelsEl = document.getElementById("colLabels");
 
-    const bgMusic = document.getElementById("bgMusic");
-    const clickSound = document.getElementById("clickSound");
-    const winSound = document.getElementById("winSound");
-    const drawSound = document.getElementById("drawSound");
-
-    // cố gắng phát nhạc nền ngay khi load (trình duyệt có thể chặn, nhưng không cần click trong code)
-    window.addEventListener("load", function () {
-      if (bgMusic) {
-        bgMusic.volume = 0.35;
-        const p = bgMusic.play();
-        if (p && typeof p.catch === "function") {
-          p.catch(function () {
-            // nếu bị chặn autoplay thì thôi, không thông báo gì trên giao diện
-          });
+    /* ====== ÂM THANH CLICK ĐƠN GIẢN BẰNG WEB AUDIO API ====== */
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          audioCtx = new AC();
         }
       }
-    });
-
-    function playAudioSafe(audioEl) {
-      if (!audioEl) return;
-      try {
-        audioEl.currentTime = 0;
-        const p = audioEl.play();
-        if (p && typeof p.catch === "function") {
-          p.catch(function () {});
-        }
-      } catch (e) {}
     }
 
     function playClickSound() {
-      if (clickSound) {
-        clickSound.volume = 0.6;
-      }
-      playAudioSafe(clickSound);
-    }
-
-    function playVictoryMusic() {
-      if (winSound) {
-        winSound.volume = 0.9;
-      }
-      playAudioSafe(winSound);
-    }
-
-    function playDrawSound() {
-      if (drawSound) {
-        drawSound.volume = 0.7;
-      }
-      playAudioSafe(drawSound);
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 700;
+      gain.gain.value = 0.08;
+      osc.connect(gain).connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      osc.start(now);
+      osc.stop(now + 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
     }
 
     function updateLabels() {
@@ -851,8 +821,6 @@
         cell.style.animationDelay = String(delay) + "s";
       });
 
-      playVictoryMusic();
-
       setTimeout(function () {
         cells.forEach(function (cell) {
           cell.classList.remove("blink-multi");
@@ -873,7 +841,6 @@
 
     function handleDraw() {
       gameOver = true;
-      playDrawSound();
 
       const cells = boardEl.querySelectorAll(".cell");
       cells.forEach(function (c) { c.classList.add("disabled"); });
