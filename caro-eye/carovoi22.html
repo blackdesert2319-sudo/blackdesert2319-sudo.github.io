@@ -19,6 +19,7 @@
       background: radial-gradient(circle at top, #1f2933 0, #020617 55%, #000 100%);
       color: #e5e7eb;
       transition: background 0.4s ease;
+      overflow-x: hidden;
     }
 
     body.winner-x {
@@ -26,6 +27,17 @@
     }
     body.winner-o {
       background: radial-gradient(circle at top, #3b1637 0, #020617 50%, #020617 100%);
+    }
+
+    /* phóng to toàn bộ game ~150% trên màn hình rộng */
+    .scale-wrap {
+      transform: scale(1.5);
+      transform-origin: center top;
+    }
+    @media (max-width: 900px) {
+      .scale-wrap {
+        transform: scale(1);
+      }
     }
 
     .game-container {
@@ -96,6 +108,8 @@
         0 0 18px rgba(15, 23, 42, 0.95),
         0 0 26px rgba(31, 41, 55, 0.9);
       border: 1px solid rgba(75, 85, 99, 0.9);
+      /* Ẩn hẳn panel chọn bàn & nút chơi lại khỏi giao diện */
+      display: none;
     }
 
     .control-panel label {
@@ -133,31 +147,14 @@
       white-space: nowrap;
     }
 
-    button:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px);
-      box-shadow:
-        0 0 20px rgba(34, 197, 94, 0.98),
-        0 0 40px rgba(22, 163, 74, 0.9);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
-    }
-
-    /* Nút giọng nói khi đang nghe */
-    #voiceControlBtn.listening {
-      background: radial-gradient(circle at top left, #ef4444, #b91c1c);
-      box-shadow:
-        0 0 18px rgba(248, 113, 113, 0.9),
-        0 0 30px rgba(248, 113, 113, 0.9);
-    }
-
     #voiceStatus {
       font-size: 12px;
       color: #9ca3af;
-      max-width: 260px;
+      max-width: 420px;
+      text-align: center;
+      margin: 0 auto 12px;
+      position: relative;
+      z-index: 1;
     }
 
     .arena {
@@ -563,9 +560,6 @@
     }
 
     @media (max-width: 640px) {
-      .control-panel {
-        border-radius: 16px;
-      }
       .player {
         flex: 1 1 auto;
       }
@@ -573,61 +567,66 @@
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
-    <div class="subtitle">
-      Bàn 3×3, 4×4: thắng khi đủ 3 ô thẳng hàng. Bàn 5×5: thắng khi đủ 4 ô thẳng hàng.
-    </div>
-
-    <div class="control-row">
-      <div class="control-panel">
-        <label for="boardSize">
-          Kích thước bàn cờ:
-          <select id="boardSize">
-            <option value="3">3 × 3</option>
-            <option value="4">4 × 4</option>
-            <option value="5" selected>5 × 5</option>
-          </select>
-        </label>
-        <button id="resetMatch">Chơi lại ván mới</button>
-
-        <!-- nút điều khiển giọng nói -->
-        <button id="voiceControlBtn">🎙 Điều khiển bằng giọng nói</button>
-        <span id="voiceStatus">
-          Nhấn 🎙 và đọc tọa độ: "1 2" hoặc "A 2". Có thể nói: "chơi lại", "bàn cờ 3x3", "bàn cờ 5x5"...
-        </span>
-      </div>
-    </div>
-
-    <div class="arena">
-      <div class="player" id="playerX">
-        <div class="name">ĐỨC QUANG</div>
-        <div class="info-row">
-          <span>Quân:</span>
-          <span class="symbol-pill">X</span>
-        </div>
-        <div class="wins">Ván thắng: <span id="scoreX">0</span></div>
+  <div class="scale-wrap">
+    <div class="game-container">
+      <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
+      <div class="subtitle">
+        Bàn 3×3, 4×4: thắng khi đủ 3 ô liên tiếp. 5×5: 4 ô. 6×6, 7×7: 5 ô thẳng hàng.
       </div>
 
-      <div class="board-wrap">
-        <div class="board-container">
-          <div class="col-labels" id="colLabels"></div>
-          <div class="row-labels" id="rowLabels"></div>
-          <div id="board" class="board"></div>
+      <!-- Panel ẩn (vẫn để trong DOM để JS sử dụng) -->
+      <div class="control-row">
+        <div class="control-panel">
+          <label for="boardSize">
+            Kích thước bàn cờ:
+            <select id="boardSize">
+              <option value="3">3 × 3</option>
+              <option value="4">4 × 4</option>
+              <option value="5" selected>5 × 5</option>
+              <option value="6">6 × 6</option>
+              <option value="7">7 × 7</option>
+            </select>
+          </label>
+          <button id="resetMatch">Chơi lại ván mới</button>
         </div>
       </div>
 
-      <div class="player" id="playerO">
-        <div class="name">BÁ TRỰC</div>
-        <div class="info-row">
-          <span>Quân:</span>
-          <span class="symbol-pill">O</span>
-        </div>
-        <div class="wins">Ván thắng: <span id="scoreO">0</span></div>
+      <div id="voiceStatus">
+        Hệ thống đang nghe. Có thể đọc tọa độ:
+        "1 2", "12", "A 1", "A1", "bờ 2", "cờ 3"...
+        Hoặc nói: "chơi lại", "bàn cờ 5x5", "bàn cờ 7x7".
       </div>
-    </div>
 
-    <div id="message"></div>
+      <div class="arena">
+        <div class="player" id="playerX">
+          <div class="name">ĐỨC QUANG</div>
+          <div class="info-row">
+            <span>Quân:</span>
+            <span class="symbol-pill">X</span>
+          </div>
+          <div class="wins">Ván thắng: <span id="scoreX">0</span></div>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board-container">
+            <div class="col-labels" id="colLabels"></div>
+            <div class="row-labels" id="rowLabels"></div>
+            <div id="board" class="board"></div>
+          </div>
+        </div>
+
+        <div class="player" id="playerO">
+          <div class="name">BÁ TRỰC</div>
+          <div class="info-row">
+            <span>Quân:</span>
+            <span class="symbol-pill">O</span>
+          </div>
+          <div class="wins">Ván thắng: <span id="scoreO">0</span></div>
+        </div>
+      </div>
+
+      <div id="message"></div>
+    </div>
   </div>
 
   <script>
@@ -651,8 +650,6 @@
     const scoreOEl = document.getElementById("scoreO");
     const rowLabelsEl = document.getElementById("rowLabels");
     const colLabelsEl = document.getElementById("colLabels");
-
-    const voiceBtn = document.getElementById("voiceControlBtn");
     const voiceStatusEl = document.getElementById("voiceStatus");
 
     let audioCtx = null;
@@ -711,7 +708,7 @@
     }
 
     function updateLabels() {
-      const letters = ["A", "B", "C", "D", "E"];
+      const letters = ["A", "B", "C", "D", "E", "F", "G"];
       rowLabelsEl.innerHTML = "";
       colLabelsEl.innerHTML = "";
 
@@ -796,7 +793,9 @@
     }
 
     function currentWinLength() {
-      return boardSize === 5 ? 4 : 3;
+      if (boardSize <= 4) return 3;
+      if (boardSize === 5) return 4;
+      return 5; // 6x6, 7x7
     }
 
     function checkWin() {
@@ -953,34 +952,36 @@
 
     function setBoardSize(size) {
       boardSize = size;
-      sizeSelect.value = String(size);
+      if (sizeSelect) sizeSelect.value = String(size);
       startingPlayer = PLAYER_X.symbol;
       currentPlayer = startingPlayer;
       createBoard();
       msgEl.textContent = "Đã đổi sang bàn " + size + "×" + size + ". ĐỨC QUANG (X) đi trước.";
     }
 
-    sizeSelect.addEventListener("change", function () {
-      const size = parseInt(sizeSelect.value, 10);
-      setBoardSize(size);
-    });
+    if (sizeSelect) {
+      sizeSelect.addEventListener("change", function () {
+        const size = parseInt(sizeSelect.value, 10);
+        setBoardSize(size);
+      });
+    }
 
-    resetBtn.addEventListener("click", function () {
-      startingPlayer = PLAYER_X.symbol;
-      currentPlayer = startingPlayer;
-      createBoard();
-      msgEl.textContent = "Đã bắt đầu ván mới. ĐỨC QUANG (X) đi trước.";
-    });
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        startingPlayer = PLAYER_X.symbol;
+        currentPlayer = startingPlayer;
+        createBoard();
+        msgEl.textContent = "Đã bắt đầu ván mới. ĐỨC QUANG (X) đi trước.";
+      });
+    }
 
     // =============== NHẬN DIỆN GIỌNG NÓI ===============
     let recognition = null;
-    let isListening = false;
-    let keepListening = false;
+    let listeningActive = true; // luôn bật
 
     function setupSpeechRecognition() {
       if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
         voiceStatusEl.textContent = "Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng Chrome trên máy tính.";
-        voiceBtn.disabled = true;
         return;
       }
 
@@ -991,22 +992,13 @@
       recognition.interimResults = false;
 
       recognition.onstart = function () {
-        isListening = true;
-        voiceBtn.classList.add("listening");
-        voiceStatusEl.textContent = "Đang lắng nghe... Đọc: '1 2' hoặc 'A 2'. Bấm lại nút để tắt.";
+        voiceStatusEl.textContent = "Đang lắng nghe... Đọc: '1 2', '12', 'A 1', 'A1', 'bờ 2'... hoặc 'chơi lại', 'bàn cờ 7x7'.";
       };
 
       recognition.onend = function () {
-        isListening = false;
-
-        if (!keepListening) {
-          voiceBtn.classList.remove("listening");
-          if (!gameOver) {
-            voiceStatusEl.textContent = "Nhấn 🎙 và đọc tọa độ: '1 2' hoặc 'A 2'. Có thể nói 'chơi lại', 'bàn cờ 3x3'...";
-          }
+        if (!listeningActive) {
           return;
         }
-
         if (!gameOver) {
           setTimeout(function () {
             try {
@@ -1016,15 +1008,11 @@
             }
           }, 200);
         } else {
-          voiceBtn.classList.remove("listening");
-          voiceStatusEl.textContent = "Ván đã kết thúc. Nhấn 'Chơi lại ván mới' để chơi tiếp.";
+          voiceStatusEl.textContent = "Ván đã kết thúc. Nói 'chơi lại' để bắt đầu ván mới.";
         }
       };
 
       recognition.onerror = function (event) {
-        isListening = false;
-        voiceBtn.classList.remove("listening");
-        keepListening = false;
         voiceStatusEl.textContent = "Lỗi giọng nói: " + event.error;
       };
 
@@ -1040,23 +1028,53 @@
         "hai": 2, "2": 2,
         "ba": 3, "3": 3,
         "bốn": 4, "bon": 4, "4": 4,
-        "năm": 5, "lam": 5, "5": 5
+        "năm": 5, "nam": 5, "5": 5,
+        "sáu": 6, "sau": 6, "6": 6,
+        "bảy": 7, "bay": 7, "bẩy": 7, "7": 7
       };
       if (map.hasOwnProperty(word)) return map[word];
       return null;
     }
 
+    // Hỗ trợ A/B/C/D/E đọc là "a", "bê", "bờ", "cờ", "xê", "dờ", "đê", "e"...
     function letterToRow(letter) {
-  // Chuẩn hóa, bỏ dấu nếu có (á, à, ... -> a)
-  let base = letter.toLowerCase();
-  if (base.normalize) {
-    base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-  const map = { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 };
-  if (map.hasOwnProperty(base)) return map[base];
-  return null;
-}
+      let base = letter.toLowerCase();
+      if (base.normalize) {
+        base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      }
 
+      const map = {
+        // A
+        "a": 1,
+
+        // B: b, be, bo (bê, bờ)
+        "b": 2,
+        "be": 2,
+        "bo": 2,
+
+        // C: c, ce, co (xê, cờ)
+        "c": 3,
+        "ce": 3,
+        "co": 3,
+
+        // D: d, de, do (đê, dờ)
+        "d": 4,
+        "de": 4,
+        "do": 4,
+
+        // E: e
+        "e": 5,
+
+        // F: ép...
+        "f": 6, "ep": 6,
+
+        // G: giê...
+        "g": 7, "ge": 7
+      };
+
+      if (map.hasOwnProperty(base)) return map[base];
+      return null;
+    }
 
     function setBoardSizeFromVoice(size) {
       setBoardSize(size);
@@ -1068,12 +1086,25 @@
 
       // lệnh chơi lại
       if (text.indexOf("chơi lại") !== -1 || text.indexOf("reset") !== -1 || text.indexOf("chơi ván mới") !== -1) {
-        resetBtn.click();
+        if (resetBtn) resetBtn.click();
+        else {
+          startingPlayer = PLAYER_X.symbol;
+          currentPlayer = startingPlayer;
+          createBoard();
+        }
         voiceStatusEl.textContent = "Đã chơi lại ván mới.";
         return;
       }
 
       // lệnh đổi bàn cờ
+      if (text.match(/7x7|7 x 7|bàn 7|bàn cờ 7/)) {
+        setBoardSizeFromVoice(7);
+        return;
+      }
+      if (text.match(/6x6|6 x 6|bàn 6|bàn cờ 6/)) {
+        setBoardSizeFromVoice(6);
+        return;
+      }
       if (text.match(/5x5|5 x 5|bàn 5|bàn cờ 5/)) {
         setBoardSizeFromVoice(5);
         return;
@@ -1088,11 +1119,11 @@
       }
 
       if (gameOver) {
-        voiceStatusEl.textContent = "Ván đã kết thúc. Nhấn 'Chơi lại ván mới' để chơi tiếp.";
+        voiceStatusEl.textContent = "Ván đã kết thúc. Nói 'chơi lại' để bắt đầu ván mới.";
         return;
       }
 
-      // tọa độ
+      // xử lý tọa độ
       let row = null;
       let col = null;
 
@@ -1105,13 +1136,22 @@
       const letters = [];
 
       tokens.forEach(function (tok) {
-        // token là chữ cái A-E
-        if (/^[abcde]$/.test(tok)) {
+        // dạng dính liền: "a2", "B3"...
+        let m = tok.match(/^([a-gA-G])(\d)$/);
+        if (m) {
+          letters.push(m[1]);
+          numbers.push(parseInt(m[2], 10));
+          return;
+        }
+
+        // token là chữ cái / từ đọc chữ cái: a, b, bê, bờ, cờ, dờ...
+        const rowFromLetter = letterToRow(tok);
+        if (rowFromLetter !== null) {
           letters.push(tok);
           return;
         }
 
-        // token là chuỗi số liền nhau "12"
+        // token là chuỗi số liền nhau "12" -> 1,2
         if (/^\d+$/.test(tok) && tok.length >= 2) {
           tok.split("").forEach(function (ch) {
             const n = parseInt(ch, 10);
@@ -1128,7 +1168,7 @@
         }
       });
 
-      // ưu tiên kiểu A 2 (chữ cái + số)
+      // ưu tiên kiểu chữ cái + số (A 1, bờ 2,...)
       if (letters.length >= 1 && numbers.length >= 1) {
         row = letterToRow(letters[0]);
         col = numbers[0];
@@ -1138,7 +1178,7 @@
       }
 
       if (row === null || col === null) {
-        voiceStatusEl.textContent = "Không hiểu tọa độ. Hãy đọc rõ: '1 2' hoặc 'A 2' (hàng A cột 2).";
+        voiceStatusEl.textContent = "Không hiểu tọa độ. Hãy đọc rõ: '1 2', '12', 'A 1', 'A1', hoặc 'bờ 2'.";
         return;
       }
 
@@ -1166,38 +1206,17 @@
       voiceStatusEl.textContent = "Đã đánh vào ô hàng " + row + ", cột " + col + ". Bạn có thể đọc tiếp tọa độ khác.";
     }
 
-    if (voiceBtn) {
-      voiceBtn.addEventListener("click", function () {
-        if (!recognition) {
-          setupSpeechRecognition();
-        }
-        if (!recognition) return;
-
-        if (!keepListening) {
-          keepListening = true;
-          voiceStatusEl.textContent = "Đang lắng nghe... Đọc: '1 2' hoặc 'A 2'. Bấm lại nút để tắt.";
-          try {
-            recognition.start();
-          } catch (e) {
-            console.error(e);
-          }
-        } else {
-          keepListening = false;
-          try {
-            recognition.stop();
-          } catch (e) {
-            console.error(e);
-          }
-          voiceBtn.classList.remove("listening");
-          voiceStatusEl.textContent = "Đã tắt điều khiển bằng giọng nói.";
-        }
-      });
-    }
-
     (function init() {
       createBoard();
       msgEl.textContent = "ĐỨC QUANG (X) đi trước. Hãy chọn 1 ô để bắt đầu!";
       setupSpeechRecognition();
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error(e);
+        }
+      }
     })();
   </script>
 </body>
