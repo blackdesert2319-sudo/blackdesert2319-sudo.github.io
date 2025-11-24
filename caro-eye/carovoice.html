@@ -79,9 +79,9 @@
       z-index: 1;
     }
 
-    .subtitle { display: none; }
+    .subtitle { display: false; }
 
-    /* Panel chọn bàn & nút reset – ẩn khỏi UI, vẫn để để JS dùng */
+    /* Panel chọn bàn & nút reset – ẩn khỏi UI, vẫn để JS dùng */
     .control-row { display: none; }
 
     #voiceStatus {
@@ -111,8 +111,8 @@
       background: radial-gradient(circle at top left, #020617, #020617 40%, #020617 100%);
       border: 1px solid rgba(96, 165, 250, 0.9);
       box-shadow:
-        0 0 30px rgba(56, 189, 248, 0.65),
-        0 0 55px rgba(37, 99, 235, 0.75);
+        0 0 40px rgba(56, 189, 248, 0.75),
+        0 0 70px rgba(37, 99, 235, 0.85);
       position: relative;
       overflow: hidden;
       transform-style: preserve-3d;
@@ -126,13 +126,13 @@
       background:
         radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.25), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(251, 113, 133, 0.25), transparent 55%);
-      opacity: 0.3;
+      opacity: 0.35;
       pointer-events: none;
       mix-blend-mode: screen;
     }
 
     .player.active::before {
-      opacity: 0.9;
+      opacity: 1;
     }
 
     .name-block {
@@ -140,43 +140,71 @@
       margin-bottom: 10px;
     }
 
-    .name-line {
+    .player-name {
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-size: 18px;
+      letter-spacing: 0.20em;
+      font-size: 20px;
       text-shadow:
-        0 0 14px rgba(248, 250, 252, 1),
-        0 0 26px rgba(15, 23, 42, 1);
+        0 0 4px rgba(15, 23, 42, 1),
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(248, 250, 252, 1),
+        0 0 26px rgba(56, 189, 248, 1),
+        0 0 36px rgba(56, 189, 248, 0.95);
+      transform: translateZ(20px);
     }
 
-    #playerX .name-line {
+    #playerX .player-name {
       color: #38bdf8;
+      text-align: left;
     }
-    #playerO .name-line {
+
+    #playerO .player-name {
       color: #fb7185;
       text-align: right;
+      text-shadow:
+        0 0 4px rgba(15, 23, 42, 1),
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(248, 250, 252, 1),
+        0 0 26px rgba(251, 113, 133, 1),
+        0 0 36px rgba(251, 113, 133, 0.95);
     }
 
     .name-underline {
-      margin-top: 3px;
+      margin-top: 4px;
       height: 2px;
       border-radius: 999px;
       background: linear-gradient(to right, rgba(148, 163, 184, 0.2), #e5e7eb, rgba(148, 163, 184, 0.2));
-      box-shadow: 0 0 10px rgba(248, 250, 252, 0.85);
+      box-shadow:
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(148, 163, 184, 0.9);
     }
 
-    .player.active .name-line {
+    .player.active .player-name {
       animation: nameBlink 0.9s linear infinite;
     }
 
     @keyframes nameBlink {
-      0%, 100% { opacity: 1; text-shadow: 0 0 18px rgba(248, 250, 252, 1); }
-      50% { opacity: 0.6; text-shadow: 0 0 30px rgba(248, 250, 252, 1); }
+      0%, 100% {
+        opacity: 1;
+        text-shadow:
+          0 0 6px rgba(15, 23, 42, 1),
+          0 0 12px rgba(248, 250, 252, 1),
+          0 0 24px rgba(129, 140, 248, 1),
+          0 0 40px rgba(56, 189, 248, 1);
+      }
+      50% {
+        opacity: 0.7;
+        text-shadow:
+          0 0 4px rgba(15, 23, 42, 1),
+          0 0 16px rgba(248, 250, 252, 1),
+          0 0 32px rgba(129, 140, 248, 1),
+          0 0 50px rgba(56, 189, 248, 1);
+      }
     }
 
     .player-bottom {
-      margin-top: 8px;
+      margin-top: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -242,8 +270,8 @@
 
     .player.active {
       box-shadow:
-        0 0 38px rgba(56, 189, 248, 1),
-        0 0 70px rgba(59, 130, 246, 1);
+        0 0 46px rgba(56, 189, 248, 1),
+        0 0 80px rgba(59, 130, 246, 1);
       border-color: rgba(129, 140, 248, 1);
       animation: playerTilt 1.3s ease-in-out infinite alternate;
     }
@@ -519,7 +547,7 @@
         width: 100%;
         max-width: 420px;
       }
-      #playerO .name-line { text-align: left; }
+      #playerO .player-name { text-align: left; }
     }
 
     @media (max-width: 640px) {
@@ -531,8 +559,8 @@
   <div class="scale-wrap">
     <div class="game-container">
       <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
-      <div class="subtitle"></div>
 
+      <!-- Panel ẩn -->
       <div class="control-row">
         <div class="control-panel">
           <label for="boardSize">
@@ -556,8 +584,7 @@
       <div class="arena">
         <div class="player" id="playerX">
           <div class="name-block">
-            <div class="name-line">ĐỨC</div>
-            <div class="name-line">QUANG</div>
+            <div class="player-name">ĐỨC QUANG</div>
             <div class="name-underline"></div>
           </div>
           <div class="player-bottom">
@@ -576,8 +603,7 @@
 
         <div class="player" id="playerO">
           <div class="name-block">
-            <div class="name-line">BÁ</div>
-            <div class="name-line">TRỰC</div>
+            <div class="player-name">BÁ TRỰC</div>
             <div class="name-underline"></div>
           </div>
           <div class="player-bottom">
@@ -669,7 +695,7 @@
       }, 120);
     }
 
-    /* ====== NHẠC NỀN (loop nhẹ nhàng) ====== */
+    /* ====== NHẠC NỀN (loop nhẹ) ====== */
     let bgMusicInterval = null;
     function startBackgroundMusic() {
       initAudio();
@@ -683,7 +709,6 @@
       let idx = 0;
       bgMusicInterval = setInterval(function () {
         const n = pattern[idx];
-        // nền rất nhỏ, không át tiếng click/thắng
         playTone(n.f, n.d, "sine", 0.035);
         idx = (idx + 1) % pattern.length;
       }, 650);
@@ -1141,7 +1166,7 @@
         return;
       }
 
-      // đánh bằng giọng nói cũng coi như thao tác người dùng -> bắt đầu nhạc nền
+      // đánh bằng giọng nói cũng coi như thao tác người dùng -> bật nhạc nền
       initAudio();
       startBackgroundMusic();
       cellEl.click();
