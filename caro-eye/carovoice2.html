@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Cờ ca rô – ĐỨC QUANG vs BÁ TRỰC</title>
   <style>
-    /* ===== BIẾN MÀU NEON LẤY TỪ gg.html ===== */
     :root {
       --bg-color: #050508;
       --glass-bg: rgba(255, 255, 255, 0.03);
@@ -47,7 +46,6 @@
         radial-gradient(circle at 90% 80%, rgba(250, 204, 21, 0.18) 0%, transparent 40%);
     }
 
-    /* phóng to game ~120% trên màn hình rộng */
     .scale-wrap {
       transform: scale(1.2);
       transform-origin: center top;
@@ -58,10 +56,10 @@
       }
     }
 
-    /* ===== KHUNG GAME – GIỮ BỐ CỤC, ĐỔI STYLE GLASS NEON ===== */
+    /* GIẢM LỀ TRÊN, TĂNG LỀ DƯỚI */
     .game-container {
       width: min(1100px, 96vw);
-      padding: 22px 24px 32px;
+      padding: 14px 24px 44px; /* top 14px, bottom 44px */
       border-radius: 28px;
       background: rgba(0, 0, 0, 0.35);
       backdrop-filter: blur(22px);
@@ -86,7 +84,7 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-size: clamp(26px, 3.4vw, 32px);
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -99,41 +97,13 @@
       z-index: 1;
     }
 
-    /* VS badge */
-    .vs-bar {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-
-    .vs-line {
-      height: 1px;
-      width: 90px;
-      background: linear-gradient(to right, transparent, rgba(148, 163, 184, 0.7), transparent);
-      box-shadow: 0 0 10px rgba(148, 163, 184, 0.8);
-    }
-
-    .vs-badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(248, 250, 252, 0.7);
-      background: rgba(0, 0, 0, 0.7);
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      font-size: 14px;
-      color: #e5e7eb;
-      text-shadow: var(--text-glow);
-    }
+    /* ẨN THANH VS NHỎ TRÊN BÀN CỜ */
+    .vs-bar { display: none; }
 
     /* Panel chọn bàn & text ẩn */
     .control-row { display: none; }
     #voiceStatus, #message { display: none; }
 
-    /* ===== LAYOUT 3 CỘT – GIỮ NGUYÊN ===== */
     .arena {
       position: relative;
       z-index: 1;
@@ -144,7 +114,7 @@
       margin-top: 6px;
     }
 
-    /* ===== PLAYER CARD – GLASS + NEON X/O ===== */
+    /* PLAYER CARD */
     .player {
       flex: 0 0 240px;
       padding: 18px 16px 20px;
@@ -157,17 +127,7 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.8);
     }
 
-    .player::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background:
-        radial-gradient(circle at 0 0, rgba(0, 243, 255, 0.22), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(188, 19, 254, 0.22), transparent 55%);
-      opacity: 0.3;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
+    /* BỎ NỀN MỜ LOE QUANH KHUNG NGƯỜI CHƠI (XOÁ ::before) */
 
     .name-block {
       position: relative;
@@ -286,9 +246,6 @@
         0 0 40px rgba(0,0,0,0.8);
     }
 
-    .player.active::before { opacity: 0.6; }
-
-    /* ===== BÀN CỜ – GIỮ BỐ CỤC, GIẢM 10% KÍCH THƯỚC ===== */
     .board-wrap {
       flex: 0 0 auto;
       display: flex;
@@ -302,13 +259,13 @@
       padding-left: 34px;
     }
 
+    /* BÀN CỜ GIẢM 10% */
     .board {
       --size: 3;
       display: grid;
       grid-template-columns: repeat(var(--size), 1fr);
       grid-auto-rows: 1fr;
       gap: 5px;
-      /* GIẢM 10%: 460px → 414px, 90vw → 81vw */
       width: min(414px, 81vw);
       aspect-ratio: 1 / 1;
       padding: 14px;
@@ -358,7 +315,6 @@
         0 0 10px rgba(0,243,255,0.8);
     }
 
-    /* Ô CỜ – STYLE NEON TỪ gg.html, GIỮ aspect-ratio để KHÔNG CO GIÃN */
     .cell {
       display: flex;
       align-items: center;
@@ -406,7 +362,6 @@
 
     .cell.filled-x,
     .cell.filled-o {
-      /* giữ rất nhẹ, không quá rực */
       background: rgba(255,255,255,0.06);
       box-shadow: 0 0 12px rgba(255,255,255,0.12);
     }
@@ -447,7 +402,6 @@
       }
     }
 
-    /* BANNER CHIẾN THẮNG – GIỮ, NHƯNG TÔNG NEON */
     .win-banner {
       position: absolute;
       inset: 0;
@@ -534,13 +488,13 @@
     <div class="game-container">
       <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
 
+      <!-- VS bị ẩn bằng CSS nhưng giữ HTML nếu sau này muốn bật lại -->
       <div class="vs-bar">
         <div class="vs-line"></div>
         <div class="vs-badge">VS</div>
         <div class="vs-line"></div>
       </div>
 
-      <!-- Panel ẩn -->
       <div class="control-row">
         <div class="control-panel">
           <label for="boardSize">
@@ -559,7 +513,6 @@
 
       <div id="voiceStatus"></div>
 
-      <!-- Banner chiến thắng -->
       <div id="winBanner" class="win-banner">
         <div class="win-banner-inner">
           <div class="win-banner-text" id="winBannerText"></div>
@@ -628,7 +581,6 @@
     const winBanner = document.getElementById("winBanner");
     const winBannerText = document.getElementById("winBannerText");
 
-    /* ====== ÂM THANH CLICK ====== */
     let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
@@ -686,11 +638,8 @@
       updateLabels();
 
       gameOver = false;
-      playerXEl.classList.remove("win-celebrate");
-      playerOEl.classList.remove("win-celebrate");
       document.body.classList.remove("winner-x", "winner-o");
       hideWinBanner();
-
       updateActivePlayerUI();
     }
 
@@ -727,7 +676,7 @@
         return;
       }
 
-      if (boardState.every(function (v) { return v !== ""; })) {
+      if (boardState.every(v => v !== "")) {
         handleDraw();
         return;
       }
@@ -739,7 +688,7 @@
     function currentWinLength() {
       if (boardSize <= 4) return 3;
       if (boardSize === 5) return 4;
-      return 5; // 6x6, 7x7
+      return 5;
     }
 
     function checkWin() {
@@ -756,13 +705,10 @@
         const symbol = boardState[index];
         if (!symbol) continue;
 
-        const rc = indexToRC(index);
-        const row = rc.row;
-        const col = rc.col;
+        const { row, col } = indexToRC(index);
 
         for (let d = 0; d < dirs.length; d++) {
-          const dr = dirs[d].dr;
-          const dc = dirs[d].dc;
+          const { dr, dc } = dirs[d];
           const line = [index];
           let ok = true;
 
@@ -782,7 +728,7 @@
           }
 
           if (ok && line.length === needed) {
-            return { winner: symbol, line: line };
+            return { winner: symbol, line };
           }
         }
       }
@@ -791,12 +737,12 @@
 
     function disableBoard() {
       const cells = boardEl.querySelectorAll(".cell");
-      cells.forEach(function (c) { c.classList.add("disabled"); });
+      cells.forEach(c => c.classList.add("disabled"));
     }
 
     function highlightWinningCells(line) {
       const cells = boardEl.querySelectorAll(".cell");
-      line.forEach(function (idx) {
+      line.forEach(idx => {
         if (cells[idx]) cells[idx].classList.add("win-cell");
       });
     }
@@ -806,15 +752,11 @@
       if (winBannerText) {
         winBannerText.textContent = (name + " chiến thắng!").toUpperCase();
       }
-      if (winBanner) {
-        winBanner.classList.add("visible");
-      }
+      if (winBanner) winBanner.classList.add("visible");
     }
 
     function hideWinBanner() {
-      if (winBanner) {
-        winBanner.classList.remove("visible");
-      }
+      if (winBanner) winBanner.classList.remove("visible");
     }
 
     function handleWin(winInfo) {
@@ -846,18 +788,18 @@
         "rgba(250, 204, 21, 0.9)",
         "rgba(34, 197, 94, 0.9)"
       ];
-      cells.forEach(function (cell) {
+      cells.forEach(cell => {
         const color = colors[Math.floor(Math.random() * colors.length)];
         const duration = 0.45 + Math.random() * 0.5;
         const delay = Math.random() * 0.4;
         cell.classList.add("blink-multi");
         cell.style.setProperty("--blink-color", color);
-        cell.style.animationDuration = String(duration) + "s";
-        cell.style.animationDelay = String(delay) + "s";
+        cell.style.animationDuration = duration + "s";
+        cell.style.animationDelay = delay + "s";
       });
 
-      setTimeout(function () {
-        cells.forEach(function (cell) {
+      setTimeout(() => {
+        cells.forEach(cell => {
           cell.classList.remove("blink-multi");
           cell.style.removeProperty("--blink-color");
           cell.style.animationDuration = "";
@@ -875,11 +817,10 @@
 
     function handleDraw() {
       gameOver = true;
-
       const cells = boardEl.querySelectorAll(".cell");
-      cells.forEach(function (c) { c.classList.add("disabled"); });
+      cells.forEach(c => c.classList.add("disabled"));
 
-      setTimeout(function () {
+      setTimeout(() => {
         startingPlayer = startingPlayer === PLAYER_X.symbol ? PLAYER_O.symbol : PLAYER_X.symbol;
         currentPlayer = startingPlayer;
         createBoard();
@@ -905,21 +846,20 @@
     }
 
     if (sizeSelect) {
-      sizeSelect.addEventListener("change", function () {
+      sizeSelect.addEventListener("change", () => {
         const size = parseInt(sizeSelect.value, 10);
         setBoardSize(size);
       });
     }
 
     if (resetBtn) {
-      resetBtn.addEventListener("click", function () {
+      resetBtn.addEventListener("click", () => {
         startingPlayer = PLAYER_X.symbol;
         currentPlayer = startingPlayer;
         createBoard();
       });
     }
 
-    // =============== NHẬN DIỆN GIỌNG NÓI ===============
     let recognition = null;
     let listeningActive = true;
 
@@ -937,10 +877,8 @@
       recognition.onend = function () {
         if (!listeningActive) return;
         if (!gameOver) {
-          setTimeout(function () {
-            try {
-              recognition.start();
-            } catch (e) {}
+          setTimeout(() => {
+            try { recognition.start(); } catch (e) {}
           }, 200);
         }
       };
@@ -961,8 +899,7 @@
         "sáu": 6, "sau": 6, "6": 6,
         "bảy": 7, "bay": 7, "bẩy": 7, "7": 7
       };
-      if (map.hasOwnProperty(word)) return map[word];
-      return null;
+      return map.hasOwnProperty(word) ? map[word] : null;
     }
 
     function letterToRow(letter) {
@@ -981,8 +918,7 @@
         "g": 7, "ge": 7
       };
 
-      if (map.hasOwnProperty(base)) return map[base];
-      return null;
+      return map.hasOwnProperty(base) ? map[base] : null;
     }
 
     function setBoardSizeFromVoice(size) {
@@ -992,7 +928,7 @@
     function handleVoiceCommand(rawText) {
       const text = rawText.toLowerCase().trim();
 
-      if (text.indexOf("chơi lại") !== -1 || text.indexOf("reset") !== -1 || text.indexOf("chơi ván mới") !== -1) {
+      if (text.includes("chơi lại") || text.includes("reset") || text.includes("chơi ván mới")) {
         if (resetBtn) resetBtn.click();
         else {
           startingPlayer = PLAYER_X.symbol;
@@ -1008,9 +944,7 @@
       if (text.match(/4x4|4 x 4|bàn 4|bàn cờ 4/)) { setBoardSizeFromVoice(4); return; }
       if (text.match(/3x3|3 x 3|bàn 3|bàn cờ 3/)) { setBoardSizeFromVoice(3); return; }
 
-      if (gameOver) {
-        return;
-      }
+      if (gameOver) return;
 
       let row = null;
       let col = null;
@@ -1018,12 +952,12 @@
       const tokens = text
         .replace(/[,\.]/g, " ")
         .split(/\s+/)
-        .filter(function (t) { return t.length > 0; });
+        .filter(t => t.length > 0);
 
       const numbers = [];
       const letters = [];
 
-      tokens.forEach(function (tok) {
+      tokens.forEach(tok => {
         let m = tok.match(/^([a-gA-G])(\d)$/);
         if (m) {
           letters.push(m[1]);
@@ -1038,7 +972,7 @@
         }
 
         if (/^\d+$/.test(tok) && tok.length >= 2) {
-          tok.split("").forEach(function (ch) {
+          tok.split("").forEach(ch => {
             const n = parseInt(ch, 10);
             if (!isNaN(n)) numbers.push(n);
           });
@@ -1061,26 +995,16 @@
         col = numbers[1];
       }
 
-      if (row === null || col === null) {
-        return;
-      }
-
-      if (row < 1 || row > boardSize || col < 1 || col > boardSize) {
-        return;
-      }
+      if (row === null || col === null) return;
+      if (row < 1 || row > boardSize || col < 1 || col > boardSize) return;
 
       const rIndex = row - 1;
       const cIndex = col - 1;
       const cellIndex = rcToIndex(rIndex, cIndex);
       const cellEl = boardEl.querySelector('.cell[data-index="' + cellIndex + '"]');
 
-      if (!cellEl) {
-        return;
-      }
-
-      if (boardState[cellIndex] !== "") {
-        return;
-      }
+      if (!cellEl) return;
+      if (boardState[cellIndex] !== "") return;
 
       cellEl.click();
     }
@@ -1089,9 +1013,7 @@
       createBoard();
       setupSpeechRecognition();
       if (recognition) {
-        try {
-          recognition.start();
-        } catch (e) {}
+        try { recognition.start(); } catch (e) {}
       }
     })();
   </script>
