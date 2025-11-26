@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Cờ ca rô – ĐỨC QUANG vs BÁ TRỰC</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+      color: #e5e7eb;
+      transition: background 0.4s ease;
+      overflow: hidden;
+    }
+
+    body.winner-x {
+      background: radial-gradient(circle at top, #0f172a 0, #020617 60%, #020617 100%);
+    }
+    body.winner-o {
+      background: radial-gradient(circle at top, #172554 0, #020617 60%, #020617 100%);
+    }
+
+    .scale-wrap {
+      transform: scale(1.15);
+      transform-origin: center top;
+    }
+    @media (max-width: 900px) {
+      .scale-wrap {
+        transform: scale(1);
+      }
+    }
+
+    .game-container {
+      width: min(1040px, 96vw);
+      padding: 20px 24px 26px;
+      border-radius: 22px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+      box-shadow:
+        0 26px 80px rgba(0, 0, 0, 0.85),
+        0 0 60px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-container::before {
+      content: "";
+      position: absolute;
+      inset: -120px;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(56, 189, 248, 0.18) 0, transparent 55%),
+        radial-gradient(circle at 92% 100%, rgba(250, 204, 21, 0.16) 0, transparent 55%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 4px;
+      font-size: clamp(24px, 3.2vw, 30px);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #facc15;
+      text-shadow:
+        0 0 16px rgba(250, 204, 21, 0.95),
+        0 0 32px rgba(250, 204, 21, 0.95);
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 8px;
+      font-size: 12px;
+      color: #cbd5f5;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .subtitle-left {
+      opacity: 0.9;
+    }
+
+    .subtitle-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.98));
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip span.key {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .control-row {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-label span {
+      opacity: 0.8;
+    }
+
+    select {
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 4px 10px;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+      box-shadow:
+        0 0 10px rgba(15, 23, 42, 0.9),
+        0 0 16px rgba(15, 23, 42, 0.9);
+    }
+
+    select:focus {
+      border-color: #38bdf8;
+      box-shadow:
+        0 0 16px rgba(56, 189, 248, 0.7),
+        0 0 30px rgba(37, 99, 235, 0.7);
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.85);
+      background: radial-gradient(circle at top, #020617, #020617);
+      color: #e5e7eb;
+      font-size: 12px;
+      padding: 4px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow:
+        0 0 10px rgba(15, 23, 42, 0.9),
+        0 6px 14px rgba(15, 23, 42, 0.9);
+      transition:
+        transform 0.08s ease,
+        box-shadow 0.1s ease,
+        border-color 0.1s ease,
+        background 0.12s ease,
+        color 0.12s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #38bdf8;
+      box-shadow:
+        0 0 16px rgba(56, 189, 248, 0.8),
+        0 10px 20px rgba(15, 23, 42, 0.95);
+      color: #facc15;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 10px rgba(15, 23, 42, 0.9),
+        0 4px 10px rgba(15, 23, 42, 1);
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: radial-gradient(circle at top, #020617, #020617);
+      color: #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow:
+        0 0 10px rgba(15, 23, 42, 0.9),
+        0 6px 14px rgba(15, 23, 42, 0.9);
+      transition:
+        transform 0.08s ease,
+        box-shadow 0.1s ease,
+        border-color 0.1s ease,
+        background 0.12s ease;
+    }
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: #facc15;
+      box-shadow:
+        0 0 16px rgba(250, 204, 21, 0.8),
+        0 10px 20px rgba(15, 23, 42, 0.95);
+    }
+    .icon-btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 10px rgba(15, 23, 42, 0.9),
+        0 4px 10px rgba(15, 23, 42, 1);
+    }
+
+    .arena {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      margin-top: 6px;
+    }
+
+    .player {
+      flex: 0 0 220px;
+      padding: 14px 14px 16px;
+      border-radius: 20px;
+      background: radial-gradient(circle at top left, #020617, #020617 40%, #020617 100%);
+      border: 1px solid rgba(96, 165, 250, 0.9);
+      box-shadow:
+        0 0 38px rgba(56, 189, 248, 0.65),
+        0 0 70px rgba(37, 99, 235, 0.8);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 800px;
+    }
+
+    .player::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.25), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(250, 204, 21, 0.22), transparent 55%);
+      opacity: 0.35;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .player.active::before {
+      opacity: 0.9;
+    }
+
+    .player-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      background: radial-gradient(circle at 30% 0%, #0f172a 0, #020617 60%, #020617 100%);
+      border: 2px solid rgba(148, 163, 184, 0.85);
+      box-shadow:
+        0 0 16px rgba(15, 23, 42, 0.95),
+        0 0 26px rgba(15, 23, 42, 0.9);
+      text-shadow:
+        0 0 8px rgba(15, 23, 42, 1);
+    }
+
+    #playerX .avatar {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.9),
+        0 0 36px rgba(37, 99, 235, 0.9);
+    }
+
+    #playerO .avatar {
+      color: #fb7185;
+      border-color: rgba(251, 113, 133, 0.9);
+      box-shadow:
+        0 0 20px rgba(251, 113, 133, 0.9),
+        0 0 36px rgba(190, 24, 93, 0.9);
+    }
+
+    .name-block {
+      flex: 1;
+    }
+
+    .player-name {
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.20em;
+      font-size: 18px;
+      text-shadow:
+        0 0 4px rgba(15, 23, 42, 1),
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(248, 250, 252, 1),
+        0 0 26px rgba(56, 189, 248, 1),
+        0 0 36px rgba(56, 189, 248, 0.95);
+      transform: translateZ(20px);
+    }
+
+    #playerX .player-name {
+      color: #38bdf8;
+      text-align: left;
+    }
+
+    #playerO .player-name {
+      color: #fb7185;
+      text-align: right;
+      text-shadow:
+        0 0 4px rgba(15, 23, 42, 1),
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(248, 250, 252, 1),
+        0 0 26px rgba(251, 113, 133, 1),
+        0 0 36px rgba(251, 113, 133, 0.95);
+    }
+
+    .name-underline {
+      margin-top: 4px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(to right, rgba(148, 163, 184, 0.2), #e5e7eb, rgba(148, 163, 184, 0.2));
+      box-shadow:
+        0 0 10px rgba(248, 250, 252, 1),
+        0 0 18px rgba(148, 163, 184, 0.9);
+    }
+
+    .player-bottom {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wins {
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+
+    .wins span {
+      color: #facc15;
+      font-weight: 800;
+      text-shadow:
+        0 0 12px rgba(250, 204, 21, 0.95),
+        0 0 22px rgba(250, 204, 21, 0.95);
+    }
+
+    .symbol-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 800;
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      background: radial-gradient(circle at top, #020617, #020617);
+      text-shadow: 0 0 8px rgba(148, 163, 184, 0.9);
+      box-shadow:
+        0 0 16px rgba(15, 23, 42, 0.95),
+        0 0 30px rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .symbol-pill.big {
+      width: 46px;
+      height: 46px;
+      border-width: 2px;
+      font-size: 20px;
+    }
+
+    #playerX .symbol-pill {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      text-shadow:
+        0 0 14px rgba(56, 189, 248, 1),
+        0 0 26px rgba(56, 189, 248, 0.9);
+      box-shadow:
+        0 0 18px rgba(56, 189, 248, 0.9),
+        0 0 34px rgba(37, 99, 235, 0.95);
+    }
+
+    #playerO .symbol-pill {
+      border-color: #fb7185;
+      color: #fb7185;
+      text-shadow:
+        0 0 14px rgba(251, 113, 133, 1),
+        0 0 26px rgba(251, 113, 133, 0.9);
+      box-shadow:
+        0 0 18px rgba(251, 113, 133, 0.95),
+        0 0 34px rgba(190, 24, 93, 0.95);
+    }
+
+    .player.active {
+      box-shadow:
+        0 0 40px rgba(56, 189, 248, 0.9),
+        0 0 76px rgba(59, 130, 246, 0.95);
+      border-color: rgba(129, 140, 248, 1);
+      animation: playerTilt 1.3s ease-in-out infinite alternate;
+    }
+
+    @keyframes playerTilt {
+      0% { transform: rotateY(-5deg) translateY(0); }
+      100% { transform: rotateY(4deg) translateY(-3px); }
+    }
+
+    .player.win-celebrate {
+      box-shadow:
+        0 0 40px rgba(250, 204, 21, 1),
+        0 0 80px rgba(250, 204, 21, 1);
+      border-color: #facc15;
+      animation: winnerPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes winnerPulse {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.03); }
+    }
+
+    .board-wrap {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .board-container {
+      position: relative;
+      display: inline-block;
+      padding-top: 30px;
+      padding-left: 34px;
+    }
+
+    .board {
+      --size: 5;
+      display: grid;
+      grid-template-columns: repeat(var(--size), 1fr);
+      grid-auto-rows: 1fr;
+      gap: 5px;
+      width: min(440px, 96vw);
+      aspect-ratio: 1 / 1;
+      padding: 14px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #020617 0%, #020617 45%, #020617 100%);
+      border: 2px solid rgba(55, 65, 81, 0.95);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 24px rgba(37, 99, 235, 0.6),
+        0 0 60px rgba(17, 24, 39, 0.9);
+      transition:
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+      animation: boardGlowBase 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes boardGlowBase {
+      0% {
+        box-shadow:
+          0 0 20px rgba(37, 99, 235, 0.45),
+          0 0 50px rgba(15, 23, 42, 0.9);
+      }
+      100% {
+        box-shadow:
+          0 0 30px rgba(37, 99, 235, 0.7),
+          0 0 70px rgba(15, 23, 42, 0.95);
+      }
+    }
+
+    .board.turn-x {
+      border-color: rgba(56, 189, 248, 0.95);
+      box-shadow:
+        0 0 32px rgba(56, 189, 248, 0.9),
+        0 0 70px rgba(37, 99, 235, 0.9);
+    }
+
+    .board.turn-o {
+      border-color: rgba(250, 204, 21, 0.95);
+      box-shadow:
+        0 0 32px rgba(250, 204, 21, 0.9),
+        0 0 70px rgba(234, 179, 8, 0.9);
+    }
+
+    .row-labels {
+      position: absolute;
+      left: 0;
+      top: 30px;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 0;
+      font-size: 18px;
+      color: #e5e7eb;
+    }
+    .row-labels div {
+      width: 26px;
+      text-align: center;
+      font-weight: 700;
+      text-shadow:
+        0 0 10px rgba(59, 130, 246, 0.95),
+        0 0 20px rgba(37, 99, 235, 0.95);
+    }
+
+    .col-labels {
+      position: absolute;
+      left: 34px;
+      right: 0;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 34px;
+      font-size: 18px;
+      color: #e5e7eb;
+    }
+    .col-labels div {
+      text-align: center;
+      font-weight: 700;
+      text-shadow:
+        0 0 10px rgba(59, 130, 246, 0.95),
+        0 0 20px rgba(37, 99, 235, 0.95);
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      color: #e5e7eb;
+      background: radial-gradient(circle at 20% 0%, #020617 0%, #020617 30%, #020617 100%);
+      border-radius: 16px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(55, 65, 81, 0.9),
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 16px rgba(15, 23, 42, 1);
+      transition:
+        transform 0.09s ease,
+        box-shadow 0.11s ease,
+        background 0.12s ease,
+        filter 0.12s ease;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+    }
+
+    .cell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 10% -10%, rgba(255, 255, 255, 0.08), transparent 60%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .cell:hover {
+      background: radial-gradient(circle at top, #020617 0%, #020617 50%, #020617 100%);
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 0 0 1px rgba(148, 163, 184, 0.98),
+        0 10px 20px rgba(15, 23, 42, 1),
+        0 0 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .cell:hover::before { opacity: 1; }
+
+    .cell:active {
+      transform: translateY(0);
+      box-shadow:
+        inset 0 0 0 1px rgba(75, 85, 99, 1),
+        0 6px 14px rgba(0, 0, 0, 1),
+        0 0 16px rgba(15, 23, 42, 1);
+      filter: brightness(0.95);
+    }
+
+    .cell.X {
+      color: #38bdf8;
+      text-shadow:
+        0 0 18px rgba(56, 189, 248, 1),
+        0 0 30px rgba(56, 189, 248, 0.9);
+    }
+
+    .cell.O {
+      color: #fb7185;
+      text-shadow:
+        0 0 18px rgba(251, 113, 133, 1),
+        0 0 30px rgba(251, 113, 133, 0.9);
+    }
+
+    .cell.filled-x {
+      background: radial-gradient(circle at top, #0f766e 0%, #115e59 45%, #022c22 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(153, 246, 228, 0.9),
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 18px rgba(45, 212, 191, 0.9);
+    }
+
+    .cell.filled-o {
+      background: radial-gradient(circle at top, #fbbf24 0%, #f97316 45%, #7c2d12 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(254, 249, 195, 0.95),
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 18px rgba(251, 191, 36, 0.95);
+    }
+
+    .cell.disabled {
+      pointer-events: none;
+      filter: grayscale(0.5) brightness(0.85);
+    }
+
+    .cell.last-move {
+      box-shadow:
+        0 0 0 2px rgba(236, 252, 203, 0.9),
+        0 0 14px rgba(250, 204, 21, 0.9),
+        0 0 28px rgba(234, 179, 8, 0.9);
+    }
+
+    .cell.win-cell {
+      position: relative;
+      background: radial-gradient(circle at center, #f97316, #b91c1c);
+      animation: winPulse 0.6s ease-in-out infinite alternate;
+    }
+
+    .cell.win-cell::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: inherit;
+      border: 2px solid rgba(248, 250, 252, 0.85);
+      box-shadow:
+        0 0 12px rgba(248, 250, 252, 0.95),
+        0 0 22px rgba(251, 146, 60, 0.95);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    @keyframes winPulse {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.04); filter: brightness(1.15); }
+    }
+
+    .cell.blink-multi {
+      animation: blinkMulti 0.5s alternate ease-in-out infinite;
+    }
+
+    @keyframes blinkMulti {
+      0% {
+        filter: brightness(0.75);
+        box-shadow:
+          inset 0 0 0 1px rgba(31, 41, 55, 0.9),
+          0 6px 12px rgba(0, 0, 0, 1),
+          0 0 10px rgba(15, 23, 42, 1);
+      }
+      100% {
+        filter: brightness(1.3);
+        box-shadow:
+          0 0 16px var(--blink-color, rgba(129, 140, 248, 0.9)),
+          0 0 32px var(--blink-color, rgba(56, 189, 248, 0.9)),
+          0 0 46px rgba(15, 23, 42, 1);
+      }
+    }
+
+    .board.shake { }
+
+    #voiceStatus, #message {
+      display: none;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.86), rgba(15, 23, 42, 0.95));
+      z-index: 5;
+      backdrop-filter: blur(6px);
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .overlay-inner {
+      padding: 20px 22px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(250, 204, 21, 0.8);
+      background: radial-gradient(circle at top, #020617, #020617 55%, #020617);
+      box-shadow:
+        0 0 30px rgba(250, 204, 21, 0.9),
+        0 0 60px rgba(56, 189, 248, 0.7);
+      text-align: center;
+      min-width: min(420px, 92vw);
+    }
+
+    .overlay-title {
+      font-size: 22px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 6px;
+      color: #facc15;
+      text-shadow:
+        0 0 16px rgba(250, 204, 21, 0.95),
+        0 0 30px rgba(250, 204, 21, 0.95);
+    }
+
+    .overlay-subtitle {
+      font-size: 13px;
+      color: #e5e7eb;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+
+    .overlay-btn {
+      margin-top: 4px;
+    }
+
+    @media (max-width: 860px) {
+      .arena {
+        flex-direction: column;
+        gap: 14px;
+      }
+      .player {
+        width: 100%;
+        max-width: 420px;
+      }
+      #playerO .player-name { text-align: left; }
+      .board-container {
+        padding-left: 24px;
+      }
+      .col-labels {
+        left: 24px;
+        padding: 0 22px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .player { flex: 1 1 auto; }
+      .game-container {
+        padding-inline: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scale-wrap">
+    <div class="game-container">
+      <h1>CỜ CA RÔ – ĐỨC QUANG vs BÁ TRỰC</h1>
+
+      <div class="subtitle-row">
+        <div class="subtitle-left">
+          <span>Điều khiển bằng giọng nói: nói <strong>&quot;A 1&quot;</strong>, &quot;B 3&quot;...</span>
+        </div>
+        <div class="subtitle-right">
+          <div class="chip">
+            <span class="key">Giọng nói:</span> <span id="voiceChipText">Đang bật</span>
+          </div>
+          <button id="soundToggle" class="icon-btn" title="Bật / tắt âm thanh">🔊</button>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <div class="control-group">
+          <label class="control-label" for="boardSize">
+            <span>Bàn cờ:</span>
+            <select id="boardSize">
+              <option value="3">3 × 3</option>
+              <option value="4">4 × 4</option>
+              <option value="5" selected>5 × 5</option>
+              <option value="6">6 × 6</option>
+              <option value="7">7 × 7</option>
+            </select>
+          </label>
+
+          <label class="control-label" for="modeSelect">
+            <span>Đối thủ:</span>
+            <select id="modeSelect">
+              <option value="pvp">Người vs Người</option>
+              <option value="ai">Người vs Máy</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <button id="resetMatch" class="btn" type="button">
+            <span>↺</span> <span>Chơi lại ván mới</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="voiceStatus"></div>
+
+      <div class="arena">
+        <div class="player" id="playerX">
+          <div class="player-header">
+            <div class="avatar">DQ</div>
+            <div class="name-block">
+              <div class="player-name">ĐỨC QUANG</div>
+              <div class="name-underline"></div>
+            </div>
+          </div>
+          <div class="player-bottom">
+            <div class="wins">Ván thắng: <span id="scoreX">0</span></div>
+            <div class="symbol-pill big">X</div>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board-container">
+            <div class="col-labels" id="colLabels"></div>
+            <div class="row-labels" id="rowLabels"></div>
+            <div id="board" class="board"></div>
+          </div>
+        </div>
+
+        <div class="player" id="playerO">
+          <div class="player-header">
+            <div class="avatar">BT</div>
+            <div class="name-block">
+              <div class="player-name">BÁ TRỰC</div>
+              <div class="name-underline"></div>
+            </div>
+          </div>
+          <div class="player-bottom">
+            <div class="wins">Ván thắng: <span id="scoreO">0</span></div>
+            <div class="symbol-pill big">O</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="message"></div>
+
+      <div id="winnerOverlay" class="overlay">
+        <div class="overlay-inner">
+          <div id="overlayTitle" class="overlay-title">ĐỨC QUANG THẮNG!</div>
+          <div id="overlaySubtitle" class="overlay-subtitle">Nhấn &quot;Chơi ván mới&quot; để tiếp tục.</div>
+          <button id="nextRoundBtn" type="button" class="btn overlay-btn">
+            <span>▶</span> <span>Chơi ván mới</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PLAYER_X = { name: "ĐỨC QUANG", symbol: "X" };
+    const PLAYER_O = { name: "BÁ TRỰC", symbol: "O" };
+
+    let boardSize = 5;
+    let boardState = [];
+    let currentPlayer = PLAYER_X.symbol;
+    let startingPlayer = PLAYER_X.symbol;
+    let scores = { X: 0, O: 0 };
+    let gameOver = false;
+    let lastMoveIndex = null;
+    let gameMode = "pvp";
+
+    const boardEl = document.getElementById("board");
+    const sizeSelect = document.getElementById("boardSize");
+    const resetBtn = document.getElementById("resetMatch");
+    const playerXEl = document.getElementById("playerX");
+    const playerOEl = document.getElementById("playerO");
+    const scoreXEl = document.getElementById("scoreX");
+    const scoreOEl = document.getElementById("scoreO");
+    const rowLabelsEl = document.getElementById("rowLabels");
+    const colLabelsEl = document.getElementById("colLabels");
+    const modeSelect = document.getElementById("modeSelect");
+    const winnerOverlayEl = document.getElementById("winnerOverlay");
+    const overlayTitleEl = document.getElementById("overlayTitle");
+    const overlaySubtitleEl = document.getElementById("overlaySubtitle");
+    const nextRoundBtn = document.getElementById("nextRoundBtn");
+    const soundToggleBtn = document.getElementById("soundToggle");
+    const voiceChipText = document.getElementById("voiceChipText");
+
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          audioCtx = new AC();
+        }
+      }
+    }
+
+    function playClickSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 700;
+      gain.gain.value = 0.08;
+      osc.connect(gain).connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      osc.start(now);
+      osc.stop(now + 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    }
+
+    function playWinSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+      gain.gain.value = 0.1;
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+
+    function playDrawSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 420;
+      gain.gain.value = 0.08;
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener("click", function () {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.textContent = soundEnabled ? "🔊" : "🔈";
+      });
+    }
+
+    function updateLabels() {
+      const letters = ["A", "B", "C", "D", "E", "F", "G"];
+      rowLabelsEl.innerHTML = "";
+      colLabelsEl.innerHTML = "";
+
+      for (let i = 0; i < boardSize; i++) {
+        const r = document.createElement("div");
+        r.textContent = letters[i];
+        rowLabelsEl.appendChild(r);
+
+        const c = document.createElement("div");
+        c.textContent = String(i + 1);
+        colLabelsEl.appendChild(c);
+      }
+    }
+
+    function createBoard() {
+      boardEl.innerHTML = "";
+      boardEl.style.setProperty("--size", boardSize);
+      boardState = new Array(boardSize * boardSize).fill("");
+      lastMoveIndex = null;
+
+      for (let i = 0; i < boardState.length; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = String(i);
+        cell.addEventListener("click", onCellClick);
+        boardEl.appendChild(cell);
+      }
+
+      updateLabels();
+
+      gameOver = false;
+      playerXEl.classList.remove("win-celebrate");
+      playerOEl.classList.remove("win-celebrate");
+      document.body.classList.remove("winner-x", "winner-o");
+
+      updateActivePlayerUI();
+    }
+
+    function indexToRC(index) {
+      const row = Math.floor(index / boardSize);
+      const col = index % boardSize;
+      return { row: row, col: col };
+    }
+
+    function rcToIndex(row, col) {
+      return row * boardSize + col;
+    }
+
+    function onCellClick(e) {
+      if (gameOver) return;
+      if (gameMode === "ai" && currentPlayer === PLAYER_O.symbol) {
+        return;
+      }
+
+      const cell = e.currentTarget;
+      const index = parseInt(cell.dataset.index, 10);
+      if (boardState[index] !== "") return;
+
+      performMoveAtIndex(index);
+    }
+
+    function performMoveAtIndex(index) {
+      if (boardState[index] !== "" || gameOver) return;
+
+      const cell = boardEl.querySelector('.cell[data-index="' + index + '"]');
+      if (!cell) return;
+
+      if (lastMoveIndex !== null) {
+        const prevCell = boardEl.querySelector('.cell[data-index="' + lastMoveIndex + '"]');
+        if (prevCell) {
+          prevCell.classList.remove("last-move");
+        }
+      }
+
+      boardState[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add(currentPlayer);
+      if (currentPlayer === PLAYER_X.symbol) {
+        cell.classList.add("filled-x");
+      } else {
+        cell.classList.add("filled-o");
+      }
+      cell.classList.add("last-move");
+      lastMoveIndex = index;
+
+      playClickSound();
+
+      const winInfo = checkWin();
+      if (winInfo) {
+        handleWin(winInfo);
+        return;
+      }
+
+      if (boardState.every(function (v) { return v !== ""; })) {
+        handleDraw();
+        return;
+      }
+
+      currentPlayer = currentPlayer === PLAYER_X.symbol ? PLAYER_O.symbol : PLAYER_X.symbol;
+      updateActivePlayerUI();
+
+      if (!gameOver && gameMode === "ai" && currentPlayer === PLAYER_O.symbol) {
+        aiMakeMove();
+      }
+    }
+
+    function currentWinLength() {
+      if (boardSize <= 4) return 3;
+      if (boardSize === 5) return 4;
+      return 5;
+    }
+
+    function checkWin() {
+      const size = boardSize;
+      const needed = currentWinLength();
+      const dirs = [
+        { dr: 0, dc: 1 },
+        { dr: 1, dc: 0 },
+        { dr: 1, dc: 1 },
+        { dr: 1, dc: -1 }
+      ];
+
+      for (let index = 0; index < boardState.length; index++) {
+        const symbol = boardState[index];
+        if (!symbol) continue;
+
+        const rc = indexToRC(index);
+        const row = rc.row;
+        const col = rc.col;
+
+        for (let d = 0; d < dirs.length; d++) {
+          const dr = dirs[d].dr;
+          const dc = dirs[d].dc;
+          const line = [index];
+          let ok = true;
+
+          for (let k = 1; k < needed; k++) {
+            const r = row + dr * k;
+            const c = col + dc * k;
+            if (r < 0 || r >= size || c < 0 || c >= size) {
+              ok = false;
+              break;
+            }
+            const idx = rcToIndex(r, c);
+            if (boardState[idx] !== symbol) {
+              ok = false;
+              break;
+            }
+            line.push(idx);
+          }
+
+          if (ok && line.length === needed) {
+            return { winner: symbol, line: line };
+          }
+        }
+      }
+      return null;
+    }
+
+    function disableBoard() {
+      const cells = boardEl.querySelectorAll(".cell");
+      cells.forEach(function (c) { c.classList.add("disabled"); });
+    }
+
+    function highlightWinningCells(line) {
+      const cells = boardEl.querySelectorAll(".cell");
+      line.forEach(function (idx) {
+        if (cells[idx]) cells[idx].classList.add("win-cell");
+      });
+    }
+
+    function showWinnerOverlay(title, subtitle) {
+      overlayTitleEl.textContent = title;
+      overlaySubtitleEl.textContent = subtitle;
+      winnerOverlayEl.classList.add("show");
+    }
+
+    function handleWin(winInfo) {
+      gameOver = true;
+      disableBoard();
+      highlightWinningCells(winInfo.line);
+      playWinSound();
+
+      const winnerSymbol = winInfo.winner;
+      scores[winnerSymbol]++;
+      scoreXEl.textContent = String(scores.X);
+      scoreOEl.textContent = String(scores.O);
+
+      if (winnerSymbol === PLAYER_X.symbol) {
+        document.body.classList.add("winner-x");
+        playerXEl.classList.add("win-celebrate");
+        playerOEl.classList.remove("active");
+        showMultiBlink("#38bdf8", "#22c55e", "#facc15");
+        showWinnerOverlay("ĐỨC QUANG THẮNG!", "Nhấn \"Chơi ván mới\" để tiếp tục trận đấu.");
+      } else {
+        document.body.classList.add("winner-o");
+        playerOEl.classList.add("win-celebrate");
+        playerXEl.classList.remove("active");
+        showMultiBlink("#fb7185", "#f97316", "#facc15");
+        showWinnerOverlay("BÁ TRỰC THẮNG!", "Nhấn \"Chơi ván mới\" để tiếp tục trận đấu.");
+      }
+    }
+
+    function handleDraw() {
+      gameOver = true;
+      disableBoard();
+      showMultiBlink("#38bdf8", "#a855f7", "#facc15");
+      playDrawSound();
+      showWinnerOverlay("HÒA!", "Hai bên cầm hòa. Nhấn \"Chơi ván mới\" để đấu lại.");
+    }
+
+    function showMultiBlink(color1, color2, color3) {
+      const cells = boardEl.querySelectorAll(".cell");
+      const colors = [color1, color2, color3];
+      cells.forEach(function (cell) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const duration = 0.38 + Math.random() * 0.32;
+        const delay = Math.random() * 0.3;
+        cell.classList.add("blink-multi");
+        cell.style.setProperty("--blink-color", color);
+        cell.style.animationDuration = String(duration) + "s";
+        cell.style.animationDelay = String(delay) + "s";
+      });
+    }
+
+    function updateActivePlayerUI() {
+      playerXEl.classList.remove("active");
+      playerOEl.classList.remove("active");
+      boardEl.classList.remove("turn-x", "turn-o");
+
+      if (currentPlayer === PLAYER_X.symbol) {
+        playerXEl.classList.add("active");
+        boardEl.classList.add("turn-x");
+      } else {
+        playerOEl.classList.add("active");
+        boardEl.classList.add("turn-o");
+      }
+    }
+
+    function setBoardSize(size) {
+      boardSize = size;
+      if (sizeSelect) sizeSelect.value = String(size);
+      startingPlayer = PLAYER_X.symbol;
+      currentPlayer = startingPlayer;
+      createBoard();
+    }
+
+    if (sizeSelect) {
+      sizeSelect.addEventListener("change", function () {
+        const size = parseInt(sizeSelect.value, 10);
+        setBoardSize(size);
+      });
+    }
+
+    if (modeSelect) {
+      modeSelect.addEventListener("change", function () {
+        gameMode = modeSelect.value;
+        startingPlayer = PLAYER_X.symbol;
+        currentPlayer = startingPlayer;
+        createBoard();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        startingPlayer = PLAYER_X.symbol;
+        currentPlayer = startingPlayer;
+        createBoard();
+      });
+    }
+
+    if (nextRoundBtn) {
+      nextRoundBtn.addEventListener("click", function () {
+        winnerOverlayEl.classList.remove("show");
+        document.body.classList.remove("winner-x", "winner-o");
+        playerXEl.classList.remove("win-celebrate");
+        playerOEl.classList.remove("win-celebrate");
+        startingPlayer = startingPlayer === PLAYER_X.symbol ? PLAYER_O.symbol : PLAYER_X.symbol;
+        currentPlayer = startingPlayer;
+        createBoard();
+      });
+    }
+
+    function aiMakeMove() {
+      if (gameOver || gameMode !== "ai" || currentPlayer !== PLAYER_O.symbol) return;
+
+      setTimeout(function () {
+        if (gameOver || gameMode !== "ai" || currentPlayer !== PLAYER_O.symbol) return;
+
+        const emptyIndices = [];
+        for (let i = 0; i < boardState.length; i++) {
+          if (!boardState[i]) emptyIndices.push(i);
+        }
+        if (emptyIndices.length === 0) return;
+
+        let bestIndex = null;
+
+        for (let i = 0; i < emptyIndices.length; i++) {
+          const idx = emptyIndices[i];
+          boardState[idx] = PLAYER_O.symbol;
+          const winInfo = checkWin();
+          boardState[idx] = "";
+          if (winInfo && winInfo.winner === PLAYER_O.symbol) {
+            bestIndex = idx;
+            break;
+          }
+        }
+
+        if (bestIndex === null) {
+          for (let i = 0; i < emptyIndices.length; i++) {
+            const idx = emptyIndices[i];
+            boardState[idx] = PLAYER_X.symbol;
+            const winInfo = checkWin();
+            boardState[idx] = "";
+            if (winInfo && winInfo.winner === PLAYER_X.symbol) {
+              bestIndex = idx;
+              break;
+            }
+          }
+        }
+
+        if (bestIndex === null) {
+          const centerRow = Math.floor(boardSize / 2);
+          const centerCol = Math.floor(boardSize / 2);
+          let minDist = Infinity;
+          emptyIndices.forEach(function (idx) {
+            const rc = indexToRC(idx);
+            const dr = rc.row - centerRow;
+            const dc = rc.col - centerCol;
+            const dist = Math.abs(dr) + Math.abs(dc);
+            if (dist < minDist) {
+              minDist = dist;
+              bestIndex = idx;
+            }
+          });
+        }
+
+        if (bestIndex !== null && !boardState[bestIndex] && !gameOver) {
+          performMoveAtIndex(bestIndex);
+        }
+      }, 420);
+    }
+
+    let recognition = null;
+    let listeningActive = true;
+
+    function setupSpeechRecognition() {
+      if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+        if (voiceChipText) voiceChipText.textContent = "Trình duyệt không hỗ trợ";
+        return;
+      }
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = "vi-VN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onend = function () {
+        if (!listeningActive) return;
+        if (!gameOver) {
+          setTimeout(function () {
+            try {
+              recognition.start();
+            } catch (e) {}
+          }, 200);
+        }
+      };
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        handleVoiceCommand(transcript);
+      };
+
+      if (voiceChipText) voiceChipText.textContent = "Đang bật";
+    }
+
+    function vietnameseWordToNumber(word) {
+      const map = {
+        "một": 1, "mot": 1, "1": 1,
+        "hai": 2, "2": 2,
+        "ba": 3, "3": 3,
+        "bốn": 4, "bon": 4, "4": 4,
+        "năm": 5, "nam": 5, "5": 5,
+        "sáu": 6, "sau": 6, "6": 6,
+        "bảy": 7, "bay": 7, "bẩy": 7, "7": 7
+      };
+      if (map.hasOwnProperty(word)) return map[word];
+      return null;
+    }
+
+    function letterToRow(letter) {
+      let base = letter.toLowerCase();
+      if (base.normalize) {
+        base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      }
+
+      const map = {
+        "a": 1,
+        "b": 2, "be": 2, "bo": 2,
+        "c": 3, "ce": 3, "co": 3,
+        "d": 4, "de": 4, "do": 4,
+        "e": 5,
+        "f": 6, "ep": 6,
+        "g": 7, "ge": 7
+      };
+
+      if (map.hasOwnProperty(base)) return map[base];
+      return null;
+    }
+
+    function setBoardSizeFromVoice(size) {
+      setBoardSize(size);
+    }
+
+    function handleVoiceCommand(rawText) {
+      const text = rawText.toLowerCase().trim();
+
+      if (text.indexOf("tạm dừng nghe") !== -1 || text.indexOf("tam dung nghe") !== -1) {
+        listeningActive = false;
+        if (recognition) {
+          try { recognition.stop(); } catch (e) {}
+        }
+        if (voiceChipText) voiceChipText.textContent = "Đang tạm dừng";
+        return;
+      }
+
+      if (text.indexOf("nghe lại") !== -1 || text.indexOf("bật nghe") !== -1 || text.indexOf("bat nghe") !== -1) {
+        listeningActive = true;
+        if (recognition) {
+          try { recognition.start(); } catch (e) {}
+        }
+        if (voiceChipText) voiceChipText.textContent = "Đang bật";
+        return;
+      }
+
+      if (
+        text.indexOf("chơi lại") !== -1 ||
+        text.indexOf("choi lai") !== -1 ||
+        text.indexOf("reset bàn cờ") !== -1 ||
+        text.indexOf("xóa hết") !== -1 ||
+        text.indexOf("xoa het") !== -1 ||
+        text.indexOf("reset") !== -1 ||
+        text.indexOf("chơi ván mới") !== -1 ||
+        text.indexOf("choi van moi") !== -1
+      ) {
+        if (winnerOverlayEl) winnerOverlayEl.classList.remove("show");
+        startingPlayer = PLAYER_X.symbol;
+        currentPlayer = startingPlayer;
+        createBoard();
+        return;
+      }
+
+      if (
+        text.match(/7x7|7 x 7|bàn 7|ban 7|bàn cờ 7|ban co 7/) ||
+        text.indexOf("bàn bảy bảy") !== -1 ||
+        text.indexOf("ban bay bay") !== -1
+      ) { setBoardSizeFromVoice(7); return; }
+
+      if (
+        text.match(/6x6|6 x 6|bàn 6|ban 6|bàn cờ 6|ban co 6/) ||
+        text.indexOf("bàn sáu sáu") !== -1 ||
+        text.indexOf("ban sau sau") !== -1
+      ) { setBoardSizeFromVoice(6); return; }
+
+      if (
+        text.match(/5x5|5 x 5|bàn 5|ban 5|bàn cờ 5|ban co 5/) ||
+        text.indexOf("bàn năm năm") !== -1 ||
+        text.indexOf("ban nam nam") !== -1
+      ) { setBoardSizeFromVoice(5); return; }
+
+      if (
+        text.match(/4x4|4 x 4|bàn 4|ban 4|bàn cờ 4|ban co 4/) ||
+        text.indexOf("bàn bốn bốn") !== -1 ||
+        text.indexOf("ban bon bon") !== -1
+      ) { setBoardSizeFromVoice(4); return; }
+
+      if (
+        text.match(/3x3|3 x 3|bàn 3|ban 3|bàn cờ 3|ban co 3/) ||
+        text.indexOf("bàn ba ba") !== -1 ||
+        text.indexOf("ban ba ba") !== -1
+      ) { setBoardSizeFromVoice(3); return; }
+
+      if (gameOver) {
+        return;
+      }
+
+      let row = null;
+      let col = null;
+
+      const tokens = text
+        .replace(/[,\.]/g, " ")
+        .split(/\s+/)
+        .filter(function (t) { return t.length > 0; });
+
+      const numbers = [];
+      const letters = [];
+
+      tokens.forEach(function (tok) {
+        let m = tok.match(/^([a-gA-G])(\d)$/);
+        if (m) {
+          letters.push(m[1]);
+          numbers.push(parseInt(m[2], 10));
+          return;
+        }
+
+        const rowFromLetter = letterToRow(tok);
+        if (rowFromLetter !== null) {
+          letters.push(tok);
+          return;
+        }
+
+        if (/^\d+$/.test(tok) && tok.length >= 2) {
+          tok.split("").forEach(function (ch) {
+            const n = parseInt(ch, 10);
+            if (!isNaN(n)) numbers.push(n);
+          });
+          return;
+        }
+
+        const vn = vietnameseWordToNumber(tok);
+        if (vn !== null) {
+          numbers.push(vn);
+        } else if (/^\d$/.test(tok)) {
+          numbers.push(parseInt(tok, 10));
+        }
+      });
+
+      if (letters.length >= 1 && numbers.length >= 1) {
+        row = letterToRow(letters[0]);
+        col = numbers[0];
+      } else if (numbers.length >= 2) {
+        row = numbers[0];
+        col = numbers[1];
+      }
+
+      if (row === null || col === null) {
+        return;
+      }
+
+      if (row < 1 || row > boardSize || col < 1 || col > boardSize) {
+        return;
+      }
+
+      const rIndex = row - 1;
+      const cIndex = col - 1;
+      const cellIndex = rcToIndex(rIndex, cIndex);
+      const cellEl = boardEl.querySelector('.cell[data-index="' + cellIndex + '"]');
+
+      if (!cellEl) {
+        return;
+      }
+
+      if (boardState[cellIndex] !== "") {
+        return;
+      }
+
+      cellEl.click();
+    }
+
+    (function init() {
+      createBoard();
+      setupSpeechRecognition();
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (e) {}
+      }
+    })();
+  </script>
+</body>
+</html>
