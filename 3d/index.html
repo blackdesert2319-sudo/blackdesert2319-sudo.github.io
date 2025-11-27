@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vẽ Hình Không Gian 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 10px 16px;
+      background: #111827;
+      color: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+    header span {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+    #controls {
+      width: 340px;
+      max-width: 100%;
+      padding: 12px;
+      border-right: 1px solid #e5e7eb;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #viewer {
+      flex: 1;
+      position: relative;
+      background: #020617;
+    }
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 180px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+    button {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: #2563eb;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+    .hint {
+      font-size: 11px;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+    #errors {
+      font-size: 12px;
+      color: #b91c1c;
+      white-space: pre-wrap;
+      max-height: 120px;
+      overflow: auto;
+      margin-top: 4px;
+    }
+    #canvas-container {
+      position: absolute;
+      inset: 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .preset-btn {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+    .preset-btn:hover {
+      background: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Trình vẽ Hình Không Gian 3D</h1>
+      <span>Điểm • Đường thẳng • Mặt phẳng – điều khiển bằng chuột</span>
+    </div>
+    <span class="badge">Web Demo</span>
+  </header>
+  <main>
+    <section id="controls">
+      <div class="label">1. Nhập đề bài (theo cú pháp đơn giản)</div>
+      <div class="hint">
+        Mỗi dòng là một đối tượng. Cú pháp hỗ trợ:
+        <br />• <b>POINT</b> Tên x y z – tạo điểm
+        <br />• <b>LINE</b> Tên Điểm1 Điểm2 – tạo đường qua 2 điểm
+        <br />• <b>PLANE</b> Tên Điểm nx ny nz – mặt phẳng qua Điểm với vector pháp tuyến (normal vector).
+      </div>
+      <textarea id="problem-input"></textarea>
+      <div class="hint">
+        Ví dụ:
+        <br />POINT A 0 0 0
+        <br />POINT B 2 1 3
+        <br />LINE d A B
+        <br />PLANE (P) A 0 1 0
+      </div>
+      <div>
+        <button id="draw-btn">Vẽ hình 3D</button>
+      </div>
+      <div class="label">2. Chọn nhanh ví dụ</div>
+      <div>
+        <button class="preset-btn" data-preset="basic">Ví dụ cơ bản</button>
+        <button class="preset-btn" data-preset="triangle">Tam giác & mặt phẳng</button>
+      </div>
+      <div class="label">3. Thông báo / lỗi khi parse</div>
+      <pre id="errors"></pre>
+    </section>
+    <section id="viewer">
+      <div id="canvas-container"></div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/three@0.161.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
