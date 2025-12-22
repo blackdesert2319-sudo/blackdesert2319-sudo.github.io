@@ -4,33 +4,60 @@
   <meta charset="utf-8">
   <title>Mở An Toàn Giao Thông</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Chống cache cho Zalo (đổi v khi cập nhật lớn) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <style>
     body{
       margin:0;
-      height:100vh;
+      min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-family:Arial;
+      font-family:Arial, sans-serif;
       background:#111827;
       color:white;
+      text-align:center;
+      padding:20px;
     }
-    a{
+    .box{
+      max-width:420px;
+      width:100%;
+    }
+    a.btn{
+      display:block;
       background:#2563eb;
       color:white;
       text-decoration:none;
       padding:18px 26px;
       font-size:20px;
-      border-radius:10px;
+      border-radius:12px;
       font-weight:bold;
+    }
+    p{
+      margin-top:14px;
+      font-size:14px;
+      opacity:.85;
+      line-height:1.4;
     }
   </style>
 </head>
 <body>
 
-  <a href="antoangiaothong.html">
-    👉 MỞ BÀI AN TOÀN GIAO THÔNG
-  </a>
+  <div class="box">
+    <!-- Link có tham số v để tránh Zalo dùng cache cũ -->
+    <a class="btn" href="at.html?v=2026">
+      👉 MỞ BÀI AN TOÀN GIAO THÔNG
+    </a>
+
+    <p>
+      Nếu không bấm được trong Zalo,<br>
+      hãy bấm dấu ⋮ góc phải và chọn <b>“Mở bằng trình duyệt”</b>.
+    </p>
+  </div>
 
 </body>
 </html>
