@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Thách An Toàn - Nhanh Một Giây</title>
+    <style>
+        /* --- CSS GIAO DIỆN NEON (OFFLINE) --- */
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #ffffff;
+            --neon-blue: #06b6d4;
+            --neon-green: #22c55e;
+            --neon-red: #ef4444;
+            --neon-yellow: #eab308;
+            --panel-bg: rgba(30, 41, 59, 0.95);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.15) 0px, transparent 50%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px rgba(255,255,255,0.8), 0 0 10px rgba(255,255,255,0.5), 0 0 20px var(--neon-blue);
+        }
+
+        .neon-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(6, 182, 212, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .screen {
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), #2563eb);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 24px;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.8);
+        }
+
+        /* --- GIAO DIỆN CÂU HỎI --- */
+        .header-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-blue);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px solid rgba(71, 85, 105, 0.5);
+            color: #e2e8f0;
+            padding: 20px 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            text-align: left;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--neon-blue);
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* HIỆU ỨNG NEON KHI CHỌN */
+        .option-btn.correct {
+            border-color: var(--neon-green) !important;
+            background: rgba(34, 197, 94, 0.3) !important;
+            box-shadow: 0 0 25px var(--neon-green), inset 0 0 10px var(--neon-green);
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--neon-green);
+            animation: pulseGreen 0.5s;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--neon-red) !important;
+            background: rgba(239, 68, 68, 0.3) !important;
+            box-shadow: 0 0 25px var(--neon-red), inset 0 0 10px var(--neon-red);
+            color: #fff;
+            text-shadow: 0 0 5px var(--neon-red);
+            animation: shake 0.4s;
+            opacity: 0.6;
+        }
+
+        @keyframes pulseGreen {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .result-icon {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .option-btn.correct .result-icon,
+        .option-btn.wrong .result-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* --- MÀN HÌNH KẾT QUẢ & HIỆU ỨNG NEON MỚI --- */
+        @keyframes neon-rainbow {
+            0% { border-color: #ff0000; box-shadow: 0 0 25px #ff0000, inset 0 0 15px #ff0000; }
+            15% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 15px #ff00ff; }
+            30% { border-color: #0000ff; box-shadow: 0 0 25px #0000ff, inset 0 0 15px #0000ff; }
+            45% { border-color: #00ffff; box-shadow: 0 0 25px #00ffff, inset 0 0 15px #00ffff; }
+            60% { border-color: #00ff00; box-shadow: 0 0 25px #00ff00, inset 0 0 15px #00ff00; }
+            75% { border-color: #ffff00; box-shadow: 0 0 25px #ffff00, inset 0 0 15px #ffff00; }
+            100% { border-color: #ff0000; box-shadow: 0 0 25px #ff0000, inset 0 0 15px #ff0000; }
+        }
+
+        .neon-party-box {
+            animation: neon-rainbow 4s linear infinite;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 6px solid var(--neon-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+            margin: 0 auto 24px auto;
+            background: rgba(15, 23, 42, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .score-pop {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <!-- START SCREEN -->
+        <div id="start-screen" class="screen active">
+            <div class="neon-box">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px #06b6d4);">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <h1 class="neon-text" style="font-size: 3rem; margin: 10px 0 0 0;">NHANH MỘT GIÂY</h1>
+                <h2 style="color: var(--neon-blue); font-size: 1.8rem; margin: 5px 0 30px 0; text-transform: uppercase;">An Toàn Cả Đời</h2>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+                    <p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: #cbd5e1;">
+                        🔊 <strong>Lưu ý:</strong> Bật loa để nghe hiệu ứng âm thanh và giọng nói.<br>
+                        Nếu trả lời sai lần 1, bạn sẽ có thêm <strong>1 cơ hội</strong> sửa sai!
+                    </p>
+                </div>
+
+                <button class="btn-primary" onclick="initGame()">Bắt Đầu Ngay</button>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="screen">
+            <div class="header-stats">
+                <span id="q-count" style="color: var(--neon-blue);">Câu 1/10</span>
+                <span id="score-display" style="color: var(--neon-yellow); text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);">Điểm: 0</span>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div class="neon-box" style="padding: 30px 20px; margin-bottom: 20px;">
+                <h3 id="question-text" class="question-text">Loading...</h3>
+            </div>
+
+            <div id="options-container" class="options-grid"></div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="screen">
+            <div id="result-box" class="neon-box" style="border-color: var(--neon-green); box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; filter: drop-shadow(0 0 10px #eab308);">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                    <path d="M4 22h16"></path>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                </svg>
+
+                <h2 style="font-size: 2rem; margin: 0 0 20px 0;">KẾT QUẢ</h2>
+                <div class="score-circle score-pop">
+                    <span id="final-score">0</span>
+                </div>
+                <p id="result-message" style="font-size: 1.3rem; margin-bottom: 30px; color: #e2e8f0;"></p>
+                <button class="btn-primary" onclick="initGame()" style="background: linear-gradient(45deg, var(--neon-green), #15803d);">Chơi Lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DỮ LIỆU CÂU HỎI ---
+        const questions = [
+            { id: 1, q: "Khi đi trên đường đông dân cư, nguy hiểm tiềm ẩn lớn nhất là gì?", options: ["A. Nhiều người băng qua đường bất ngờ", "B. Xe chạy rất nhanh", "C. Không có biển báo giao thông", "D. Trời nắng nóng"], a: 0 },
+            { id: 2, q: "Điểm mù của xe tải thường nằm ở đâu?", options: ["A. Đằng trước xe tải", "B. Bên phải xe tải và phía sau", "C. Bên trái xe tải", "D. Trên nóc xe tải"], a: 1 },
+            { id: 3, q: "Tình huống nào dưới đây dễ dẫn đến nguy hiểm khi sang đường?", options: ["A. Sang đường đúng nơi quy định", "B. Có người điều khiển giao thông", "C. Sang đường từ sau một xe ô tô đang đỗ", "D. Sang đường khi trời nắng đẹp"], a: 2 },
+            { id: 4, q: "Hành vi nào sau đây là nguy hiểm và bị cấm khi lái xe máy?", options: ["A. Quan sát gương chiếu hậu", "B. Bật xi-nhan đúng quy định", "C. Giữ khoảng cách an toàn", "D. Sử dụng điện thoại khi lái xe"], a: 3 },
+            { id: 5, q: "Việc 'tự ý đấu nối thiết bị điện không đúng kỹ thuật' thuộc nhóm nguồn nhiệt nào?", options: ["A. Bức xạ nhiệt", "B. Ma sát tĩnh điện", "C. Thiết bị điện", "D. Nguồn lửa trực tiếp"], a: 2 },
+            { id: 6, q: "Đổ xăng quá đầy hoặc không vặn chặt nắp bình gây nguy cơ cháy nổ do:", options: ["A. Rò rỉ nhiên liệu", "B. Tia sét đánh", "C. Chất oxi hóa", "D. Bức xạ mặt trời"], a: 0 },
+            { id: 7, q: "Tại sao KHÔNG được hút thuốc hoặc dùng bật lửa gần cây xăng?", options: ["A. Làm hỏng bật lửa", "B. Xăng dễ bay hơi, gặp lửa sẽ cháy nổ", "C. Khói thuốc làm hỏng xăng", "D. Mùi xăng khó chịu"], a: 1 },
+            { id: 8, q: "Để phòng cháy cho phương tiện, chủ xe cần làm gì?", options: ["A. Lắp thêm đèn led công suất lớn", "B. Giữ nguyên thiết kế điện và kiểm tra định kỳ", "C. Tích trữ xăng trong cốp", "D. Dùng cầu chì quá tải"], a: 1 },
+            { id: 9, q: "Đám cháy loại B là đám cháy xảy ra với vật liệu nào?", options: ["A. Chất rắn (gỗ, giấy)", "B. Chất lỏng (xăng, dầu)", "C. Thiết bị điện", "D. Kim loại"], a: 1 },
+            { id: 10, q: "Tại sao KHÔNG dùng nước để chữa cháy xăng dầu?", options: ["A. Phản ứng sinh nhiệt", "B. Xăng nhẹ hơn nước, nổi lên làm cháy lan", "C. Cung cấp thêm oxy", "D. Nước làm tăng nhiệt độ"], a: 1 }
+        ];
+
+        // ============================================================
+        //  SỬA ĐỂ CHẠY TỐT TRONG ZALO:
+        //  - KHÔNG tạo AudioContext ngay khi load trang (tránh crash)
+        //  - Bọc try/catch cho audio + speech
+        // ============================================================
+
+        // --- HỆ THỐNG ÂM THANH OFFLINE (LAZY INIT) ---
+        let audioCtx = null;
+
+        function getAudioCtx() {
+            if (audioCtx) return audioCtx;
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return null;
+                audioCtx = new AC();
+                return audioCtx;
+            } catch (e) {
+                return null; // Zalo/webview không hỗ trợ -> bỏ qua âm thanh
+            }
+        }
+
+        function playSound(type) {
+            const ctx = getAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                try { ctx.resume(); } catch (e) {}
+            }
+
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.4);
+            }
+        }
+
+        // --- HỆ THỐNG GIỌNG NÓI (SAFE) ---
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) return;
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'vi-VN';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+
+                // Một số webview (Zalo) có thể lỗi getVoices() -> bọc try
+                let voices = [];
+                try { voices = window.speechSynthesis.getVoices() || []; } catch (e) {}
+                const vnVoice = voices.find(v => (v.lang || '').includes('vi'));
+                if (vnVoice) utterance.voice = vnVoice;
+
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                // Bỏ qua nếu môi trường không hỗ trợ
+            }
+        }
+
+        // --- LOGIC GAME MỚI (Cập nhật 2 lượt chọn) ---
+        let currentIdx = 0;
+        let score = 0;
+        let isLocked = false;
+        let attempts = 0;
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function initGame() {
+            // Chỉ khởi tạo audio khi có thao tác click => hợp chuẩn autoplay policy
+            const ctx = getAudioCtx();
+            if (ctx && ctx.state === 'suspended') {
+                try { ctx.resume(); } catch (e) {}
+            }
+
+            // “mồi” voices (nếu có) - bọc try để không crash trên Zalo
+            try { if ('speechSynthesis' in window) window.speechSynthesis.getVoices(); } catch (e) {}
+
+            startGame();
+        }
+
+        function startGame() {
+            score = 0;
+            currentIdx = 0;
+            isLocked = false;
+            attempts = 0;
+            stopConfetti();
+            
+            const resultBox = document.getElementById('result-box');
+            if (resultBox) resultBox.classList.remove('neon-party-box');
+
+            showScreen('game-screen');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            attempts = 0;
+            const q = questions[currentIdx];
+            document.getElementById('q-count').innerText = `Câu ${currentIdx + 1}/${questions.length}`;
+            document.getElementById('score-display').innerText = `Điểm: ${score}`;
+            document.getElementById('question-text').innerText = q.q;
+            
+            const percent = ((currentIdx) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${opt}</span><span class="result-icon"></span>`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+            isLocked = false;
+        }
+
+        function checkAnswer(selectedIdx, btn) {
+            if (isLocked || btn.classList.contains('wrong') || btn.classList.contains('correct')) return;
+
+            const q = questions[currentIdx];
+            const iconSpan = btn.querySelector('.result-icon');
+            const btns = document.querySelectorAll('.option-btn');
+
+            if (selectedIdx === q.a) {
+                isLocked = true;
+                btn.classList.add('correct');
+                iconSpan.innerHTML = '✔';
+                
+                const points = (attempts === 0) ? 10 : 5;
+                score += points;
+                
+                playSound('correct');
+                speak(attempts === 0 ? "Chính xác!" : "Đúng rồi!");
+                
+                document.getElementById('score-display').innerText = `Điểm: ${score}`;
+                setTimeout(nextQuestion, 2000);
+
+            } else {
+                attempts++;
+                btn.classList.add('wrong');
+                iconSpan.innerHTML = '✖';
+                playSound('wrong');
+
+                if (attempts >= 2) {
+                    isLocked = true;
+                    speak("Tiếc quá, chưa đúng.");
+                    
+                    const correctBtn = btns[q.a];
+                    correctBtn.classList.add('correct');
+                    correctBtn.querySelector('.result-icon').innerHTML = '✔';
+
+                    setTimeout(nextQuestion, 2000);
+                } else {
+                    speak("Chưa đúng, bạn còn một cơ hội nữa!");
+                }
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIdx < questions.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            showScreen('end-screen');
+            document.getElementById('final-score').innerText = score;
+            
+            const resultBox = document.getElementById('result-box');
+            resultBox.classList.add('neon-party-box');
+            
+            let msg = "";
+            let isWin = false;
+            if (score === 100) { msg = "Xuất sắc! Bạn là bậc thầy an toàn! 🏆"; isWin = true; }
+            else if (score >= 80) { msg = "Rất tốt! Kiến thức vững vàng. 🌟"; isWin = true; }
+            else if (score >= 50) { msg = "Khá tốt! Cố gắng hơn xíu nữa nhé. 👍"; }
+            else { msg = "Hãy ôn lại kiến thức và thử lại nào! 📚"; }
+            
+            document.getElementById('result-message').innerText = msg;
+            
+            if (score > 0) startConfetti();
+            
+            if (isWin) speak("Chúc mừng! Bạn đã hoàn thành xuất sắc trò chơi.");
+            else speak("Bạn đã hoàn thành trò chơi. Hãy cố gắng hơn lần sau nhé.");
+        }
+
+        // --- HIỆU ỨNG PHÁO HOA ---
+        let confettiCtx, animationId, confettiPieces = [];
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            confettiCtx = canvas.getContext('2d');
+            
+            confettiPieces = Array.from({length: 200}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                size: Math.random() * 8 + 4,
+                speedY: Math.random() * 3 + 2,
+                speedX: Math.random() * 4 - 2
+            }));
+            updateConfetti();
+        }
+
+        function updateConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            confettiCtx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiPieces.forEach(p => {
+                p.y += p.speedY; p.x += p.speedX;
+                confettiCtx.fillStyle = p.color;
+                
+                confettiCtx.beginPath();
+                confettiCtx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+                confettiCtx.fill();
+
+                if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+            });
+            animationId = requestAnimationFrame(updateConfetti);
+        }
+
+        function stopConfetti() {
+            if (animationId) cancelAnimationFrame(animationId);
+            const canvas = document.getElementById('confetti-canvas');
+            if (confettiCtx && canvas) confettiCtx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confetti-canvas');
+            if(canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        });
+    </script>
+</body>
+</html>
